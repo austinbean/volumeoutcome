@@ -3,17 +3,27 @@
 do "/Users/austinbean/Desktop/Birth2005-2012/FilePathGlobal.do"
 
 
+* Imports and labels:
+
 foreach nm of numlist 2005(1)2012{
 
 import delimited "${birthdata}/Birth`nm'.csv"
 
 do "${birthdata}/Label Variables.do"
 
+gen year = `nm'
+
+* Add FIDS to patient records:
+* Merge now on names using hosps.csv, which was matched to FIDS by hand.  
+
+merge m:1 fid year using "${birthdata}/LevelInfo.dta", gen(facinfo)
+drop if facinfo == 2
+label variable facinfo "No facility information available"
+replace facinfo = 0 if facinfo == 1 | facinfo == 2
+replace facinfo = 1 if facinfo == 3
+_strip_labels facinfo
+
 save "${birthdata}/Birth`nm'.dta", replace
-
-do "${birthdata}/Fac-level Counts.do"
-
-save "${birthdata}/FacCount`nm'.dta", replace
 
 clear
 }
@@ -22,27 +32,33 @@ clear
 * Create Combined Data from All Years:
 
 use "${birthdata}/Birth2005.dta", clear
-gen yr2005 = 2005
 
 foreach nm of numlist 2006(1)2012{
-
 append using "${birthdata}/Birth`nm'.dta", gen(yr`nm')
-
-replace yr`nm' = `nm' if yr`nm' == 1
-
 }
+_strip_labels facinfo
 
-foreach nm of numlist 2005(1)2012{
-replace yr`nm' = 0 if yr`nm' == .
-}
-
-egen year = rowtotal(yr*)
-drop yr*
-label variable year "Year"
 
 save "${birthdata}/Births2005-2012.dta", replace
 
+
+
+
+
 * Combine Facility-level Counts into one:
+
+foreach nm of numlist 2005(1)2012{
+
+use "${birthdata}/Birth`nm'.dta", clear
+
+do "${birthdata}/Fac-level Counts.do"
+
+save "${birthdata}/FacCount`nm'.dta", replace
+
+
+}
+
+
 use "${birthdata}/FacCount2005.dta", clear
 gen yr2005 = 2005
 
@@ -154,12 +170,6 @@ merge m:1 facname ncdobyear ncdobmonth using "${birthdata}/CombinedFacCount`nm'.
 * those not matched are almost all home birth or a limited number of birthing center births
 * only 1500 out of 375,000 are dropped if non-matched values are dropped.
 
-* Merge now on names using hosps.csv, which was matched to FIDS by hand.  
-
-merge m:1 fid year using "${birthdata}/LevelInfo.dta", gen(facinfo)
-label variable facinfo "No facility information available"
-replace facinfo = 0 if facinfo == 1 | facinfo == 2
-replace facinfo = 1 if facinfo == 3
 
 
 /*
