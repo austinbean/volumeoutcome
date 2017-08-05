@@ -1,6 +1,6 @@
 * Compute Fac-level Counts. 
 
-*use "/Users/austinbean/Desktop/Birth2005-2012/Birth2007.dta", clear
+*use "/Users/austinbean/Desktop/BirthData2005-2012/Birth2007.dta", clear
 
 * Current problem - some months have zeros for VLBW births or deaths.  Keep them.   
 
