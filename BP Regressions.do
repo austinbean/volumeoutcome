@@ -114,7 +114,7 @@ replace fid = 0
 estimates use "/Users/austinbean/Desktop/Birth2005-2012/nndlev3full.ster"
 predict prnnd
 * TODO - these lines are not exactly in the right locations!
-twoway line prnnd lag_1_months, xtitle("NICU Volume Previous Month") ytitle("Probability of Death") title("VLBW Mortality as a Function of NICU Volume") graphregion(color(white)) xline(30, lcolor(red)) xline(119, lcolor(red))
+twoway line prnnd lag_1_months, xtitle("NICU Volume Previous Month") ytitle("Probability of Death") title("VLBW Mortality as a Function of NICU Volume") graphregion(color(white)) xline(30, lcolor(red)) xline(143, lcolor(red)) text(0.0225 143 "Total Travis County" "Monthly NICU Admits", place(e)) 
 
 
 
