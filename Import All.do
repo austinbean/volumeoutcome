@@ -9,14 +9,14 @@ foreach nm of numlist 2005(1)2012{
 
 import delimited "${birthdata}/Birth`nm'.csv"
 
-do "${birthdata}/Label Variables.do"
+do "${birthdo}/Label Variables.do"
 
 gen year = `nm'
 
 * Add FIDS to patient records:
 * Merge now on names using hosps.csv, which was matched to FIDS by hand.  
 
-merge m:1 fid year using "${birthdata}/LevelInfo.dta", gen(facinfo)
+merge m:1 fid year using "${birthdo}/LevelInfo.dta", gen(facinfo)
 drop if facinfo == 2
 label variable facinfo "No facility information available"
 replace facinfo = 0 if facinfo == 1 | facinfo == 2
@@ -51,7 +51,7 @@ foreach nm of numlist 2005(1)2012{
 
 use "${birthdata}/Birth`nm'.dta", clear
 
-do "${birthdata}/Fac-level Counts.do"
+do "${birthdo}/Fac-level Counts.do"
 
 save "${birthdata}/FacCount`nm'.dta", replace
 
