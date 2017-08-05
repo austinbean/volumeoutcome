@@ -10,7 +10,7 @@ label variable bs_sex      "Sex 1 Male 0 Female"
 replace bs_sex = 0 if bs_sex == 2
 label define mf_l 1 "Male"
 label define mf_l 0 "Female", add
-label variable bs_sex mf_l
+label values bs_sex mf_l
   
 label variable b_bcntyc "Place of Birth - County" 
 label define cnty_l 001 "Anderson", add
@@ -385,6 +385,7 @@ label values pay pay_l
 label variable bo_tra1 "Mother Transferred for Maternal Medical or Fetus Indications for this Delivery?"  
 replace bo_tra1 = 0 if bo_tra1 == 2
 replace bo_tra1 = . if bo_tra1 == 9
+label values bo_tra1 yn_l
       
 label variable bo_fac1 "If Transferred, Enter the Name of Facility Mother Transferred From:"      
 label variable diab_pre " Diabetes Prepregnancy (Diagnosis prior to this pregnancy)"
