@@ -4,12 +4,25 @@
 
 * Current problem - some months have zeros for VLBW births or deaths.  Keep them.   
 
+* TODO - count only among those who were NOT transferred and among facilities which have level 2 or level 3 ONLY.
+
+
 sort facname ncdobmonth
 
 * NOTE: small number of home births.
 
-* Count of NICU admits by month
+* Generate variable to track transfers
+
+gen transferred = 0
+replace transferred = 1 if bo_tra1 == 1 | bo_trans == 1
+label variable transferred "Infant transferred"
+
+* Count of NICU admits by month.  The key variable I think is this one.
 replace adm_nicu = 0 if adm_nicu == 2
+gen nic_ad = 0
+replace nic_ad = 1 if adm_nicu == 1 & transferred == 0
+bysort facname ncdobmonth: gen f_c = sum(nic_ad)
+bysort facname ncdobmonth: egen mnt_c = max(f_c)
 bysort facname ncdobmonth: gen f_c_i = sum(adm_nicu)
 bysort facname ncdobmonth: egen month_count = max(f_c_i)
 drop f_c_i
