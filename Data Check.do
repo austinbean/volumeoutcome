@@ -1,5 +1,8 @@
 * Data Check
-* Is the size of the population reasonable, given other data.  
+* Is the size of the population reasonable, given other data. 
+
+do "/Users/austinbean/Desktop/Birth2005-2012/FilePathGlobal.do"
+ 
 
 * 2010
 
@@ -19,7 +22,7 @@ count if bwtr4 < 2 | ab_nicu == "Y"
 
 * 31,013
 
-use "/Users/austinbean/Desktop/Birth2005-2012/Birth2010.dta", clear
+use "${birthdata}/Birth2010.dta", clear
 
 count if adm_nicu == 1
 

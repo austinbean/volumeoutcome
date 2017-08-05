@@ -1,7 +1,8 @@
 * Regressions 
 
+do "/Users/austinbean/Desktop/Birth2005-2012/FilePathGlobal.do"
 
-use "/Users/austinbean/Desktop/Birth2005-2012/Births2005-2012wCounts.dta"
+use "${birthdata}/Births2005-2012wCounts.dta"
 
 * Drop home births.
 drop if b_bplace != 1
@@ -35,7 +36,7 @@ logit neonataldeath i.ncdobyear b_m_educ lag_*_months NeoIntensive SoloIntermedi
 * Adding FE's for birth weight w500599 - w12501499
 logit neonataldeath i.ncdobyear b_m_educ lag_*_months NeoIntensive SoloIntermediate pay bca_aeno-hypsospa i.fid w500599-w12501499 if facinfo == 1
 
-* Adding multiple birth indicator multiple
+* Adding multiple birth indicator "multiple"
 logit neonataldeath i.ncdobyear b_m_educ lag_*_months NeoIntensive SoloIntermediate pay bca_aeno-hypsospa i.fid w500599-w12501499 multiple if facinfo == 1
 * This one works, but takes a while:
 estimates save nndweight
@@ -48,3 +49,32 @@ logit neonataldeath i.ncdobyear b_m_educ lag_*_months NeoIntensive SoloIntermedi
 estimates save nndwrace
 
 
+* For level 3 only:
+keep if facinfo == 1
+
+* with lagged values of nicu admits, payment status, and firm FE's (works):
+logit neonataldeath i.ncdobyear lag_*_months pay i.fid if  NeoIntensive == 1
+
+* adding maternal education and health status (works):
+logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fid if NeoIntensive == 1
+
+* adding birth weight indicators (works) :
+logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fid w500599-w12501499 if NeoIntensive == 1
+
+* adding race indicators for mother ( ):
+logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if NeoIntensive == 1
+
+
+* For Level 2 only:
+
+* with lagged values of nicu admits, payment status, and firm FE's (works):
+logit neonataldeath i.ncdobyear lag_*_months pay i.fid if  SoloIntermediate == 1
+
+* adding maternal education and health status (works):
+logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fid if SoloIntermediate == 1
+
+* adding birth weight indicators ( ) :
+logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fid w500599-w12501499 if SoloIntermediate == 1
+
+* adding race indicators for mother ( ):
+logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if SoloIntermediate == 1
