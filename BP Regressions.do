@@ -27,6 +27,8 @@ logit neonataldeath i.ncdobyear lag_*_months NeoIntensive SoloIntermediate i.fid
 * The above WORKS and does converge reasonably quickly. 
 
 * Adding insurance status:
+* TODO - fix this: range is 1-3 I think.  
+* Write i.pay.
 logit neonataldeath i.ncdobyear lag_*_months NeoIntensive SoloIntermediate pay i.fid if facinfo == 1
  
 * Adding some health states bca_aeno - hypsospa:  
@@ -61,9 +63,10 @@ logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fi
 * adding birth weight indicators (works) :
 logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fid w500599-w12501499 if NeoIntensive == 1
 
-* adding race indicators for mother ( ):
+* adding race indicators for mother (works ):
+* ADD QUADRATIC TERM IN LAGGED VOLUME
 logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if NeoIntensive == 1
-
+estimates save nndlev3full
 
 * For Level 2 only - among those NOT transferred: if bo_tra1 == 0 & bo_trans == 0
 
@@ -78,6 +81,8 @@ logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fi
 
 * adding race indicators for mother (works ):
 logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if SoloIntermediate == 1 & bo_tra1 == 0 & bo_trans == 0
+estimates save nndlev2full
+
 
 * When specializing to those not transferred, this gives magnitudes which are more reasonable: the negative effect in Intensive is much larger
 
@@ -97,3 +102,24 @@ logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fi
 logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if SoloIntermediate == 0 & NeoIntensive == 0 & bo_tra1 == 0 & bo_trans == 0
 
  
+ 
+* Create variables at means.
+preserve
+keep neonataldeath ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple
+collapse (mean) *
+expand = 11
+replace lag_1_months = 20*(_n-1)
+replace ncdobyear = 2012
+replace fid = 0
+estimates use "/Users/austinbean/Desktop/Birth2005-2012/nndlev3full.ster"
+predict prnnd
+* TODO - these lines are not exactly in the right locations!
+twoway line prnnd lag_1_months, xtitle("NICU Volume Previous Month") ytitle("Probability of Death") title("VLBW Mortality as a Function of NICU Volume") graphregion(color(white)) xline(30, lcolor(red)) xline(119, lcolor(red))
+
+
+
+
+
+
+
+
