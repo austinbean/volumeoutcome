@@ -50,6 +50,7 @@ bysort facname ncdobmonth: replace lbw_month = 0 if lbw_month == .
 bysort facname ncdobmonth: replace vlbw_month = 0 if vlbw_month == .
 
 
+
 * Compute some mortality counts at LBW or VLBW by month:
 
 gen vlbw_mort = 0
@@ -79,7 +80,7 @@ bysort facname ncdobmonth: replace lbw_month_mort = 0 if lbw_month_mort == .
 keep if b_bplace == 1
 
 * Keep subset:
-keep facname ncdobmonth b_bcntyc month_count lbw_month vlbw_month lbw_month_mort vlbw_month_mort
+keep facname ncdobmonth b_bcntyc month_count lbw_month vlbw_month lbw_month_mort vlbw_month_mort 
 
 sort facname ncdobmonth
 
@@ -87,3 +88,16 @@ sort facname ncdobmonth
 * browse if b_bcntyc == 227
  
 duplicates drop facname ncdobmonth, force
+
+* Count of LBW, VLBW in year:
+
+bysort facname : gen lbw_y_i = sum(lbw_month)
+bysort facname : egen lbw_year = max(lbw_y_i)
+drop lbw_y_i
+label variable lbw_year "Low Birth Weight Infants in Year"
+
+bysort facname : gen vlbw_y_i = sum(vlbw_month)
+bysort facname : egen vlbw_year = max(vlbw_y_i)
+drop vlbw_y_i
+label variable vlbw_year "Very Low Birth Weight Infants in Year"
+
