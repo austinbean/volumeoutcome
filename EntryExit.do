@@ -3,9 +3,9 @@
 
 do "/Users/austinbean/Desktop/Birth2005-2012/FilePathGlobal.do"
 
-use "${birthdata}/Births2005-2012wCounts.dta"
+use "${birthdata}/Births2005-2012wCounts.dta", clear
 
-
+/*
 * Entry: does it happen between 2005 and 2012?  Where?  What are effects on volumes?
 * Entrants/Level Changes: 
 * Christus Santa Rosa, Bexar, 2008 - Level 3
@@ -51,13 +51,9 @@ use "${birthdata}/Births2005-2012wCounts.dta"
 * Val Verde Regional, Val Verde , 2008 - Downgrade 3 to 2
 * Citizens Medical Center, Victora, 2012 - Downgrade 3 to 1
 * Cedar Park Regional, Williamson, 2012 - Upgrade 1 to 2
-* 
-
 
 * Goal: compute the effect on these firms' competitors.  
 
-
-/*
 Present in data:
 
 - Christus Santa Rosa, 293120, 2008
@@ -74,7 +70,6 @@ Present in data:
 - Central Texas Medical Center, 2093151
 - Edinburg Regional Med Center, 2151200
 - Doctors Hospital Renaissance, 2156335
-
 - Lake Pointe Medical Center, 3976115
 
 */
@@ -87,11 +82,80 @@ replace added3 = 1 if fid == 1216116 & year == 2006
 replace added3 = 1 if fid == 1576070 & year == 2007
 replace added3 = 1 if fid == 1576444 & year == 2009
 replace added3 = 1 if fid == 2011895 & year == 2006
-replace added3 = 1 if fid == 2012015 & year == 2008
+*replace added3 = 1 if fid == 2012015 & year == 2008 /* No records */
 replace added3 = 1 if fid == 2015026 & year == 2006
 replace added3 = 1 if fid == 2016290 & year == 2012
 replace added3 = 1 if fid == 2016479 & year == 2011
 replace added3 = 1 if fid == 2093151 & year == 2009
 replace added3 = 1 if fid == 2151200 & year == 2007
 replace added3 = 1 if fid == 2156335 & year == 2007
-replace added3 = 1 if fid == 3796115 & year == 2007
+replace added3 = 1 if fid == 3976115 & year == 2007
+
+
+* TODO... add county numbers.  Use variable label.do  
+gen neighbor3 = 0
+replace neighbor3 = 1 if b_bcntyc == & year == 2008 & added3 == 0
+replace neighbor3 = 1 if b_bcntyc == & year == 2010 & added3 == 0
+replace neighbor3 = 1 if b_bcntyc == & year == 2007 & added3 == 0
+replace neighbor3 = 1 if b_bcntyc == & year == 2006 & added3 == 0
+replace neighbor3 = 1 if b_bcntyc == & year == 2007 & added3 == 0
+replace neighbor3 = 1 if b_bcntyc == & year == 2009 & added3 == 0
+replace neighbor3 = 1 if b_bcntyc == & year == 2006 & added3 == 0
+replace neighbor3 = 1 if b_bcntyc == & year == 2008 & added3 == 0
+replace neighbor3 = 1 if b_bcntyc == & year == 2006 & added3 == 0
+replace neighbor3 = 1 if b_bcntyc == & year == 2012 & added3 == 0
+replace neighbor3 = 1 if b_bcntyc == & year == 2011 & added3 == 0
+replace neighbor3 = 1 if b_bcntyc == & year == 2009 & added3 == 0
+replace neighbor3 = 1 if b_bcntyc == & year == 2007 & added3 == 0
+replace neighbor3 = 1 if b_bcntyc == & year == 2007 & added3 == 0
+replace neighbor3 = 1 if b_bcntyc == & year == 2007 & added3 == 0
+
+* drop non-hospitals
+
+drop if b_bplace != 1
+
+* track entry in county 
+bysort b_bcntyc year: gen ent_i = sum(added3)
+bysort b_bcntyc year: egen entry = max(ent_i)
+replace entry = 1 if entry > 1
+label variable entry "some entry in county during year"
+
+* track patients admitted to nicu, among those not transferred.
+gen transferred = 0
+replace transferred = 1 if bo_trans == 1 | bo_tra1 == 1
+gen adm_no_trans = 0
+replace adm_no_trans = 1 if transferred == 0 & adm_nicu == 1
+
+* sum total admits to NICU 
+bysort facname year: gen ads = sum(adm_no_trans)
+bysort facname year: egen admits = max(ads)
+drop ads
+label variable admits "patients admitted to NICU and not transferred"
+
+* how many admits TO THE NICU did you add if you added the facility?
+
+bysort facname (year): gen admit_incr = ((admits[_n+1] + admits[_n+2] + admits[_n+3])/3) if added3 == 1
+label variable admit_incr " three year average NICU admits following level 3 investment " 
+
+
+* check entry NEXT year:
+gen nextent = 0
+bysort facname (year): replace nextent = 1 if entry[_n+1] == 1
+
+* check for entry PRIOR year
+gen prevent = 0
+bysort facname (year): replace prevent = 1 if entry[_n-1] == 1
+
+* generate indicator 1 if NOT the entrant in the prior or subsequent year:
+
+gen notentprior = 0
+bysort facname (year): replace notentprior = 1 if prevent
+
+
+* collapse to one entry per year:
+
+duplicates drop facname year, force
+keep facname year admits nextent prevent added3 entry
+
+* Now, compute mean admits to NICU ignoring the entering facility...
+
