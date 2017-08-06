@@ -1,5 +1,7 @@
 * Regressions 
 
+* Next steps: Entry: does it happen between 2005 and 2012?  Where?  What are effects on volumes?
+
 do "/Users/austinbean/Desktop/Birth2005-2012/FilePathGlobal.do"
 
 use "${birthdata}/Births2005-2012wCounts.dta"
@@ -68,7 +70,7 @@ logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fi
 logit neonataldeath i.ncdobyear b_m_educ lag_*_months i.pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if NeoIntensive == 1
 estimates save nndlev3full
 
-* W/ quadratic volume terms:
+* W/ quadratic lagged volume terms:
 foreach nm of numlist 1(1)6{
 
 gen lag_`nm'_months_sq = lag_`nm'_months^2
@@ -78,13 +80,17 @@ label variable lag_`nm'_months_sq " squared lagged `nm' month volume "
 logit neonataldeath i.ncdobyear b_m_educ lag_*_months lag_*_months_sq i.pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if NeoIntensive == 1
 estimates save "/Users/austinbean/Desktop/Birth2005-2012/nndlev3fullsq"
 
-* USING SUM OF LAGGED VOLUMES *
+* USING SUM OF LAGGED VOLUMES, w/ squared terms *
+foreach nm of numlist 1(1)6{
+gen total_`nm'_months_sq = total_`nm'_months^2
+label variable total_`nm'_months_sq " squared total `nm' month previous volume "
+}
 
-logit neonataldeath total_2_months i.ncdobyear b_m_educ i.pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if NeoIntensive == 1
+logit neonataldeath total_2_months total_2_months_sq i.ncdobyear b_m_educ i.pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if NeoIntensive == 1
 
-logit neonataldeath total_3_months i.ncdobyear b_m_educ i.pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if NeoIntensive == 1
+logit neonataldeath total_3_months total_3_months_sq i.ncdobyear b_m_educ i.pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if NeoIntensive == 1
 
-logit neonataldeath total_6_months i.ncdobyear b_m_educ i.pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if NeoIntensive == 1
+logit neonataldeath total_6_months total_6_months_sq i.ncdobyear b_m_educ i.pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if NeoIntensive == 1
 
 
 
