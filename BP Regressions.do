@@ -12,6 +12,8 @@ bysort fid: egen brtotal = max(fc)
 
 drop if brtotal < 25
 
+* USING INDIVIDUAL MONTH LAGS *
+
 * Regress on lagged volumes and year
 logit neonataldeath i.ncdobyear lag_*_months
 
@@ -44,7 +46,6 @@ logit neonataldeath i.ncdobyear b_m_educ lag_*_months NeoIntensive SoloIntermedi
 estimates save nndweight
 * file nndweight.ster saved to save time in the future.  
 
-
 * Adding race information for mother:
 logit neonataldeath i.ncdobyear b_m_educ lag_*_months NeoIntensive SoloIntermediate pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if facinfo == 1
 * saving the output:
@@ -64,9 +65,28 @@ logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fi
 logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fid w500599-w12501499 if NeoIntensive == 1
 
 * adding race indicators for mother (works ):
-* ADD QUADRATIC TERM IN LAGGED VOLUME
-logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if NeoIntensive == 1
+logit neonataldeath i.ncdobyear b_m_educ lag_*_months i.pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if NeoIntensive == 1
 estimates save nndlev3full
+
+* W/ quadratic volume terms:
+foreach nm of numlist 1(1)6{
+
+gen lag_`nm'_months_sq = lag_`nm'_months^2
+label variable lag_`nm'_months_sq " squared lagged `nm' month volume "
+
+}
+logit neonataldeath i.ncdobyear b_m_educ lag_*_months lag_*_months_sq i.pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if NeoIntensive == 1
+estimates save "/Users/austinbean/Desktop/Birth2005-2012/nndlev3fullsq"
+
+* USING SUM OF LAGGED VOLUMES *
+
+logit neonataldeath total_2_months i.ncdobyear b_m_educ i.pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if NeoIntensive == 1
+
+logit neonataldeath total_3_months i.ncdobyear b_m_educ i.pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if NeoIntensive == 1
+
+logit neonataldeath total_6_months i.ncdobyear b_m_educ i.pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple if NeoIntensive == 1
+
+
 
 * For Level 2 only - among those NOT transferred: if bo_tra1 == 0 & bo_trans == 0
 
@@ -104,6 +124,12 @@ logit neonataldeath i.ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa i.fi
  
  
 * Create variables at means.
+
+* Travis County:
+* browse if b_bcntyc == 227
+
+
+* Linear Volume Only:
 preserve
 keep neonataldeath ncdobyear b_m_educ lag_*_months pay bca_aeno-hypsospa fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple
 collapse (mean) *
@@ -113,8 +139,39 @@ replace ncdobyear = 2012
 replace fid = 0
 estimates use "/Users/austinbean/Desktop/Birth2005-2012/nndlev3full.ster"
 predict prnnd
-* TODO - these lines are not exactly in the right locations!
-twoway line prnnd lag_1_months, xtitle("NICU Volume Previous Month") ytitle("Probability of Death") title("VLBW Mortality as a Function of NICU Volume") graphregion(color(white)) xline(30, lcolor(red)) xline(143, lcolor(red)) text(0.0225 143 "Total Travis County" "Monthly NICU Admits", place(e)) 
+twoway line prnnd lag_1_months, xtitle("NICU Volume Previous Month") ytitle("Probability of Death") title("VLBW Mortality as a Function of NICU Volume") graphregion(color(white)) xline(34, lcolor(red)) xline(143, lcolor(red)) text(0.025 34 "Average Travis County" "Monthly NICU Admits", place(e))  text(0.0225 143 "Total Travis County" "Monthly NICU Admits", place(e)) 
+
+* Quadratic volume, lagged one month:
+preserve
+keep neonataldeath ncdobyear b_m_educ lag_*_months lag_*_months_sq pay bca_aeno-hypsospa fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple
+collapse (mean) *
+expand = 11
+replace lag_1_months = 20*(_n-1)
+replace lag_1_months_sq = (20*(_n-1))^2
+replace ncdobyear = 2012
+replace fid = 0
+estimates use "/Users/austinbean/Desktop/Birth2005-2012/nndlev3fullsq.ster"
+predict prnnd
+twoway line prnnd lag_1_months, xtitle("NICU Volume Previous Month") ytitle("Probability of Death") title("VLBW Mortality as a Function of NICU Volume") graphregion(color(white)) xline(34, lcolor(red)) xline(143, lcolor(red)) text(0.025 34 "Average Travis County" "Monthly NICU Admits", place(e))  text(0.0225 143 "Total Travis County" "Monthly NICU Admits", place(e)) 
+
+
+* Quadratic volume, including more months:
+preserve
+keep neonataldeath ncdobyear b_m_educ lag_*_months lag_*_months_sq pay bca_aeno-hypsospa fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple
+collapse (mean) *
+expand = 11
+foreach nm of numlist 1(1)6{
+replace lag_`nm'_months = 20*(_n-1)
+replace lag_`nm'_months_sq = (20*(_n-1))^2
+}
+replace ncdobyear = 2012
+replace fid = 0
+estimates use "/Users/austinbean/Desktop/Birth2005-2012/nndlev3fullsq.ster"
+predict prnnd
+twoway line prnnd lag_1_months, xtitle("NICU Volume Previous Month") ytitle("Probability of Death") title("VLBW Mortality as a Function of NICU Volume") graphregion(color(white)) xline(34, lcolor(red)) xline(143, lcolor(red)) text(0.025 34 "Average Travis County" "Monthly NICU Admits", place(e))  text(0.0225 143 "Total Travis County" "Monthly NICU Admits", place(e)) 
+
+
+
 
 
 
