@@ -60,11 +60,11 @@ use "${birthdata}/Births2005-2012wCounts.dta"
 /*
 Present in data:
 
-- Christus Santa Rosa, 293120
+- Christus Santa Rosa, 293120, 2008
 - Christus St Michael, 376245
 - Baylor Medical Center at Frisco, 856316
 - Presbyterian Hospital of Denton, 1216116
-- Memoiral Hermann Sugar Land, 1576070
+- Memorial Hermann Sugar Land, 1576070
 - St Lukes Sugarland, 1576444
 - Houston Northwest Medical Center, 2011895
 - Spring Branch Med Center, 2012015
@@ -74,6 +74,24 @@ Present in data:
 - Central Texas Medical Center, 2093151
 - Edinburg Regional Med Center, 2151200
 - Doctors Hospital Renaissance, 2156335
+
 - Lake Pointe Medical Center, 3976115
 
 */
+
+gen added3 = 0
+replace added3 = 1 if fid == 293120 & year == 2008
+replace added3 = 1 if fid == 376245 & year == 2010
+replace added3 = 1 if fid == 856316 & year == 2007
+replace added3 = 1 if fid == 1216116 & year == 2006
+replace added3 = 1 if fid == 1576070 & year == 2007
+replace added3 = 1 if fid == 1576444 & year == 2009
+replace added3 = 1 if fid == 2011895 & year == 2006
+replace added3 = 1 if fid == 2012015 & year == 2008
+replace added3 = 1 if fid == 2015026 & year == 2006
+replace added3 = 1 if fid == 2016290 & year == 2012
+replace added3 = 1 if fid == 2016479 & year == 2011
+replace added3 = 1 if fid == 2093151 & year == 2009
+replace added3 = 1 if fid == 2151200 & year == 2007
+replace added3 = 1 if fid == 2156335 & year == 2007
+replace added3 = 1 if fid == 3796115 & year == 2007
