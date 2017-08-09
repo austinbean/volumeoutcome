@@ -148,6 +148,10 @@ twoway line prnnd lag_1_months, xtitle("NICU Volume Previous Month") ytitle("Pro
 
 * Quadratic volume, lagged one month:
 preserve
+foreach nm of numlist 1(1)6{
+gen lag_`nm'_months_sq = lag_`nm'_months^2
+label variable lag_`nm'_months_sq " squared lagged `nm' month volume "
+}
 keep neonataldeath ncdobyear b_m_educ lag_*_months lag_*_months_sq pay bca_aeno-hypsospa fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple
 collapse (mean) *
 expand = 11
@@ -162,13 +166,13 @@ twoway line prnnd lag_1_months, xtitle("NICU Volume Previous Month") ytitle("Pro
 
 * Quadratic volume, including more months:
 preserve
-keep neonataldeath ncdobyear b_m_educ lag_*_months lag_*_months_sq pay bca_aeno-hypsospa fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple
-collapse (mean) *
-expand = 11
 foreach nm of numlist 1(1)6{
 replace lag_`nm'_months = 20*(_n-1)
 replace lag_`nm'_months_sq = (20*(_n-1))^2
 }
+keep neonataldeath ncdobyear b_m_educ lag_*_months lag_*_months_sq pay bca_aeno-hypsospa fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple
+collapse (mean) *
+expand = 11
 replace ncdobyear = 2012
 replace fid = 0
 estimates use "/Users/austinbean/Desktop/Birth2005-2012/nndlev3fullsq.ster"
@@ -178,7 +182,32 @@ twoway line prnnd lag_1_months, xtitle("NICU Volume Previous Month") ytitle("Pro
 
 
 
+* Quadratic volume, lagged one month - expanding each observation separately:
+* Computing the mean *by hospital* for the whole population at each volume.
+preserve
+keep if b_bplace == 1
+foreach nm of numlist 1(1)6{
+gen lag_`nm'_months_sq = lag_`nm'_months^2
+label variable lag_`nm'_months_sq " squared lagged `nm' month volume "
+}
+keep neonataldeath ncdobyear b_m_educ lag_*_months lag_*_months_sq pay bca_aeno-hypsospa fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple
+gen id = _n
+expand = 11
+bysort id: replace lag_1_months = 20*(_n-1)
+bysort id: replace lag_1_months_sq = (20*(_n-1))^2
 
+estimates use "/Users/austinbean/Desktop/Birth2005-2012/nndlev3fullsq.ster"
+predict prnnd
+
+sort fid ncdobyear lag_1_months
+
+collapse (mean) prnnd, by(fid ncdobyear lag_1_months)
+
+* Williamson County - By hospital in year 2012
+twoway line prnnd lag_1_months if fid == 4916029 & ncdobyear == 2012 || line prnnd lag_1_months if fid == 4916419 & ncdobyear == 2012 || line prnnd lag_1_months if fid == 4916433 & ncdobyear == 2012 || line prnnd lag_1_months if fid == 4916068 & ncdobyear == 2012 ||  line prnnd lag_1_months if fid == 4916426 & ncdobyear == 2012, xtitle("NICU Volume Previous Month") ytitle("Probability of Death") title("VLBW Mortality as a Function of NICU Volume") graphregion(color(white)) xline(34, lcolor(red)) xline(143, lcolor(red)) text(0.025 34 "Average Travis County" "Monthly NICU Admits", place(e))  text(0.0225 143 "Total Travis County" "Monthly NICU Admits", place(e)) legend(label(1 "Georgetown Hospital - 1") label(2 "Scott and White - 1") label(3 "Seton Med. Center - 3") label(4 "Round Rock Med. Center - 2") label(5 "Cedar Park Regional - 2"))
+
+* Travis Count - By hospital in year 2012
+twoway line prnnd lag_1_months if fid == 4530170 & ncdobyear == 2012 || line prnnd lag_1_months if fid == 4530200 & ncdobyear == 2012 || line prnnd lag_1_months if fid == 4536337 & ncdobyear == 2012 || line prnnd lag_1_months if fid == 4536253 & ncdobyear == 2012 ||  line prnnd lag_1_months if fid == 4530190 & ncdobyear == 2012 ||  line prnnd lag_1_months if fid == 4536048 & ncdobyear == 2012, xtitle("NICU Volume Previous Month") ytitle("Probability of Death") title("VLBW Mortality as a Function of NICU Volume") graphregion(color(white)) xline(34, lcolor(red)) xline(143, lcolor(red)) text(0.045 34 "Average Travis County" "Monthly NICU Admits", place(e))  text(0.045 143 "Total Travis County" "Monthly NICU Admits", place(e)) legend(label(1 "Brackenridge") label(2 "Seton Med. Center") label(3 "Seton Northwest") label(4 "North Austin Med. Center") label(5 "St David's") label(6 "South Austin"))
 
 
 
