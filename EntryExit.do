@@ -56,7 +56,7 @@ use "${birthdata}/Births2005-2012wCounts.dta", clear
 
 Present in data:
 
-- Christus Santa Rosa, 293120, 2008
+- Christus Santa Rosa, Bexar, 293120, 2008
 - Christus St Michael, 376245
 - Baylor Medical Center at Frisco, 856316
 - Presbyterian Hospital of Denton, 1216116
@@ -64,7 +64,7 @@ Present in data:
 - St Lukes Sugarland, 1576444
 - Houston Northwest Medical Center, 2011895
 - Spring Branch Med Center, 2012015
-- Memoiral Hermann Southeast, 2015026
+- Memorial Hermann Southeast, 2015026
 - Christus St Catherine, 2016290
 - St lukes at the vintage, 2016479
 - Central Texas Medical Center, 2093151
@@ -75,40 +75,97 @@ Present in data:
 */
 
 gen added3 = 0
-replace added3 = 1 if fid == 293120 & year == 2008
-replace added3 = 1 if fid == 376245 & year == 2010
-replace added3 = 1 if fid == 856316 & year == 2007
-replace added3 = 1 if fid == 1216116 & year == 2006
-replace added3 = 1 if fid == 1576070 & year == 2007
-replace added3 = 1 if fid == 1576444 & year == 2009
-replace added3 = 1 if fid == 2011895 & year == 2006
-*replace added3 = 1 if fid == 2012015 & year == 2008 /* No records */
-replace added3 = 1 if fid == 2015026 & year == 2006
-replace added3 = 1 if fid == 2016290 & year == 2012
-replace added3 = 1 if fid == 2016479 & year == 2011
-replace added3 = 1 if fid == 2093151 & year == 2009
-replace added3 = 1 if fid == 2151200 & year == 2007
-replace added3 = 1 if fid == 2156335 & year == 2007
-replace added3 = 1 if fid == 3976115 & year == 2007
+replace added3 = 1 if fid == 293120 & year == 2008 
+/* Christus SR, Bexar */
+
+replace added3 = 1 if fid == 376245 & year == 2010 
+/*  Christus SM, Bowie */
+
+replace added3 = 1 if fid == 856316 & year == 2007 
+/* Baylor Frisco, Collin */
+
+replace added3 = 1 if fid == 1216116 & year == 2006 
+/* Presbyterian Denton, Denton */
+
+replace added3 = 1 if fid == 1576070 & year == 2007 
+/* Memorial Hermann Sugarland,  Fort Bend */
+
+replace added3 = 1 if fid == 1576444 & year == 2009 
+/* St Lukes Sugarland, Fort Bend */
+
+replace added3 = 1 if fid == 2011895 & year == 2006 
+/* Houston Northwest, Harris */
+
+*replace added3 = 1 if fid == 2012015 & year == 2008 /* No records - Spring Branch Med, Harris */
+
+replace added3 = 1 if fid == 2015026 & year == 2006 
+/* Memorial Hermann Southeast, Harris */
+
+replace added3 = 1 if fid == 2016290 & year == 2012 
+/* Christus St Catherine, Harris */
+
+replace added3 = 1 if fid == 2016479 & year == 2011 
+/* St Lukes Vintage, Harris */
+
+replace added3 = 1 if fid == 2093151 & year == 2009 
+/* Central Texas Med, Hays */
+
+replace added3 = 1 if fid == 2151200 & year == 2007 
+/* Edinburg Regional, Hidalgo */
+
+replace added3 = 1 if fid == 2156335 & year == 2007 
+/* Doctors Renaissance, Hidalgo  */
+
+replace added3 = 1 if fid == 3976115 & year == 2007 
+/* Lake Pointe Medical, Rockwall */
 
 
 * TODO... add county numbers.  Use variable label.do  
 gen neighbor3 = 0
-replace neighbor3 = 1 if b_bcntyc == & year == 2008 & added3 == 0
-replace neighbor3 = 1 if b_bcntyc == & year == 2010 & added3 == 0
-replace neighbor3 = 1 if b_bcntyc == & year == 2007 & added3 == 0
-replace neighbor3 = 1 if b_bcntyc == & year == 2006 & added3 == 0
-replace neighbor3 = 1 if b_bcntyc == & year == 2007 & added3 == 0
-replace neighbor3 = 1 if b_bcntyc == & year == 2009 & added3 == 0
-replace neighbor3 = 1 if b_bcntyc == & year == 2006 & added3 == 0
-replace neighbor3 = 1 if b_bcntyc == & year == 2008 & added3 == 0
-replace neighbor3 = 1 if b_bcntyc == & year == 2006 & added3 == 0
-replace neighbor3 = 1 if b_bcntyc == & year == 2012 & added3 == 0
-replace neighbor3 = 1 if b_bcntyc == & year == 2011 & added3 == 0
-replace neighbor3 = 1 if b_bcntyc == & year == 2009 & added3 == 0
-replace neighbor3 = 1 if b_bcntyc == & year == 2007 & added3 == 0
-replace neighbor3 = 1 if b_bcntyc == & year == 2007 & added3 == 0
-replace neighbor3 = 1 if b_bcntyc == & year == 2007 & added3 == 0
+replace neighbor3 = 1 if b_bcntyc == 15 & year == 2008 & added3 == 0 
+/* Christus SR, Bexar */
+
+replace neighbor3 = 1 if b_bcntyc == 19 & year == 2010 & added3 == 0 
+/*  Christus SM, Bowie */
+
+replace neighbor3 = 1 if b_bcntyc == 43 & year == 2007 & added3 == 0 
+/* Baylor Frisco, Collin */
+
+replace neighbor3 = 1 if b_bcntyc == 61 & year == 2006 & added3 == 0
+ /* Presbyterian Denton, Denton */
+ 
+replace neighbor3 = 1 if b_bcntyc == 79 & year == 2007 & added3 == 0 
+/* Memorial Hermann Sugarland,  Fort Bend */
+
+replace neighbor3 = 1 if b_bcntyc == 79 & year == 2009 & added3 == 0 
+/* St Lukes Sugarland, Fort Bend */
+
+replace neighbor3 = 1 if b_bcntyc == 101 & year == 2006 & added3 == 0 
+/* Houston Northwest, Harris */
+
+replace neighbor3 = 1 if b_bcntyc == 101 & year == 2008 & added3 == 0 
+/* Spring Branch Med, Harris */
+
+replace neighbor3 = 1 if b_bcntyc == 101 & year == 2006 & added3 == 0 
+/* Memorial Hermann Southeast, Harris */
+
+replace neighbor3 = 1 if b_bcntyc == 101 & year == 2012 & added3 == 0 
+/* Christus St Catherine, Harris */
+
+replace neighbor3 = 1 if b_bcntyc == 101 & year == 2011 & added3 == 0 
+/* St Lukes Vintage, Harris */
+
+replace neighbor3 = 1 if b_bcntyc == 105 & year == 2009 & added3 == 0  
+// Central Texas Med, Hays 
+
+replace neighbor3 = 1 if b_bcntyc == 108 & year == 2007 & added3 == 0 
+/* Edinburg Regional, Hidalgo */
+
+replace neighbor3 = 1 if b_bcntyc == 108 & year == 2007 & added3 == 0 
+/* Doctors Renaissance, Hidalgo  */
+
+replace neighbor3 = 1 if b_bcntyc == 199 & year == 2007 & added3 == 0 
+/* Lake Pointe Medical, Rockwall */
 
 * drop non-hospitals
 
@@ -147,9 +204,7 @@ gen prevent = 0
 bysort facname (year): replace prevent = 1 if entry[_n-1] == 1
 
 * generate indicator 1 if NOT the entrant in the prior or subsequent year:
-
-gen notentprior = 0
-bysort facname (year): replace notentprior = 1 if prevent
+* Use neighbor3
 
 
 * collapse to one entry per year:
