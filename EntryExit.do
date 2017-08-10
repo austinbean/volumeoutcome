@@ -167,6 +167,13 @@ replace neighbor3 = 1 if b_bcntyc == 108 & year == 2007 & added3 == 0
 replace neighbor3 = 1 if b_bcntyc == 199 & year == 2007 & added3 == 0 
 /* Lake Pointe Medical, Rockwall */
 
+
+* All counties of interest:
+
+gen ofinterest = 0
+replace ofinterest = 1 if b_bcntyc == 199 | b_bcntyc == 108 | b_bcntyc ==105 | b_bcntyc ==101 | b_bcntyc ==79 | b_bcntyc == 61 | b_bcntyc == 43 | b_bcntyc == 19 | b_bcntyc == 15
+
+
 * drop non-hospitals
 
 drop if b_bplace != 1
@@ -203,14 +210,32 @@ bysort facname (year): replace nextent = 1 if entry[_n+1] == 1
 gen prevent = 0
 bysort facname (year): replace prevent = 1 if entry[_n-1] == 1
 
-* generate indicator 1 if NOT the entrant in the prior or subsequent year:
-* Use neighbor3
 
 
 * collapse to one entry per year:
 
+
+
 duplicates drop facname year, force
-keep facname year admits nextent prevent added3 entry
+
+* generate indicator 1 if NOT the entrant in the prior or subsequent year:
+* Use neighbor3
+* sort b_bcntyc year
+
+
+sort fid year
+gen next3 = 0
+replace next3 = 1 if neighbor3[_n+1] == 1 
+
+bysort fid (year): gen regdiff = admits - admits[_n-1] if next3 == 1 & admits>0 & admits[_n-1]>0
+bysort fid (year): gen nextdiff = admits[_n+1] - admits if next3 == 1 & admits>0 & admits[_n+1]>0
+bysort fid (year): gen diff = admits - admits[_n-1] if neighbor3 == 1 & added3 == 0 & admits>0 & admits[_n-1]>0
+
+
+sort b_bcntyc year fid
+browse b_bcntyc facname NeoIntensive SoloIntermediate next3 regdiff nextdiff diff if ofinterest == 1
+
+*keep facname year admits nextent prevent added3 entry
 
 * Now, compute mean admits to NICU ignoring the entering facility...
 
