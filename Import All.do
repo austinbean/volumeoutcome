@@ -23,6 +23,7 @@ replace facinfo = 0 if facinfo == 1 | facinfo == 2
 replace facinfo = 1 if facinfo == 3
 _strip_labels facinfo
 
+
 save "${birthdata}Birth`nm'.dta", replace
 
 clear
@@ -77,6 +78,12 @@ replace yr`nm' = 0 if yr`nm' == .
 egen year = rowtotal(yr*)
 drop yr*
 label variable year "Year"
+
+* Create Transferred Patients files:
+
+
+
+
 
 * 1 - 6 month counts:
 bysort facname (year ncdobmonth): gen total_1_months = month_count[_n-1] 
