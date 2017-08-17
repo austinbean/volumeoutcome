@@ -13,6 +13,6 @@ save "${birthdata}/fids.dta", replace
 
 do "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/Import 1990 - 2012.do"
 
-keep fid year NeoIntensive SoloIntermediate NeoIntensiveCapacity NeoIntermediateCapacity
+keep fid year NeoIntensive SoloIntermediate NeoIntensiveCapacity NeoIntermediateCapacity TotalDeliveries TransfersOut_NO_NICU-TransfersOut_HAS_NICU TransfersInternally_HAS_NICU
 
 save "${birthdata}/LevelInfo.dta", replace
