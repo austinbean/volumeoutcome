@@ -35,14 +35,12 @@ clear
 use "${birthdata}Birth2005.dta", clear
 
 foreach nm of numlist 2006(1)2012{
-append using "${birthdata}Birth`nm'.dta", gen(yr`nm')
+append using "${birthdata}Birth`nm'.dta"
 }
 _strip_labels facinfo
 
 
 save "${birthdata}Births2005-2012.dta", replace
-
-
 
 
 
@@ -78,12 +76,6 @@ replace yr`nm' = 0 if yr`nm' == .
 egen year = rowtotal(yr*)
 drop yr*
 label variable year "Year"
-
-* Create Transferred Patients files:
-
-
-
-
 
 * 1 - 6 month counts:
 bysort facname (year ncdobmonth): gen total_1_months = month_count[_n-1] 
@@ -170,12 +162,46 @@ rename year ncdobyear
 save "${birthdata}CombinedFacCount.dta", replace
 
 
+* Create Transferred Patients files:
+
+foreach nm of numlist 2005(1)2012{
+
+use "${birthdata}Birth`nm'.dta", clear
+
+do "${birthdo}CountTransfers.do"
+
+save "${birthdata}TransferCount`nm'.dta", replace
+
+
+}
+
+
+use "${birthdata}TransferCount2005.dta", clear
+
+foreach nm of numlist 2006(1)2012{
+
+append using "${birthdata}TransferCount`nm'.dta"
+
+
+}
+
+
+save "${birthdata}CombinedTransferCount.dta", replace
+
+
 use "${birthdata}Births2005-2012.dta", clear
 
-merge m:1 facname ncdobyear ncdobmonth using "${birthdata}CombinedFacCount`nm'.dta", nogen
 
+* Merge facility information.  
+merge m:1 facname ncdobyear ncdobmonth using "${birthdata}CombinedFacCount.dta", nogen
 * those not matched are almost all home birth or a limited number of birthing center births
 * only 1500 out of 375,000 are dropped if non-matched values are dropped.
+
+
+* Merge transfers
+merge m:1 facname ncdobyear ncdobmonth using "${birthdata}CombinedTransferCount.dta"
+drop if _merge == 2
+drop _merge
 
 
 
@@ -186,9 +212,55 @@ unique facname if b_bplace == 1 & _merge != 3
 unique facname, by(year) gen(hnumber)
 */
 
-gen capex = 0
 
-replace capex = 1 if month_count > NeoIntensiveCapacity
+
+* replace missing for zeros - count variables will be missing if there are no transfers, eg.
+replace vlbw_month = 0 if vlbw_month == .
+replace vlbw_month_ex = 0 if vlbw_month_ex == .
+replace vlbw_month_mort = 0 if vlbw_month_mort == .
+replace vlbw_month_mort_ex = 0 if vlbw_month_mort_ex == .
+
+replace lbw_month = 0 if lbw_month == .
+replace lbw_month_ex = 0 if lbw_month_ex == .
+replace lbw_month_mort = 0 if lbw_month_mort == .
+replace lbw_month_mort_ex = 0 if lbw_month_mort_ex == .
+
+replace transin = 0 if transin == .
+replace transin_lbw = 0 if transin_lbw == .
+replace transin_vlbw = 0 if transin_vlbw == .
+replace transin_death = 0 if transin_death == .
+
+replace transout = 0 if transout == .
+replace transout_lbw = 0 if transout_lbw == .
+replace transout_vlbw = 0 if transout_vlbw == .
+replace transout_deaths = 0 if transout_deaths == .
+
+
+* Capacity measures:
+* These are complicated.
+* think further about SoloIntermediate or NeoIntensiveCapacity.
+* And the indicators for the facilities themselves too.  NeoIntensive and SoloIntermediate
+
+gen capex = 0 if NeoIntensive == 1
+replace capex = 1 if ((month_count-transout) > NeoIntensiveCapacity) & NeoIntensiveCapacity != 0 & NeoIntensiveCapacity != . & month_count != .
+label variable capex "more NICU admits than beds for the month"
+
+gen cap2 = 2*NeoIntensiveCapacity
+gen capex2 = 0 if NeoIntensive == 1
+replace capex2 = 1 if ((month_count-transout) > cap2) & month_count != . & NeoIntensiveCapacity != 0 & NeoIntensiveCapacity != .
+label variable capex2 "more NICU admits than 2 times beds"
+
+gen capex_trans = 0
+replace capex_trans = 1 if (month_count - transout) > NeoIntensiveCapacity & NeoIntensiveCapacity != . & NeoIntensiveCapacity != 0
+label variable capex_trans "utilization mins transfers out"
+
+gen bddays = NeoIntensiveCapacity*30 if NeoIntensiveCapacity != . & NeoIntensiveCapacity != 0
+
+gen avg_util = (month_count - transout)*13 + transout if (NeoIntensive == 1 | SoloIntermediate == 1) 
+label variable "average util 13 days for non-transferred"
+
+gen used_days = bddays - avg_util if NeoIntensiveCapacity != 0
+
 
 
 
