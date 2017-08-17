@@ -1,3 +1,6 @@
+do "/Users/austinbean/Desktop/Birth2005-2012/FilePathGlobal.do"
+
+
 * label variables.
 
 label variable ncdobyear "Year of Birth "
@@ -651,8 +654,18 @@ replace facname = "TEXAS HEALTH HARRIS METHODIST HOSPITAL H-E-B" if facname == "
 
 * Add Fids:
 
-merge m:1 facname using "/Users/austinbean/Desktop/Birth2005-2012/fids.dta"
-
+merge m:1 facname using "${birthdata}fids.dta"
+label variable fid "FID of birth facility"
 drop if _merge == 2
 
 drop _merge 
+
+* Add Fids to transfers:
+* The name of the facility infant transferred to is recorded in bo_facil
+* If mother is transferred this is in bo_fac1
+
+merge m:1 bo_facil using "${birthdata}transfids.dta"
+label variable transfid "FID of facility transferred to"
+drop if _merge == 2
+
+drop _merge
