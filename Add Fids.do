@@ -9,6 +9,25 @@ keep  facname fid
 save "${birthdata}fids.dta", replace
 
 
+/* 
+
+What is this?  Would like to merge in the main file on
+bo_facil to add fids for transferred facilities, creating the
+variable transfid.  
+This is the easiest way to do that with the hosps.csv file.  
+Note that bo_facil is the name of facility to which infant transferred.
+bo_fac1 is the name of the facility to which the mother was transffered.  
+*/
+
+import delimited "${birthdo}hosps.csv", clear
+
+keep  facname fid
+rename facname bo_facil
+rename fid transfid
+
+save "${birthdata}transfids.dta", replace
+
+
 * Also generate and add level information:  
 
 quietly do "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/Import 1990 - 2012.do"
