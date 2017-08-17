@@ -17,22 +17,49 @@ Testing: use "/Users/austinbean/Desktop/BirthData2005-2012/Birth2007.dta", clear
 
 keep if bo_trans == 1 /* drop untransferred infants */
 
-sort bo_trans
+gen lbw = 0
+replace lbw = 1 if b_wt_cgr < 2500
+
+gen vlbw = 0
+replace vlbw = 1 if b_wt_cgr < 1500
+
+* count transfers OUT
+
+bysort fid ncdobmonth: gen t_o = sum(bo_trans)
+bysort fid ncdobmonth: egen transout = max(t_o)
+drop t_o
+label variable transout "Transfers out, all"
+
+bysort fid ncdobmonth lbw: gen t_l = sum(lbw)
+bysort fid ncdobmonth: egen transout_lbw = max(t_l)
+drop t_l
+label variable transout_lbw "Transfers out, LBW"
+
+bysort fid ncdobmonth vlbw: gen t_v = sum(vlbw)
+bysort fid ncdobmonth: egen transout_vlbw = max(t_v)
+drop t_v
+label variable transout_vlbw "Transfers out, VLBW"
+
+bysort fid ncdobmonth neonataldeath: gen n_s = sum(neonataldeath)
+bysort fid ncdobmonth: egen transout_deaths = max(n_s)
+drop n_s
+label variable transout_death "Transfers out, later died"
+
+
+* Count transfers IN
 
 bysort transfid ncdobmonth: gen t_c = sum(bo_trans)
 bysort transfid ncdobmonth: egen transin = max(t_c)
 drop t_c
 label variable transin "Transfers in, all"
 
-gen lbw = 0
-replace lbw = 1 if b_wt_cgr < 2500
+
 bysort transfid ncdobmonth lbw: gen translbw = sum(lbw)
 bysort transfid ncdobmonth: egen transin_lbw = max(translbw)
 drop translbw
 label variable transin_lbw "Transfers in, LBW"
 
-gen vlbw = 0
-replace vlbw = 1 if b_wt_cgr < 1500
+
 bysort transfid ncdobmonth vlbw: gen transvlbw = sum(vlbw)
 bysort transfid ncdobmonth: egen transin_vlbw = max(transvlbw)
 drop transvlbw
@@ -43,7 +70,10 @@ bysort transfid ncdobmonth: egen transin_death = max(transd)
 drop transd
 label variable transin_death "Transfers in, later died"
 
-keep bo_facil ncdobyear ncdobmonth transfid transin transin_lbw transin_vlbw transin_death
+* DO COUNTS FOR THE YEAR
+
+* ADD ADDITIONAL VARIABLES.
+keep bo_facil ncdobyear ncdobmonth transfid transin transout transin_lbw transout_lbw transin_vlbw transout_vlbw transin_death transout_death 
 duplicates drop bo_facil ncdobmonth, force
 
 drop if transfid == .
