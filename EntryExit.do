@@ -86,6 +86,13 @@ replace added3 = 1 if fid == 856316 & year == 2007
 
 replace added3 = 1 if fid == 1216116 & year == 2006 
 /* Presbyterian Denton, Denton */
+/*
+
+browse if fid == 1216116 & (ncdobyear == 2005 | ncdobyear == 2006 | ncdobyear == 2007 )
+- Transfers all to Cook childrens, then stops doing so.  
+*/
+
+
 
 replace added3 = 1 if fid == 1576070 & year == 2007 
 /* Memorial Hermann Sugarland,  Fort Bend */
@@ -237,5 +244,45 @@ browse b_bcntyc facname NeoIntensive SoloIntermediate next3 regdiff nextdiff dif
 
 *keep facname year admits nextent prevent added3 entry
 
-* Now, compute mean admits to NICU ignoring the entering facility...
+** To compute TOTAL deaths at the facility
+
+preserve
+bysort fid year: gen trns = sum(bo_trans)
+bysort fid year: egen transfers = max(trns)
+
+bysort fid year: gen dts = sum(neonataldeath)
+bysort fid year: egen hdeaths = max(dts)
+
+bysort fid year: gen ads = sum(adm_nicu)
+bysort fid year: egen nicu_admits = max(ads)
+
+
+keep facname fid ncdobyear ncdobmonth transfers hdeaths
+duplicates drop facname ncdobmonth ncdobyear, force
+
+/*
+* Level Changers:
+browse if fid == 293120 /* 2008 */
+browse if fid == 376245 /* 2010 */
+browse if fid == 856316 /* 2007 */
+browse if fid == 1216116 /* 2006 */
+browse if fid == 2015026 /* 2006 */
+browse if fid == 2093151 /* Central Texas Med Center - 2009 */
+browse if fid == 2151200 /* Edinburg Regional - 2007 */
+browse if fid == 2156335 /* Doctors H - Renaissance - 2007 */
+
+deaths	year  Linked cohort   LC, <= 28 days
+1476	2005    2406            1504
+1514	2006    2420            1544 
+1455	2007    2460            1484
+1457	2008    2394            1480
+1395	2009    2360            1467
+1421	2010    2240            1442
+1329	2011
+1343	2012
+
+
+
+*/
+
 
