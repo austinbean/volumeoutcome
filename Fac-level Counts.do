@@ -59,17 +59,19 @@ label variable lbw_month_ex "LBW babies in month, EX transfers"
 bysort facname ncdobmonth vlbw: gen vl_c_i = _n if vlbw == 1
 bysort facname ncdobmonth: egen vlbw_month = max(vl_c_i)
 drop vl_c_i
-label variable vlbw_month "VLBW babies in month"
+label variable vlbw_month "VLBW babies in month, including all"
 	* Excluding
 bysort facname ncdobmonth vlbw transferred: gen vl_c_i = _n if vlbw == 1 & transferred == 0 
 bysort facname ncdobmonth: egen vlbw_month_ex = max(vl_c_i)
 drop vl_c_i
-label variable vlbw_month_ex "VLBW babies in month"
+label variable vlbw_month_ex "VLBW babies in month, excluding transfers"
 
 
 bysort facname ncdobmonth: replace lbw_month = 0 if lbw_month == .
 bysort facname ncdobmonth: replace vlbw_month = 0 if vlbw_month == .
 
+bysort facname ncdobmonth: replace lbw_month_ex = 0 if lbw_month_ex == .
+bysort facname ncdobmonth: replace vlbw_month_ex = 0 if vlbw_month_ex == .
 
 
 * Compute some mortality counts at LBW or VLBW by month:
@@ -95,7 +97,7 @@ label variable vlbw_month_mort "Monthly VLBW mortality, inc transfers"
 
 * VLBW mortality excluding transfers
 bysort facname ncdobmonth vlbw_mort_ex: gen vl_i = sum(vlbw_mort_ex)
-bysort facname ncdobmonth: egen vlbw_month_mort = max(vl_i)
+bysort facname ncdobmonth: egen vlbw_month_mort_ex = max(vl_i)
 drop vl_i vlbw_mort_ex
 label variable vlbw_month_mort_ex "Monthly VLBW mortality, EX transfers"
 
@@ -118,20 +120,6 @@ bysort facname ncdobmonth: replace lbw_month_mort = 0 if lbw_month_mort == .
 bysort facname ncdobmonth: replace vlbw_month_mort_ex = 0 if vlbw_month_mort_ex == .
 bysort facname ncdobmonth: replace lbw_month_mort_ex = 0 if lbw_month_mort_ex == .
 
-
-* dropping home births
-keep if b_bplace == 1
-
-* Keep subset:
-keep facname ncdobmonth b_bcntyc month_count lbw_month vlbw_month lbw_month_mort vlbw_month_mort 
-
-sort facname ncdobmonth
-
-* Travis County:
-* browse if b_bcntyc == 227
- 
-duplicates drop facname ncdobmonth, force
-
 * Count of LBW, VLBW in year:
 
 bysort facname : gen lbw_y_i = sum(lbw_month)
@@ -143,4 +131,19 @@ bysort facname : gen vlbw_y_i = sum(vlbw_month)
 bysort facname : egen vlbw_year = max(vlbw_y_i)
 drop vlbw_y_i
 label variable vlbw_year "Very Low Birth Weight Infants in Year"
+
+
+* dropping home births
+keep if b_bplace == 1
+
+* Keep subset:
+keep facname ncdobmonth b_bcntyc month_count month_count_ex lbw_month lbw_month_ex vlbw_month vlbw_month_ex lbw_month_mort vlbw_month_mort vlbw_month_mort_ex lbw_month_mort_ex lbw_year vlbw_year
+
+sort facname ncdobmonth
+
+* Travis County:
+* browse if b_bcntyc == 227
+ 
+duplicates drop facname ncdobmonth, force
+
 
