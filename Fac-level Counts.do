@@ -14,19 +14,26 @@ sort facname ncdobmonth
 * Generate variable to track transfers
 
 gen transferred = 0
-replace transferred = 1 if bo_tra1 == 1 | bo_trans == 1
+replace transferred = 1 if bo_trans == 1
 label variable transferred "Infant transferred"
 
-* Count of NICU admits by month.  The key variable I think is this one.
+
+* All NICU admits, transferred or not:
 replace adm_nicu = 0 if adm_nicu == 2
-gen nic_ad = 0
-replace nic_ad = 1 if adm_nicu == 1 & transferred == 0
-bysort facname ncdobmonth: gen f_c = sum(nic_ad)
-bysort facname ncdobmonth: egen mnt_c = max(f_c)
 bysort facname ncdobmonth: gen f_c_i = sum(adm_nicu)
 bysort facname ncdobmonth: egen month_count = max(f_c_i)
 drop f_c_i
-label variable month_count "Total NICU admits at facility in month"
+label variable month_count "Total NICU admits in month INC transfers"
+
+
+* Count of NICU admits by month, EX transfers
+gen nic_ad = 0
+replace nic_ad = 1 if adm_nicu == 1 & transferred == 0
+bysort facname ncdobmonth: gen f_c = sum(nic_ad)
+bysort facname ncdobmonth: egen month_count_ex = max(f_c)
+drop  f_c
+label variable month_count_ex "Total NICU admits in month EX transfers"
+
 
 * Counts of LBW, VLBW by month :
 
@@ -36,15 +43,29 @@ replace vlbw = 1 if b_wt_cgr < 1500
 gen lbw = 0
 replace lbw = 1 if b_wt_cgr < 2500
 
+* Low Birth Weight, including and excluding transfers
 bysort facname ncdobmonth lbw: gen lb_c_i = _n if lbw == 1 
 bysort facname ncdobmonth: egen lbw_month = max(lb_c_i)
 drop lb_c_i
-label variable lbw_month "LBW babies in month"
+label variable lbw_month "LBW babies in month, inc transfers"
+	* Excluding
+bysort facname ncdobmonth lbw transferred: gen lb_c_i = _n if lbw == 1 & transferred == 0 
+bysort facname ncdobmonth: egen lbw_month_ex = max(lb_c_i)
+drop lb_c_i
+label variable lbw_month_ex "LBW babies in month, EX transfers"
 
+
+* Very Low Birth Weight, including and excluding transfers
 bysort facname ncdobmonth vlbw: gen vl_c_i = _n if vlbw == 1
 bysort facname ncdobmonth: egen vlbw_month = max(vl_c_i)
 drop vl_c_i
 label variable vlbw_month "VLBW babies in month"
+	* Excluding
+bysort facname ncdobmonth vlbw transferred: gen vl_c_i = _n if vlbw == 1 & transferred == 0 
+bysort facname ncdobmonth: egen vlbw_month_ex = max(vl_c_i)
+drop vl_c_i
+label variable vlbw_month_ex "VLBW babies in month"
+
 
 bysort facname ncdobmonth: replace lbw_month = 0 if lbw_month == .
 bysort facname ncdobmonth: replace vlbw_month = 0 if vlbw_month == .
@@ -52,28 +73,50 @@ bysort facname ncdobmonth: replace vlbw_month = 0 if vlbw_month == .
 
 
 * Compute some mortality counts at LBW or VLBW by month:
-
+* Very low birth weight
 gen vlbw_mort = 0
 replace vlbw_mort = 1 if vlbw == 1 & neonataldeath == 1
+	* excluding transfers
+gen vlbw_mort_ex = 0
+replace vlbw_mort_ex = 1 if vlbw == 1 & neonataldeath == 1 & transferred == 0
 
+* Low birth weight
 gen lbw_mort = 0
 replace lbw_mort = 1 if lbw == 1 & neonataldeath == 1
+	* excluding transfers
+gen lbw_mort_ex = 0
+replace lbw_mort_ex = 1 if lbw == 1 & neonataldeath == 1 & transferred == 0
 
-bysort facname ncdobmonth vlbw_mort: gen vlw_i = 1 if vlbw_mort == 1
-bysort facname ncdobmonth vlbw_mort: egen vl_i = sum(vlw_i)
+* VLBW mortality including transfers
+bysort facname ncdobmonth vlbw_mort: gen vl_i = sum(vlbw_mort)
 bysort facname ncdobmonth: egen vlbw_month_mort = max(vl_i)
-drop vlw_i vl_i vlbw_mort
-label variable vlbw_month_mort "Monthly VLBW mortality"
+drop vl_i vlbw_mort
+label variable vlbw_month_mort "Monthly VLBW mortality, inc transfers"
 
-bysort facname ncdobmonth lbw_mort: gen lbw_i = 1 if lbw_mort == 1
-bysort facname ncdobmonth lbw_mort: egen lb_i = sum(lbw_i)
+* VLBW mortality excluding transfers
+bysort facname ncdobmonth vlbw_mort_ex: gen vl_i = sum(vlbw_mort_ex)
+bysort facname ncdobmonth: egen vlbw_month_mort = max(vl_i)
+drop vl_i vlbw_mort_ex
+label variable vlbw_month_mort_ex "Monthly VLBW mortality, EX transfers"
+
+* LBW mortality, including transfers
+bysort facname ncdobmonth lbw_mort: egen lb_i = sum(lbw_mort)
 bysort facname ncdobmonth: egen lbw_month_mort = max(lb_i)
-drop lbw_i lb_i lbw_mort
-label variable lbw_month_mort "Monthly LBW mortality"
+drop lb_i lbw_mort
+label variable lbw_month_mort "Monthly LBW mortality, inc transfers"
+
+* LBW mortality, excluding transfers
+bysort facname ncdobmonth lbw_mort_ex: egen lb_i = sum(lbw_mort_ex)
+bysort facname ncdobmonth: egen lbw_month_mort_ex = max(lb_i)
+drop lb_i lbw_mort_ex
+label variable lbw_month_mort_ex "Monthly LBW mortality, ex transfers"
+
 
 bysort facname ncdobmonth: replace vlbw_month_mort = 0 if vlbw_month_mort == .
 bysort facname ncdobmonth: replace lbw_month_mort = 0 if lbw_month_mort == .
 
+bysort facname ncdobmonth: replace vlbw_month_mort_ex = 0 if vlbw_month_mort_ex == .
+bysort facname ncdobmonth: replace lbw_month_mort_ex = 0 if lbw_month_mort_ex == .
 
 
 * dropping home births
