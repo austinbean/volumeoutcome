@@ -7,7 +7,7 @@ do "/Users/austinbean/Desktop/Birth2005-2012/FilePathGlobal.do"
 
 foreach nm of numlist 2005(1)2012{
 
-import delimited "${birthdata}/Birth`nm'.csv"
+import delimited "${birthdata}Birth`nm'.csv"
 
 do "${birthdo}/Label Variables.do"
 
@@ -16,14 +16,14 @@ gen year = `nm'
 * Add FIDS to patient records:
 * Merge now on names using hosps.csv, which was matched to FIDS by hand.  
 
-merge m:1 fid year using "${birthdo}/LevelInfo.dta", gen(facinfo)
+merge m:1 fid year using "${birthdata}LevelInfo.dta", gen(facinfo)
 drop if facinfo == 2
 label variable facinfo "No facility information available"
 replace facinfo = 0 if facinfo == 1 | facinfo == 2
 replace facinfo = 1 if facinfo == 3
 _strip_labels facinfo
 
-save "${birthdata}/Birth`nm'.dta", replace
+save "${birthdata}Birth`nm'.dta", replace
 
 clear
 }
@@ -31,15 +31,15 @@ clear
 
 * Create Combined Data from All Years:
 
-use "${birthdata}/Birth2005.dta", clear
+use "${birthdata}Birth2005.dta", clear
 
 foreach nm of numlist 2006(1)2012{
-append using "${birthdata}/Birth`nm'.dta", gen(yr`nm')
+append using "${birthdata}Birth`nm'.dta", gen(yr`nm')
 }
 _strip_labels facinfo
 
 
-save "${birthdata}/Births2005-2012.dta", replace
+save "${birthdata}Births2005-2012.dta", replace
 
 
 
@@ -49,22 +49,22 @@ save "${birthdata}/Births2005-2012.dta", replace
 
 foreach nm of numlist 2005(1)2012{
 
-use "${birthdata}/Birth`nm'.dta", clear
+use "${birthdata}Birth`nm'.dta", clear
 
-do "${birthdo}/Fac-level Counts.do"
+do "${birthdo}Fac-level Counts.do"
 
-save "${birthdata}/FacCount`nm'.dta", replace
+save "${birthdata}FacCount`nm'.dta", replace
 
 
 }
 
 
-use "${birthdata}/FacCount2005.dta", clear
+use "${birthdata}FacCount2005.dta", clear
 gen yr2005 = 2005
 
 foreach nm of numlist 2006(1)2012{
 
-append using "${birthdata}/FacCount`nm'.dta", gen(yr`nm')
+append using "${birthdata}FacCount`nm'.dta", gen(yr`nm')
 
 replace yr`nm' = `nm' if yr`nm' == 1
 
@@ -160,12 +160,12 @@ label variable lag_6_vlbw " VLBW lag 6 Months"
 
 rename year ncdobyear
 
-save "${birthdata}/CombinedFacCount.dta", replace
+save "${birthdata}CombinedFacCount.dta", replace
 
 
-use "${birthdata}/Births2005-2012.dta", clear
+use "${birthdata}Births2005-2012.dta", clear
 
-merge m:1 facname ncdobyear ncdobmonth using "${birthdata}/CombinedFacCount`nm'.dta", nogen
+merge m:1 facname ncdobyear ncdobmonth using "${birthdata}CombinedFacCount`nm'.dta", nogen
 
 * those not matched are almost all home birth or a limited number of birthing center births
 * only 1500 out of 375,000 are dropped if non-matched values are dropped.
@@ -179,6 +179,12 @@ unique facname if b_bplace == 1 & _merge != 3
 unique facname, by(year) gen(hnumber)
 */
 
-save "${birthdata}/Births2005-2012wCounts.dta", replace
+gen capex = 0
+
+replace capex = 1 if month_count > NeoIntensiveCapacity
+
+
+
+save "${birthdata}Births2005-2012wCounts.dta", replace
 
 
