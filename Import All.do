@@ -242,24 +242,24 @@ replace transout_deaths = 0 if transout_deaths == .
 * And the indicators for the facilities themselves too.  NeoIntensive and SoloIntermediate
 
 gen capex = 0 if NeoIntensive == 1
-replace capex = 1 if ((month_count-transout) > NeoIntensiveCapacity) & NeoIntensiveCapacity != 0 & NeoIntensiveCapacity != . & month_count != .
+replace capex = 1 if ((month_count+transin-transout) > NeoIntensiveCapacity) & NeoIntensiveCapacity != 0 & NeoIntensiveCapacity != . & month_count != .
 label variable capex "more NICU admits than beds for the month"
 
 gen cap2 = 2*NeoIntensiveCapacity
 gen capex2 = 0 if NeoIntensive == 1
-replace capex2 = 1 if ((month_count-transout) > cap2) & month_count != . & NeoIntensiveCapacity != 0 & NeoIntensiveCapacity != .
+replace capex2 = 1 if ((month_count+trainsin-transout) > cap2) & month_count != . & NeoIntensiveCapacity != 0 & NeoIntensiveCapacity != .
 label variable capex2 "more NICU admits than 2 times beds"
 
 gen capex_trans = 0
-replace capex_trans = 1 if (month_count - transout) > NeoIntensiveCapacity & NeoIntensiveCapacity != . & NeoIntensiveCapacity != 0
+replace capex_trans = 1 if (month_count+transin - transout) > NeoIntensiveCapacity & NeoIntensiveCapacity != . & NeoIntensiveCapacity != 0
 label variable capex_trans "utilization mins transfers out"
 
 gen bddays = NeoIntensiveCapacity*30 if NeoIntensiveCapacity != . & NeoIntensiveCapacity != 0
 
-gen avg_util = (month_count - transout)*13 + transout if (NeoIntensive == 1 | SoloIntermediate == 1) 
-label variable "average util 13 days for non-transferred"
+gen avg_util = (month_count+transin - transout)*13 + transout if (NeoIntensiveCapacity != 0 & NeoIntensiveCapacity != .) 
+label variable avg_util "average util 13 days for non-transferred"
 
-gen used_days = bddays - avg_util if NeoIntensiveCapacity != 0
+gen used_days = bddays - avg_util if (NeoIntensiveCapacity != 0 & NeoIntensiveCapacity != .)
 
 
 
