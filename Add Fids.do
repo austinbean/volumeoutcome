@@ -1,5 +1,6 @@
 * Add Fids:
 do "/Users/austinbean/Desktop/Birth2005-2012/FilePathGlobal.do"
+capture quietly do "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/TX Global Filepath Names.do"
 
 
 import delimited "${birthdo}hosps.csv", clear
@@ -35,3 +36,19 @@ quietly do "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/Import 19
 keep fid year NeoIntensive SoloIntermediate NeoIntensiveCapacity NeoIntermediateCapacity TotalDeliveries TransfersOut_NO_NICU-TransfersOut_HAS_NICU TransfersInternally_HAS_NICU
 
 save "${birthdata}LevelInfo.dta", replace
+
+
+
+*  Get all distances:
+* This is only the closest 10 per zipcode.  What file creates TX Zip All Hospital Distances.csv???
+* I think the file I want is "TX Hospital Sets.do"
+* And see this file: "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/TX All Distances.csv"
+ import delimited "${TXhospital}TX Zip All Hospital Distances.csv"
+ 
+keep zip ziplat ziplong fid faclat faclong zipfacdistance
+
+bysort zip (fid): gen cntr = _n
+
+reshape wide 
+ 
+ 
