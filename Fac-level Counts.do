@@ -120,6 +120,20 @@ bysort facname ncdobmonth: replace lbw_month_mort = 0 if lbw_month_mort == .
 bysort facname ncdobmonth: replace vlbw_month_mort_ex = 0 if vlbw_month_mort_ex == .
 bysort facname ncdobmonth: replace lbw_month_mort_ex = 0 if lbw_month_mort_ex == .
 
+
+* dropping home births
+keep if b_bplace == 1
+
+
+* Travis County:
+* browse if b_bcntyc == 227
+ 
+duplicates drop facname ncdobmonth, force
+
+* Keep subset:
+
+keep facname ncdobmonth b_bcntyc month_count month_count_ex lbw_month lbw_month_ex vlbw_month vlbw_month_ex lbw_month_mort vlbw_month_mort vlbw_month_mort_ex lbw_month_mort_ex
+
 * Count of LBW, VLBW in year:
 
 bysort facname : gen lbw_y_i = sum(lbw_month)
@@ -133,17 +147,5 @@ drop vlbw_y_i
 label variable vlbw_year "Very Low Birth Weight Infants in Year"
 
 
-* dropping home births
-keep if b_bplace == 1
-
-* Keep subset:
-keep facname ncdobmonth b_bcntyc month_count month_count_ex lbw_month lbw_month_ex vlbw_month vlbw_month_ex lbw_month_mort vlbw_month_mort vlbw_month_mort_ex lbw_month_mort_ex lbw_year vlbw_year
-
 sort facname ncdobmonth
-
-* Travis County:
-* browse if b_bcntyc == 227
- 
-duplicates drop facname ncdobmonth, force
-
 
