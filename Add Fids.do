@@ -33,7 +33,7 @@ save "${birthdata}transfids.dta", replace
 
 quietly do "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/Import 1990 - 2012.do"
 
-keep fid year NeoIntensive SoloIntermediate NeoIntensiveCapacity NeoIntermediateCapacity TotalDeliveries TransfersOut_NO_NICU-TransfersOut_HAS_NICU TransfersInternally_HAS_NICU
+keep fid year NeoIntensive SoloIntermediate NeoIntensiveCapacity NeoIntermediateCapacity TotalDeliveries TransfersOut_NO_NICU-TransfersOut_HAS_NICU TransfersInternally_HAS_NICU nfpstatus TotalBeds ObstetricsLevel ObstetricBeds ObstetricCare
 
 save "${birthdata}LevelInfo.dta", replace
 
