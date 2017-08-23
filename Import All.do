@@ -248,7 +248,7 @@ label variable capex "more NICU admits than beds for the month"
 
 gen cap2 = 2*NeoIntensiveCapacity
 gen capex2 = 0 if NeoIntensive == 1
-replace capex2 = 1 if ((month_count+trainsin-transout) > cap2) & month_count != . & NeoIntensiveCapacity != 0 & NeoIntensiveCapacity != .
+replace capex2 = 1 if ((month_count+transin-transout) > cap2) & month_count != . & NeoIntensiveCapacity != 0 & NeoIntensiveCapacity != .
 label variable capex2 "more NICU admits than 2 times beds"
 
 gen capex_trans = 0
@@ -284,11 +284,6 @@ drop _merge
 
 * Add closest hospital - tracks which hospital is actually closest, whether chosen or not:
 merge m:1 PAT_ZIP using "${TXhospital}TX Zip Distances to Closest Hospital.dta"
-drop if _merge == 2 | _merge == 1
-drop _merge
-
-* Add zip distances - Adds information about the *chosen* hospital, inc. level, transfers, etc. 
-merge m:1 THCIC_ID PAT_ZIP using "${TXhospital}TX Zip Distances to All TX Hospitals.dta"
 drop if _merge == 2 | _merge == 1
 drop _merge
 
