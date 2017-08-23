@@ -1,6 +1,7 @@
 * Texas DSHS Birth Data
 
 do "/Users/austinbean/Desktop/Birth2005-2012/FilePathGlobal.do"
+capture quietly do "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/TX Global Filepath Names.do"
 
 
 * Imports and labels:
@@ -263,6 +264,33 @@ gen used_days = bddays - avg_util if (NeoIntensiveCapacity != 0 & NeoIntensiveCa
 
 
 
+* Add the THCIC_ID from the Inpatient Discharge Records to get distances:
+/*
+TX Choice Model Extras.do contains a call to this function.
+5% of the data can't be matched.
+This also makes use of TX Merge Hospital Choices VARIANT.do.
+*/
+
+
+gen THCIC_ID = .
+quietly do "${TXhospital}TX Hospital Code Match.do"
+
+* Zip codes: 
+* about 2% of the sample is not matched - most are from out of state.
+rename b_mrzip PAT_ZIP
+merge m:1 PAT_ZIP using "${TXhospital}TX Zip Code Choice Sets.dta"
+drop if _merge == 2 | _merge == 1
+drop _merge
+
+* Add closest hospital:
+merge m:1 PAT_ZIP using "${TXhospital}TX Zip Distances to Closest Hospital.dta"
+drop if _merge == 2 | _merge == 1
+drop _merge
+
+* Add zip distances: 
+merge m:1 THCIC_ID PAT_ZIP using "${TXhospital}TX Zip Distances to All TX Hospitals.dta"
+drop if _merge == 2 | _merge == 1
+drop _merge
 
 save "${birthdata}Births2005-2012wCounts.dta", replace
 
