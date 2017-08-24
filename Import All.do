@@ -355,10 +355,6 @@ replace zipfacdistancecn`i' = . if chosenind == `i'
 }
 
 
-* Small for Gestational Age:
-
-
-
 
 
 save "${birthdata}Births2005-2012wCounts.dta", replace
