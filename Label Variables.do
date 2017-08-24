@@ -676,6 +676,103 @@ gen ga34 = 0
 replace ga34 = 1 if b_es_ges>=34 & b_es_ges < 99
 
 
+* Small for Gestational Age and Large for Gestational Age
+/*
+* Small and Large for Gestational Age:
+* Computed using NCHS Denominator file for 2010 - 9999 is missing brthwgt, so exclude, though it doesn't change results at all.  
+	levelsof combgest if combgest < 99, local(levs)
+	foreach cg of local levs{
+	quietly summarize brthwgt if combgest == `cg' & brthwgt < 9999, d 
+	di `cg'
+	di "10th percentile"
+	di `r(p10)', 
+	di "90th percentile"
+	di `r(p90)'
+	di "******"
+	}
+
+*/
+
+generate small_gest_age = 0
+label variable small_gest_age "Small for Gestational Age"
+replace small_gest_age = 1 if b_es_ges <= 24 & b_wt_cgr < 482
+replace small_gest_age = 1 if b_es_ges == 25 & b_wt_cgr < 539
+replace small_gest_age = 1 if b_es_ges == 26 & b_wt_cgr < 595
+replace small_gest_age = 1 if b_es_ges == 27 & b_wt_cgr < 660
+replace small_gest_age = 1 if b_es_ges == 28 & b_wt_cgr < 794
+replace small_gest_age = 1 if b_es_ges == 29 & b_wt_cgr < 907
+replace small_gest_age = 1 if b_es_ges == 30 & b_wt_cgr < 1085
+replace small_gest_age = 1 if b_es_ges == 31 & b_wt_cgr < 1240
+replace small_gest_age = 1 if b_es_ges == 32 & b_wt_cgr < 1430
+replace small_gest_age = 1 if b_es_ges == 33 & b_wt_cgr < 1616
+replace small_gest_age = 1 if b_es_ges == 34 & b_wt_cgr < 1830
+replace small_gest_age = 1 if b_es_ges == 35 & b_wt_cgr < 2045
+replace small_gest_age = 1 if b_es_ges == 36 & b_wt_cgr < 2268
+replace small_gest_age = 1 if b_es_ges == 37 & b_wt_cgr < 2481
+replace small_gest_age = 1 if b_es_ges == 38 & b_wt_cgr < 2706
+replace small_gest_age = 1 if b_es_ges == 39 & b_wt_cgr < 2863
+replace small_gest_age = 1 if b_es_ges == 40 & b_wt_cgr < 2920
+replace small_gest_age = 1 if b_es_ges == 41 & b_wt_cgr < 2948
+replace small_gest_age = 1 if b_es_ges == 42 & b_wt_cgr < 2863
+replace small_gest_age = 1 if b_es_ges == 43 & b_wt_cgr < 2835
+replace small_gest_age = 1 if b_es_ges == 44 & b_wt_cgr < 2837
+replace small_gest_age = 1 if b_es_ges == 45 & b_wt_cgr < 2835
+replace small_gest_age = 1 if b_es_ges == 46 & b_wt_cgr < 2780
+replace small_gest_age = 1 if b_es_ges == 47 & b_wt_cgr < 2752
+
+
+gen large_gest_age = 0
+label variable large_gest_age "Large for gestational age"
+replace large_gest_age = 1 if b_es_ges <= 24  & b_wt_cgr >1290
+replace large_gest_age = 1 if b_es_ges == 25  & b_wt_cgr >1555
+replace large_gest_age = 1 if b_es_ges == 26  & b_wt_cgr >2005
+replace large_gest_age = 1 if b_es_ges == 27  & b_wt_cgr >2070
+replace large_gest_age = 1 if b_es_ges == 28  & b_wt_cgr >3040
+replace large_gest_age = 1 if b_es_ges == 29  & b_wt_cgr >3175
+replace large_gest_age = 1 if b_es_ges == 30  & b_wt_cgr >3315
+replace large_gest_age = 1 if b_es_ges == 31  & b_wt_cgr >3315
+replace large_gest_age = 1 if b_es_ges == 32  & b_wt_cgr >3329
+replace large_gest_age = 1 if b_es_ges == 33  & b_wt_cgr >3345
+replace large_gest_age = 1 if b_es_ges == 34  & b_wt_cgr >3430
+replace large_gest_age = 1 if b_es_ges == 35  & b_wt_cgr >3498
+replace large_gest_age = 1 if b_es_ges == 36  & b_wt_cgr >3561
+replace large_gest_age = 1 if b_es_ges == 37  & b_wt_cgr >3686
+replace large_gest_age = 1 if b_es_ges == 38  & b_wt_cgr >3840
+replace large_gest_age = 1 if b_es_ges == 39  & b_wt_cgr >3954
+replace large_gest_age = 1 if b_es_ges == 40  & b_wt_cgr >4026
+replace large_gest_age = 1 if b_es_ges == 41  & b_wt_cgr >4090
+replace large_gest_age = 1 if b_es_ges == 42  & b_wt_cgr >4054
+replace large_gest_age = 1 if b_es_ges == 43  & b_wt_cgr >3998
+replace large_gest_age = 1 if b_es_ges == 44  & b_wt_cgr >4020
+replace large_gest_age = 1 if b_es_ges == 45  & b_wt_cgr >4025
+replace large_gest_age = 1 if b_es_ges == 46  & b_wt_cgr >3985
+replace large_gest_age = 1 if b_es_ges == 47  & b_wt_cgr >3997
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 * Correct one typo
 
 replace facname = "TEXAS HEALTH HARRIS METHODIST HOSPITAL H-E-B" if facname == "TEXAS HEALTH HARRIS METHODIST HOSPTIAL H-E-B"
