@@ -636,6 +636,10 @@ gen w800899 = 0
 replace w800899 = 1 if b_wt_cgr>=800 & b_wt_cgr<900
 label variable w800899 "1 if 800 <= weight < 900"
 
+gen w900999 = 0
+replace w900999 = 1 if b_wt_cgr>=900 & b_wt_cgr<1000
+label variable w900999 "1 if 900 <= weight < 1000"
+
 gen w10001249 = 0
 replace w10001249 = 1 if b_wt_cgr>1000 & b_wt_cgr<1250
 label variable w10001249 "1 if 1000<= weight < 1250"
@@ -647,6 +651,30 @@ label variable w12501499 "1 if 1250 <= weight < 1500"
 gen multiple = 0
 replace multiple = 1 if b_btype > 1
 label variable multipl "1 if multiple birth"
+
+* Gestational Age Bins
+
+gen ga24 = 0
+replace ga24 = 1 if b_es_ges < 24
+
+gen ga2425 = 0
+replace ga2425 = 1 if b_es_ges>=24 & b_es_ges<26
+
+gen ga2627 = 0
+replace ga2627 = 1 if b_es_ges>=26 & b_es_ges<28
+
+gen ga2829 = 0
+replace ga2829 = 1 if b_es_ges>=28 & b_es_ges<30
+
+gen ga3031 = 0 
+replace ga3031 = 1 if b_es_ges>=30 & b_es_ges<32
+
+gen ga3233 = 0
+replace ga3233 = 1 if b_es_ges>=32 & b_es_ges<34
+
+gen ga34 = 0
+replace ga34 = 1 if b_es_ges>=34 & b_es_ges < 99
+
 
 * Correct one typo
 
