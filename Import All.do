@@ -341,19 +341,23 @@ replace m_whtnhis = 1 if m_rwhite == 1 & m_hispanic == 0
 
 
 * set distance to missing in 50 closest firms to remove this as a potential instrument.
-* DOESN'T WORK YET.  
 gen chosenind = .
 
-foreach i of numlist 1/50{
+forvalues i=1/50{
 di "`i'"
-if fidcn`i' == "fid"{
-di "hi"
-replace chosenind = `i'
-
-}
+replace chosenind = `i' if fidcn`i' == fid
 }
 
-count if fidcn`i' == fid
+forvalues i = 1/50{
+
+replace zipfacdistancecn`i' = . if chosenind == `i'
+
+}
+
+
+* Small for Gestational Age:
+
+
 
 
 
