@@ -18,7 +18,7 @@ drop if brtotal < 25
 logit neonataldeath 
 
 
-
+logit neonataldeath b_m_educ i.pay w500599-w12501499 multiple ga24-ga34 small_gest_age large_gest_age l3_25-l1_10_100 m_hispanic-m_whtnhis, or
 
 
 
