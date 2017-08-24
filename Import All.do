@@ -292,6 +292,71 @@ merge m:1 PAT_ZIP using "${birthdata}closest50hospitals.dta"
 drop if _merge == 2 | _merge == 1
 drop _merge
 
+
+* VLBW/Year Indicators for B/P Regressions:
+	* for Level 3: 0-25, 25-50, 50-100, >100
+gen l3_25 = 0
+replace l3_25 = 1 if NeoIntensive == 1 & vlbw_year <= 25
+
+gen l3_25_50 = 0
+replace l3_25_50 = 1 if NeoIntensive == 1 & vlbw_year>25 & vlbw_year <= 50
+
+gen l3_50_100 = 0
+replace l3_50_100 = 1 if NeoIntensive == 1 & vlbw_year > 50 & vlbw_year <= 100
+
+gen l3_100 = 0
+replace l3_100 = 1 if NeoIntensive == 1 & vlbw_year > 100 & vlbw_year != .
+
+	*Level 2
+gen l2_10 = 0
+replace l2_10 = 1 if SoloIntermediate == 1 & vlbw_year <= 10
+
+gen l2_10_25 = 0
+replace l2_10_25 = 1 if SoloIntermediate == 1 & vlbw_year > 10 & vlbw_year <= 25
+
+gen l2_25 = 0 
+replace l2_25 = 1 if SoloIntermediate == 1 & vlbw_year > 25 & vlbw_year != .
+
+	* Level 1
+gen l1_10 = 0
+replace l1_10 = 1 if SoloIntermediate == 0 & NeoIntensive == 0 & vlbw_year <= 10
+
+gen l1_10_100 = 0
+replace l1_10_100 = 1 if SoloIntermediate == 0 & NeoIntensive == 0 & vlbw_year > 10 & vlbw_year != .
+
+
+* Combined racial categories:
+
+gen m_hispanic = 0
+replace m_hispanic =1 if m_hismex == 1 | m_hispr == 1 | m_hiscub == 1 | m_hisoth == 1 | m_h_unk == 1
+
+gen m_asian = 0
+replace m_asian = 1 if m_rasnin == 1 | m_rchina == 1 | m_rfilip == 1 | m_rjapan == 1 | m_rkorea == 1 | m_rviet == 1 | m_rothas == 1 
+
+gen m_pacisl = 0
+replace m_pacisl = 1 if m_rhawai == 1 | m_rguam == 1 | m_rsamoa == 1 | m_rothpa == 1 
+
+gen m_whtnhis = 0 
+replace m_whtnhis = 1 if m_rwhite == 1 & m_hispanic == 0
+
+
+* set distance to missing in 50 closest firms to remove this as a potential instrument.
+* DOESN'T WORK YET.  
+gen chosenind = .
+
+foreach i of numlist 1/50{
+di "`i'"
+if fidcn`i' == "fid"{
+di "hi"
+replace chosenind = `i'
+
+}
+}
+
+count if fidcn`i' == fid
+
+
+
 save "${birthdata}Births2005-2012wCounts.dta", replace
 
 
