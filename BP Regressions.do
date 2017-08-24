@@ -13,6 +13,19 @@ bysort fid: egen brtotal = max(fc)
 
 drop if brtotal < 25
 
+**** Closest replica of B/P:
+
+logit neonataldeath 
+
+
+
+
+
+
+
+
+
+
 * USING INDIVIDUAL MONTH LAGS *
 
 * Regress on lagged volumes and year
