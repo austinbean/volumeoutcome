@@ -618,39 +618,103 @@ label define nnd_l 1 "Died"
 label define nnd_l 0 "Lived", add
 label values neonataldeath nnd_l
 
-* Create Weight Bins:
+* Create Weight Bins for Males:
+
+gen m500599 = 0
+replace m500599 = 1 if b_wt_cgr >= 500 & b_wt_cgr <600 & b_btype == 1 & bs_sex == 1
+label variable m500599 "male 1 if 500 <= weight < 600"
+
+gen m600699 = 0
+replace m600699 = 1 if b_wt_cgr >=600 & b_wt_cgr<700 & b_btype == 1 & bs_sex == 1
+label variable m600699 "male 1 if 600 <= weight < 700"
+
+gen m700799 = 0
+replace m700799 = 1 if b_wt_cgr>=700 & b_wt_cgr<800 & b_btype == 1 & bs_sex == 1
+label variable m700799 "male 1 if 700 <= weight < 800"
+
+gen m800899 = 0
+replace m800899 = 1 if b_wt_cgr>=800 & b_wt_cgr<900 & b_btype == 1 & bs_sex == 1
+label variable m800899 "male 1 if 800 <= weight < 900"
+
+gen m900999 = 0
+replace m900999 = 1 if b_wt_cgr>=900 & b_wt_cgr<1000 & b_btype == 1 & bs_sex == 1
+label variable m900999 "male 1 if 900 <= weight < 1000"
+
+gen m10001249 = 0
+replace m10001249 = 1 if b_wt_cgr>1000 & b_wt_cgr<1250 & b_btype == 1 & bs_sex == 1
+label variable m10001249 "male 1 if 1000<= weight < 1250"
+
+gen m12501499 = 0
+replace m12501499 = 1 if b_wt_cgr>1250 & b_wt_cgr<1500 & b_btype == 1 & bs_sex == 1
+label variable m12501499 "male 1 if 1250 <= weight < 1500"
+
+* Create Weight Bins for Females:
+
 
 gen w500599 = 0
-replace w500599 = 1 if b_wt_cgr >= 500 & b_wt_cgr <600
-label variable w500599 "1 if 500 <= weight < 600"
+replace w500599 = 1 if b_wt_cgr >= 500 & b_wt_cgr <600 & b_btype == 1 & bs_sex == 0
+label variable w500599 "female 1 if 500 <= weight < 600"
 
 gen w600699 = 0
-replace w600699 = 1 if b_wt_cgr >=600 & b_wt_cgr<700
-label variable w600699 "1 if 600 <= weight < 700"
+replace w600699 = 1 if b_wt_cgr >=600 & b_wt_cgr<700 & b_btype == 1 & bs_sex == 0
+label variable w600699 "female 1 if 600 <= weight < 700"
 
 gen w700799 = 0
-replace w700799 = 1 if b_wt_cgr>=700 & b_wt_cgr<800
-label variable w700799 "1 if 700 <= weight < 800"
+replace w700799 = 1 if b_wt_cgr>=700 & b_wt_cgr<800 & b_btype == 1 & bs_sex == 0
+label variable w700799 "female 1 if 700 <= weight < 800"
 
 gen w800899 = 0
-replace w800899 = 1 if b_wt_cgr>=800 & b_wt_cgr<900
-label variable w800899 "1 if 800 <= weight < 900"
+replace w800899 = 1 if b_wt_cgr>=800 & b_wt_cgr<900 & b_btype == 1 & bs_sex == 0
+label variable w800899 "female 1 if 800 <= weight < 900"
 
 gen w900999 = 0
-replace w900999 = 1 if b_wt_cgr>=900 & b_wt_cgr<1000
-label variable w900999 "1 if 900 <= weight < 1000"
+replace w900999 = 1 if b_wt_cgr>=900 & b_wt_cgr<1000 & b_btype == 1 & bs_sex == 0
+label variable w900999 "female 1 if 900 <= weight < 1000"
 
 gen w10001249 = 0
-replace w10001249 = 1 if b_wt_cgr>1000 & b_wt_cgr<1250
-label variable w10001249 "1 if 1000<= weight < 1250"
+replace w10001249 = 1 if b_wt_cgr>1000 & b_wt_cgr<1250 & b_btype == 1 & bs_sex == 0
+label variable w10001249 "female 1 if 1000<= weight < 1250"
 
 gen w12501499 = 0
-replace w12501499 = 1 if b_wt_cgr>1250 & b_wt_cgr<1500
-label variable w12501499 "1 if 1250 <= weight < 1500"
+replace w12501499 = 1 if b_wt_cgr>1250 & b_wt_cgr<1500 & b_btype == 1 & bs_sex == 0
+label variable w12501499 "female 1 if 1250 <= weight < 1500"
+
+
 
 gen multiple = 0
 replace multiple = 1 if b_btype > 1
 label variable multipl "1 if multiple birth"
+
+* Multiple weight categories:
+
+gen mw500599 = 0
+replace mw500599 = 1 if b_wt_cgr >= 500 & b_wt_cgr <600 & b_btype > 1
+label variable mw500599 "mutliples: 1 if 500 <= weight < 600"
+
+gen mw600699 = 0
+replace mw600699 = 1 if b_wt_cgr >=600 & b_wt_cgr<700 & b_btype > 1
+label variable mw600699 "multiples: 1 if 600 <= weight < 700"
+
+gen mw700799 = 0
+replace mw700799 = 1 if b_wt_cgr>=700 & b_wt_cgr<800 & b_btype > 1
+label variable mw700799 "multiple: 1 if 700 <= weight < 800"
+
+gen mw800899 = 0
+replace mw800899 = 1 if b_wt_cgr>=800 & b_wt_cgr<900 & b_btype > 1
+label variable mw800899 "multiple: 1 if 800 <= weight < 900"
+
+gen mw900999 = 0
+replace mw900999 = 1 if b_wt_cgr>=900 & b_wt_cgr<1000 & b_btype > 1
+label variable mw900999 "multiple: 1 if 900 <= weight < 1000"
+
+gen mw10001249 = 0
+replace mw10001249 = 1 if b_wt_cgr>1000 & b_wt_cgr<1250 & b_btype > 1
+label variable mw10001249 "multiple: 1 if 1000<= weight < 1250"
+
+gen mw12501499 = 0
+replace mw12501499 = 1 if b_wt_cgr>1250 & b_wt_cgr<1500 & b_btype > 1
+label variable mw12501499 "multiple: 1 if 1250 <= weight < 1500"
+
 
 * Gestational Age Bins
 
