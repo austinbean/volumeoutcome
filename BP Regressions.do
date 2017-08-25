@@ -18,9 +18,9 @@ drop if brtotal < 25
 logit neonataldeath 
 
 
-logit neonataldeath b_m_educ i.pay w500599-w12501499 multiple ga24-ga34 small_gest_age large_gest_age l3_25-l1_10_100 m_hispanic-m_whtnhis, or
+logit neonataldeath i.b_m_educ i.pay i.year m500599-w12501499 mw500599-mw12501499  ga24-ga34 small_gest_age large_gest_age l3_25-l1_10_100 m_hispanic-m_whtnhis, or
 
-
+* To add - weight categories for multiples, i.year 
 
 
 
