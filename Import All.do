@@ -324,6 +324,20 @@ replace l1_10 = 1 if SoloIntermediate == 0 & NeoIntensive == 0 & vlbw_year <= 10
 gen l1_10_100 = 0
 replace l1_10_100 = 1 if SoloIntermediate == 0 & NeoIntensive == 0 & vlbw_year > 10 & vlbw_year != .
 
+	* level 3 levels.
+gen lev3vols = 0
+replace lev3vols = 1 if l3_25 == 1
+replace lev3vols = 2 if l3_25_50 == 1
+replace lev3vols = 3 if l3_50_100 == 1
+replace lev3vols = 4 if l3_100 == 1
+label define l3l 0 "Not level 3"
+label define l3l 1 " < 25 patients", add
+label define l3l 2 "25-50 patients", add
+label define l3l 3 "50 - 100 patients", add
+label define l3l 4 ">100 patients", add
+label values lev3vols l3l
+
+
 
 * Combined racial categories:
 
