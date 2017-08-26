@@ -720,25 +720,31 @@ label variable mw12501499 "multiple: 1 if 1250 <= weight < 1500"
 
 gen ga24 = 0
 replace ga24 = 1 if b_es_ges < 24
+label variable ga24 "gestational age < 24 weeks"
 
 gen ga2425 = 0
 replace ga2425 = 1 if b_es_ges>=24 & b_es_ges<26
+label variable ga2425 "gestational age 24 - 25 weeks"
 
 gen ga2627 = 0
 replace ga2627 = 1 if b_es_ges>=26 & b_es_ges<28
+label variable ga2627 "gestational age 26 - 27 weeks"
 
 gen ga2829 = 0
 replace ga2829 = 1 if b_es_ges>=28 & b_es_ges<30
+label variable ga2829 "gestational age 28 - 29 weeks"
 
 gen ga3031 = 0 
 replace ga3031 = 1 if b_es_ges>=30 & b_es_ges<32
+label variable ga3031 "gestational age 30 - 31 weeks"
 
 gen ga3233 = 0
 replace ga3233 = 1 if b_es_ges>=32 & b_es_ges<34
+label variable ga3233 "gestational age 32 - 33 weeks"
 
 gen ga34 = 0
 replace ga34 = 1 if b_es_ges>=34 & b_es_ges < 99
-
+label variable ga34 "gestational age > 34  weeks"
 
 * Small for Gestational Age and Large for Gestational Age
 /*
