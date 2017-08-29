@@ -355,12 +355,27 @@ replace m_whtnhis = 1 if m_rwhite == 1 & m_hispanic == 0
 
 
 * set distance to missing in 50 closest firms to remove this as a potential instrument.
+
+
+
 gen chosenind = .
 
 forvalues i=1/50{
 di "`i'"
 replace chosenind = `i' if fidcn`i' == fid
 }
+
+
+gen chdist = .
+
+forvalues n = 1/50{
+
+replace chdist = zipfacdistancecn`n' if chosenind == `n'
+
+}
+label variable chdist "distance to chosen hospital"
+
+
 
 forvalues i = 1/50{
 
