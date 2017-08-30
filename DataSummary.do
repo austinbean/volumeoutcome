@@ -157,3 +157,33 @@ label define rl 0 "Other", add
 label values race rl
 
 bysort ncdobyear: tab race
+
+* Unique Counties:
+
+forvalues n = 2005/2012{
+
+unique b_bcntyc if ncdobyear == `n'
+
+}
+
+
+* Maximum admits:
+
+ bysort b_bcntyc ncdobyear ncdobmonth: gen nsm = sum(adm_nicu)
+ bysort b_bcntyc ncdobyear ncdobmonth: egen maxmonth = max(nsm)
+ 
+ levelsof b_bcntyc, local(cntys)
+ 
+ foreach nm of local cntys{
+di "`nm'"
+ quietly summarize maxmonth if b_bcntyc == `nm',d
+ local r9 = `r(p90)'
+ local r95 = `r(p95)'
+ 
+ di "`nm', `r9', `r95'"
+ 
+ }
+ 
+ 
+
+
