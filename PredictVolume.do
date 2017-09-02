@@ -88,10 +88,12 @@ bysort patid: replace chosen = 1 if chosenind == 51 & fidcn == 0
 drop faclatcn faclongcn
 
 
+	* some checks - does anyone have two chosen facilities?
+bysort patid: gen sm = sum(chosen)
+bysort patid: egen ch1 = max(sm)
 
-
-
-
+bysort patid fidcn: gen fidid = _n
+count if fidid > 1 & chosen == 1
 
 
 
