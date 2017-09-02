@@ -95,11 +95,22 @@ bysort patid: egen ch1 = max(sm)
 bysort patid fidcn: gen fidid = _n
 drop if fidid > 1
 drop sm ch1 fidid
-* can also check this by doing tab chosen and comparing count of 1's to unique patid - should be equal.
+* can also check this by doing tab chosen and comparing count of 1's to unique patid - will be equal.
 
 gen zipfacdistancecn2 = zipfacdistancecn^2
 
 keep patid PAT_ZIP chosen zipfacdistancecn zipfacdistancecn2 hs
 
 clogit chosen zipfacdistancecn zipfacdistancecn2, group(patid)
+mat a1 = e(b)
+estimates save "${birthdata}hospchoicedistanceonly"
+
+clogit chosen zipfacdistancecn zipfacdistancecn2 i.PAT_ZIP, group(patid) from(a1)
+
+predict pr1
+
+* try an asclogit to get a zip-specific effect:
+
+asclogit chosen zipfacdistancecn zipfacdistancecn2 , case(patid) alternatives(hs) casevars(i.PAT_ZIP) from(a1)
+
 
