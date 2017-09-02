@@ -89,15 +89,17 @@ drop faclatcn faclongcn
 
 
 	* some checks - does anyone have two chosen facilities?
+	* And has everyone chosen a facility?  (After these checks, everyone is correct.)
 bysort patid: gen sm = sum(chosen)
 bysort patid: egen ch1 = max(sm)
-
 bysort patid fidcn: gen fidid = _n
-count if fidid > 1 & chosen == 1
+drop if fidid > 1
+drop sm ch1 fidid
+* can also check this by doing tab chosen and comparing count of 1's to unique patid - should be equal.
 
+gen zipfacdistancecn2 = zipfacdistancecn^2
 
+keep patid PAT_ZIP chosen zipfacdistancecn zipfacdistancecn2 hs
 
-
-
-
+clogit chosen zipfacdistancecn zipfacdistancecn2, group(patid)
 
