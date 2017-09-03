@@ -99,18 +99,35 @@ drop sm ch1 fidid
 
 gen zipfacdistancecn2 = zipfacdistancecn^2
 
-keep patid PAT_ZIP chosen zipfacdistancecn zipfacdistancecn2 hs
+keep patid fid fidcn PAT_ZIP chosen zipfacdistancecn zipfacdistancecn2 hs
 
-clogit chosen zipfacdistancecn zipfacdistancecn2, group(patid)
+
+
+clogit chosen zipfacdistancecn zipfacdistancecn2 , group(patid)
+
 mat a1 = e(b)
-estimates save "${birthdata}hospchoicedistanceonly"
-
-clogit chosen zipfacdistancecn zipfacdistancecn2 i.PAT_ZIP, group(patid) from(a1)
+estimates save "${birthdata}hospchoicedistanceonly", replace
 
 predict pr1
 
-* try an asclogit to get a zip-specific effect:
 
-asclogit chosen zipfacdistancecn zipfacdistancecn2 , case(patid) alternatives(hs) casevars(i.PAT_ZIP) from(a1)
+clogit chosen zipfacdistancecn zipfacdistancecn2 i.fidcn, group(patid)
+estimates save "${birthdata}hospchoicedistancefes", replace
+
+
+predict pr2
+
+
+bysort patid: egen mprob = max(pr2)
+gen ind1 = 0
+bysort patid: replace ind1 = 1 if pr2 == mprob
+
+gen fdshr = 0
+replace fdshr = fidcn if ind1 == 1
+bysort patid: egen fshr = max(fdshr)
+
+* try an asclogit to get a zip-specific effect:
+* takes too long for now...  
+* asclogit chosen zipfacdistancecn zipfacdistancecn2 , case(patid) alternatives(hs) casevars(i.PAT_ZIP) from(a1)
 
 
