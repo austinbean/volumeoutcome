@@ -376,13 +376,13 @@ replace chdist = zipfacdistancecn`n' if chosenind == `n'
 label variable chdist "distance to chosen hospital"
 
 
-
+/*
 forvalues i = 1/50{
 
 replace zipfacdistancecn`i' = . if chosenind == `i'
 
 }
-
+*/
 
 
 
