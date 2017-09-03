@@ -14,6 +14,7 @@ capture quietly do "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/T
 use "${inpatient}2010 4 Quarter PUDF.dta"
 
 
+
 	* Keep pregnancy and delivery related
 keep if hcfa_mdc == 14 | hcfa_mdc == 15
 
