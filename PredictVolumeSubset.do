@@ -9,8 +9,19 @@ use "${birthdata}Births2005-2012wCounts.dta"
 keep if b_bplace == 1
 keep if year == 2010
 
-drop if pat_zip < 70000 | pat_zip > 79999
+drop if PAT_ZIP < 70000 | PAT_ZIP > 79999
 drop if fid == .
+
+	* count by fid to compare to predicted share:
+preserve
+bysort fid: gen fdcn = _n
+bysort fid: egen fidcount = max(fdcn)
+drop fdcn
+label variable fidcount "observed count at fid"
+keep fid fidcount
+duplicates drop fid, force
+save "${birthdata}subpopfidtest.dta", replace
+restore
 
 gen fidcn51 = 0
 label variable fidcn51 "51 fidcn"
@@ -30,7 +41,7 @@ gen patid = _n
 
 * drop a bunch of variables here BEFORE the reshape to cut down on the time taken.  
 
-keep zipfacdistancecn*  fidcn* faclatcn* faclongcn* fid patid
+keep zipfacdistancecn*  fidcn* faclatcn* faclongcn* fid patid 
 
 reshape long fidcn faclatcn faclongcn zipfacdistancecn, i(patid) j(hs)
 
@@ -78,17 +89,59 @@ keep patid fid fidcn  chosen zipfacdistancecn zipfacdistancecn2 hs
 	predict pr2
 */
 
+estimates use "${birthdata}nicuchoicedistanceonly"
+predict pr1
+
+estimates use "${birthdata}nicuchoicedistancefes"
+predict pr2
+
+	* Max probabilities of choice
+	* Track the maximum probability
 bysort patid: egen mprob = max(pr2)
 gen ind1 = 0
 bysort patid: replace ind1 = 1 if pr2 == mprob
+drop mprob
+	* about 3300 individuals have ind1 == 1 & fidcn == 0 -> i.e, chose the Outside Option (7% of total)
+	
+	* Does anyone have two choices?
+bysort patid: gen smmx = sum(ind1)
+bysort patid: egen ch2 = max(smmx)
+tab ch2
+drop smmx ch2
+	* No, no one has two choices.
+	
 
+	* Get the FID corresponding to the maximum probability
 gen fdshr = 0
 replace fdshr = fidcn if ind1 == 1
 bysort patid: egen fshr = max(fdshr)
-label variable fdshr "fid of fac w/ max choice prob"
+label variable fshr "fid of fac w/ max choice prob"
+drop fdshr
 
 duplicates drop patid, force
 
-bysort fdshr: gen cntr = _n
-bysort fdshr: egen tot = max(cntr)
+	* Compute shares
+bysort fshr: gen cntr = _n
+bysort fshr: egen totcnt = max(cntr)
+label variable totcnt "total count of predicted nicu admits"
 drop cntr
+
+* keep market shares only:
+keep fshr totcnt
+duplicates drop fshr, force
+
+/*
+	* check by merging in counts from earlier:
+rename fshr fid
+merge 1:1 fid using "${birthdata}subpopfidtest.dta"
+replace totcnt = 0 if _merge == 2
+rename totcnt totalcountnicu
+label variable totalcountnicu "nicu model volume prediction"
+rename fidcount fidcountsubpop
+label variable fidcountsubpop "nicu sub pop actual volume"
+drop _merge
+save "${birthdata}modelchecksub.dta", replace
+
+* Merge with file in PredictVolume.do
+
+*/
