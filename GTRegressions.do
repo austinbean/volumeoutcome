@@ -17,7 +17,7 @@ gen bedspub = pub*TotalBeds
 gen bedsprivnfp = TotalBeds*privnfp
 gen bedsforp = TotalBeds*forp
 
-eststo: regress neonataldeath pub privnfp forp TotalBeds bedspub bedsprivnfp bedsforp  NeoIntensive SoloIntermediate i.year if NeoIntensive == 1
+eststo: regress neonataldeath pub privnfp forp TotalBeds bedspub bedsprivnfp bedsforp  NeoIntensive SoloIntermediate i.year 
 
 
 
