@@ -38,6 +38,22 @@ quietly do "${TXhospital}TX Hospital Code Match.do"
 drop if pat_zip < 70000 | pat_zip > 79999
 drop if fid == .
 
+	* count actual fids observed for check of model
+preserve
+bysort fid: gen fdcn = _n
+bysort fid: egen fidcount = max(fdcn)
+drop fdcn
+label variable fidcount "observed count at fid"
+keep fid fidcount
+duplicates drop fid, force
+save "${birthdata}wholepopfidtest.dta", replace
+restore
+
+
+
+
+
+
 rename pat_zip PAT_ZIP
 
 merge m:1 PAT_ZIP using "${birthdata}closest50hospitals.dta"
@@ -103,32 +119,81 @@ gen zipfacdistancecn2 = zipfacdistancecn^2
 keep patid fid fidcn PAT_ZIP chosen zipfacdistancecn zipfacdistancecn2 hs
 
 
+/*
+* Estimating two choice models - first w/out facility FE's, second with.
 
-clogit chosen zipfacdistancecn zipfacdistancecn2 , group(patid)
+	clogit chosen zipfacdistancecn zipfacdistancecn2 , group(patid)
 
-mat a1 = e(b)
-estimates save "${birthdata}hospchoicedistanceonly", replace
+	mat a1 = e(b)
+	estimates save "${birthdata}hospchoicedistanceonly", replace
 
+	predict pr1
+
+	clogit chosen zipfacdistancecn zipfacdistancecn2 i.fidcn, group(patid)
+	estimates save "${birthdata}hospchoicedistancefes", replace
+
+	predict pr2
+*/
+
+estimates use "${birthdata}hospchoicedistanceonly"
 predict pr1
 
-
-clogit chosen zipfacdistancecn zipfacdistancecn2 i.fidcn, group(patid)
-estimates save "${birthdata}hospchoicedistancefes", replace
-
-
+estimates use "${birthdata}hospchoicedistancefes"
 predict pr2
 
-
+	* Max probabilities of choice
+	* Track the maximum probability
 bysort patid: egen mprob = max(pr2)
 gen ind1 = 0
 bysort patid: replace ind1 = 1 if pr2 == mprob
+drop mprob
+	* about 3300 individuals have ind1 == 1 & fidcn == 0 -> i.e, chose the Outside Option (7% of total)
+	
+	* Does anyone have two choices?
+bysort patid: gen smmx = sum(ind1)
+bysort patid: egen ch2 = max(smmx)
+tab ch2
+drop smmx ch2
+	* No, no one has two choices.
+	
 
+	* Get the FID corresponding to the maximum probability
 gen fdshr = 0
 replace fdshr = fidcn if ind1 == 1
 bysort patid: egen fshr = max(fdshr)
+label variable fshr "fid of fac w/ max choice prob"
+drop fdshr
 
-* try an asclogit to get a zip-specific effect:
-* takes too long for now...  
-* asclogit chosen zipfacdistancecn zipfacdistancecn2 , case(patid) alternatives(hs) casevars(i.PAT_ZIP) from(a1)
+duplicates drop patid, force
 
+	* Compute shares
+bysort fshr: gen cntr = _n
+bysort fshr: egen totcnt = max(cntr)
+label variable totcnt "total count of predicted nicu admits"
+drop cntr
 
+* keep market shares only:
+keep fshr totcnt
+duplicates drop fshr, force
+
+/*
+	* check by merging in counts from earlier:
+rename fshr fid
+merge 1:1 fid using "${birthdata}wholepopfidtest.dta"
+replace totcnt = 0 if _merge == 2
+rename totcnt totalcountwhole
+label variable totalcountwhole "whole model volume prediction"
+rename fidcount fidcountwhole
+label variable fidcountwhole "whole population actual volume"
+drop _merge
+save "${birthdata}modelcheckwhole.dta", replace
+
+use "${birthdata}modelcheckwhole.dta", clear
+merge 1:1 fid using "${birthdata}modelchecksub.dta"
+replace totalcountwhole = 0 if _merge == 2
+replace fidcountwhole = 0 if _merge == 2
+replace totalcountnicu = 0 if _merge == 1
+replace fidcountsubpop = 0 if _merge == 1
+drop _merge
+save "${birthdata}combinedmodelcheck.dta", replace
+*/
