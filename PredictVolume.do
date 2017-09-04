@@ -194,6 +194,14 @@ replace totalcountwhole = 0 if _merge == 2
 replace fidcountwhole = 0 if _merge == 2
 replace totalcountnicu = 0 if _merge == 1
 replace fidcountsubpop = 0 if _merge == 1
+replace totalcountwhole = totalcountwhole*4
+label variable totalcountwhole "whole model volume prediction, x 4"
+replace fidcountwhole = fidcountwhole*4
+label variable fidcountwhole "whole population actual volume, x 4"
+rename fidcountwhole ACTUALvol_allpop
+rename totalcountwhole PREDvol_allpop
+rename totalcountnicu PREDvol_subset
+rename fidcountsubpop ACTUALvol_subset
 drop _merge
 save "${birthdata}combinedmodelcheck.dta", replace
 */
