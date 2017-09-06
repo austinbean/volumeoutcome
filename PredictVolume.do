@@ -190,7 +190,7 @@ save "${birthdata}modelcheckwhole_i.dta", replace
 
 	* check by merging in counts from earlier:
 use "${birthdata}modelcheckwhole_i.dta", clear
-
+rename fshr fid
 merge 1:1 fid using "${birthdata}wholepopfidtest.dta"
 replace totcnt = 0 if _merge == 2
 rename totcnt totalcountwhole
@@ -198,6 +198,8 @@ label variable totalcountwhole "model prediction - whole population"
 rename fidcount fidcountwhole
 label variable fidcountwhole "actual volume - whole population"
 drop _merge
+
+* Note here - there are a few facs which have positive counts but zero shares - 4536351, 4536417.  Investigate.
 
 merge 1:1 fid using "${birthdata}wholepop_fidshares.dta", gen(fdsh)
 rename exp_share PREDshare_allpop
@@ -213,8 +215,10 @@ use "${birthdata}modelcheckwhole.dta", clear
 merge 1:1 fid using "${birthdata}modelchecksub.dta"
 replace totalcountwhole = 0 if _merge == 2
 replace fidcountwhole = 0 if _merge == 2
+replace PREDshare_allpop = 0 if _merge == 2
 replace totalcountnicu = 0 if _merge == 1
 replace fidcountsubpop = 0 if _merge == 1
+replace PREDshare_subpop = 0 if _merge == 1
 replace totalcountwhole = totalcountwhole*4
 label variable totalcountwhole "whole model volume prediction, x 4"
 replace fidcountwhole = fidcountwhole*4
@@ -226,4 +230,5 @@ rename fidcountsubpop ACTUALvol_subset
 drop _merge
 save "${birthdata}combinedmodelcheck.dta", replace
 
-*/
+replace PREDshare_allpop = 0 if PREDshare_allpop < 1
+replace PREDshare_subpop = 0 if PREDshare_subpop < 1

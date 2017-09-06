@@ -171,6 +171,7 @@ label variable exp_share "share as sum of choice probs"
 
 replace totalcountnicu = 0 if _merge == 2
 replace fidcountsubpop = 0 if _merge == 2
+replace exp_share = 0 if _merge == 1
 drop _merge 
 rename exp_share PREDshare_subpop
 
