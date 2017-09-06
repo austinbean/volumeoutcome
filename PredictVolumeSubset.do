@@ -23,6 +23,18 @@ duplicates drop fid, force
 save "${birthdata}subpopfidtest.dta", replace
 restore
 
+
+	* Patient Count at zip code level and save results.
+preserve
+bysort PAT_ZIP: gen zc = _n
+bysort PAT_ZIP: egen zipcount = max(zc)
+keep PAT_ZIP zipcount
+duplicates drop PAT_ZIP, force
+save "${birthdata}subpopzipcount.dta", replace
+restore
+
+	* Generate Outside Option
+
 gen fidcn51 = 0
 label variable fidcn51 "51 fidcn"
 gen faclatcn51 = 0
@@ -41,7 +53,7 @@ gen patid = _n
 
 * drop a bunch of variables here BEFORE the reshape to cut down on the time taken.  
 
-keep zipfacdistancecn*  fidcn* faclatcn* faclongcn* fid patid 
+keep PAT_ZIP zipfacdistancecn*  fidcn* faclatcn* faclongcn* fid patid 
 
 reshape long fidcn faclatcn faclongcn zipfacdistancecn, i(patid) j(hs)
 
@@ -68,7 +80,7 @@ drop sm ch1 fidid
 
 gen zipfacdistancecn2 = zipfacdistancecn^2
 
-keep patid fid fidcn  chosen zipfacdistancecn zipfacdistancecn2 hs
+keep patid PAT_ZIP fid fidcn  chosen zipfacdistancecn zipfacdistancecn2 hs
 
 
 
@@ -110,6 +122,19 @@ tab ch2
 drop smmx ch2
 	* No, no one has two choices.
 	
+	
+* Merge zip information back in, compute shares at zipcode level
+* Why are there zip-code level differences in the choice probs when the distances are the same?
+* But it shouldn't matter anyway - each individual generates a share.
+* But then we sum over probabilities, rather than individuals.
+preserve
+bysort fidcn: gen s1 = sum(pr2)
+bysort fidcn: egen exp_share = max(s1)
+keep fidcn exp_share
+duplicates drop fidcn, force
+rename fidcn fid
+save "${birthdata}subpop_fidshares.dta", replace
+restore
 
 	* Get the FID corresponding to the maximum probability
 gen fdshr = 0
@@ -130,7 +155,7 @@ drop cntr
 keep fshr totcnt
 duplicates drop fshr, force
 
-/*
+
 	* check by merging in counts from earlier:
 rename fshr fid
 merge 1:1 fid using "${birthdata}subpopfidtest.dta"
@@ -140,8 +165,17 @@ label variable totalcountnicu "nicu model volume prediction"
 rename fidcount fidcountsubpop
 label variable fidcountsubpop "nicu sub pop actual volume"
 drop _merge
+
+merge 1:1 fid using "${birthdata}subpop_fidshares.dta"
+label variable exp_share "share as sum of choice probs"
+
+replace totalcountnicu = 0 if _merge == 2
+replace fidcountsubpop = 0 if _merge == 2
+drop _merge 
+rename exp_share PREDshare_subpop
+
 save "${birthdata}modelchecksub.dta", replace
 
 * Merge with file in PredictVolume.do
 
-*/
+
