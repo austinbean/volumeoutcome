@@ -155,6 +155,17 @@ bysort patid: egen ch2 = max(smmx)
 tab ch2
 drop smmx ch2
 	* No, no one has two choices.
+
+	* Compute expected shares
+preserve
+bysort fidcn: gen s1 = sum(pr2)
+bysort fidcn: egen exp_share = max(s1)
+keep fidcn exp_share
+duplicates drop fidcn, force
+rename fidcn fid
+save "${birthdata}wholepop_fidshares.dta", replace
+restore
+	
 	
 
 	* Get the FID corresponding to the maximum probability
@@ -175,17 +186,27 @@ drop cntr
 * keep market shares only:
 keep fshr totcnt
 duplicates drop fshr, force
+save "${birthdata}modelcheckwhole_i.dta", replace
 
-/*
 	* check by merging in counts from earlier:
-rename fshr fid
+use "${birthdata}modelcheckwhole_i.dta", clear
+
 merge 1:1 fid using "${birthdata}wholepopfidtest.dta"
 replace totcnt = 0 if _merge == 2
 rename totcnt totalcountwhole
-label variable totalcountwhole "whole model volume prediction"
+label variable totalcountwhole "model prediction - whole population"
 rename fidcount fidcountwhole
-label variable fidcountwhole "whole population actual volume"
+label variable fidcountwhole "actual volume - whole population"
 drop _merge
+
+merge 1:1 fid using "${birthdata}wholepop_fidshares.dta", gen(fdsh)
+rename exp_share PREDshare_allpop
+replace PREDshare_allpop = 0 if fdsh == 1 
+replace totalcountwhole = 0 if fdsh == 2
+replace fidcountwhole = 0 if fdsh == 2
+label variable PREDshare_allpop "predicted share all population"
+drop fdsh
+
 save "${birthdata}modelcheckwhole.dta", replace
 
 use "${birthdata}modelcheckwhole.dta", clear
@@ -204,4 +225,5 @@ rename totalcountnicu PREDvol_subset
 rename fidcountsubpop ACTUALvol_subset
 drop _merge
 save "${birthdata}combinedmodelcheck.dta", replace
+
 */
