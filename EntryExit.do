@@ -286,3 +286,26 @@ deaths	year  Linked cohort   LC, <= 28 days
 */
 
 
+/*
+
+Making a graph: 
+
+browse
+preserve
+duplicates drop ncdobyear fid, force
+keep ncdobyear fid facname added3 NeoIntensive TotalDeliveries TransfersOut_NO_NICU-TransfersOut_HAS_NICU TransfersInternally_HAS_NICU
+bysort fid: egen everad = max(added3)
+browse if everad == 1
+gen hs_totnicu = TransfersInFromOthers_HAS_NICU + TransfersInternally_HAS_NICU
+label variable hs_totnicu "total nicu admits, source: hospital survey"
+twoway line TotalDeliveries TransfersOut_NO_NICU TransfersInFromOthers_HAS_NICU TransfersInternally_HAS_NICU hs_totnicu ncdobyear if fid == 293120, xline(2008) title("Deliveries at Christus Santa Rosa") xtitle("Year") ytitle("Total Deliveries at >20 Weeks G.A") legend(label(1 "Total Deliveries") label(2 "NICU Transfers Out") label(3 "NICU Transfers In") label(4 "Internal NICU Admits") label(5 "Total NICU Admits") )
+
+twoway line TotalDeliveries ncdobyear if fid == 293120 ||  line TransfersOut_NO_NICU ncdobyear if fid == 293210 & ncdobyear <= 2008 || line TransfersInFromOthers_HAS_NICU ncdobyear if fid == 293210 & ncdobyear >= 2008 || line TransfersInternally_HAS_NICU ncdobyear if fid == 293210 & ncdobyear >= 2008 || line hs_totnicu ncdobyear if fid == 293120 & ncdobyear >= 2008, ///
+ xline(2008) title("Deliveries at Christus Santa Rosa") xtitle("Year") ytitle("Total Deliveries at >20 Weeks G.A") ///
+ legend(label(1 "Total Deliveries") label(2 "NICU Transfers Out") label(3 "NICU Transfers In") label(4 "Internal NICU Admits") label(5 "Total NICU Admits") )
+
+
+
+*/
+
+
