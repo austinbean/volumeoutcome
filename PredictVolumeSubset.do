@@ -136,6 +136,20 @@ rename fidcn fid
 save "${birthdata}subpop_fidshares.dta", replace
 restore
 
+
+ * Expected shares from the simpler model:
+ 
+preserve
+bysort fidcn: gen shr = sum(pr1)
+bysort fidcn: egen exp_share = max(shr)
+keep fidcn exp_share
+duplicates drop fidcn, force
+rename fidcn fid
+rename exp_share var_exp_share
+save "${birthdata}subpop_fidshares_nofes.dta", replace
+restore
+	
+
 	* Get the FID corresponding to the maximum probability
 gen fdshr = 0
 replace fdshr = fidcn if ind1 == 1
@@ -169,11 +183,16 @@ drop _merge
 merge 1:1 fid using "${birthdata}subpop_fidshares.dta"
 label variable exp_share "share as sum of choice probs"
 
-replace totalcountnicu = 0 if _merge == 2
-replace fidcountsubpop = 0 if _merge == 2
-replace exp_share = 0 if _merge == 1
-drop _merge 
+merge 1:1 fid using "${birthdata}subpop_fidshares_nofes.dta", gen(m2)
+label variable var_exp_share "share as sum of choice probs, no fes"
+
+*replace totalcountnicu = 0 if _merge == 2
+*replace fidcountsubpop = 0 if _merge == 2
+*replace exp_share = 0 if _merge == 1
+*replace var_exp_share = 0 if m2 == 1
+drop _merge m2
 rename exp_share PREDshare_subpop
+rename var_exp_share PREDshare_subpop_nofes
 
 save "${birthdata}modelchecksub.dta", replace
 
