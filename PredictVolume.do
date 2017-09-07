@@ -166,6 +166,20 @@ rename fidcn fid
 save "${birthdata}wholepop_fidshares.dta", replace
 restore
 	
+
+ * Expected shares from the simpler model:
+ 
+preserve
+bysort fidcn: gen shr = sum(pr1)
+bysort fidcn: egen exp_share = max(shr)
+keep fidcn exp_share
+duplicates drop fidcn, force
+rename fidcn fid
+rename exp_share var_exp_share
+save "${birthdata}wholepop_fidshares_nofes.dta", replace
+restore
+	
+	
 	
 
 	* Get the FID corresponding to the maximum probability
@@ -209,20 +223,41 @@ replace fidcountwhole = 0 if fdsh == 2
 label variable PREDshare_allpop "predicted share all population"
 drop fdsh
 
+merge 1:1 fid using "${birthdata}wholepop_fidshares_nofes.dta", gen(shr2)
+rename var_exp_share PREDshare_allpop_var
+replace PREDshare_allpop_var = 0 if shr2 == 1
+replace totalcountwhole = 0 if shr2 == 2
+replace fidcountwhole = 0 if shr2 == 2
+label variable PREDshare_allpop_var "predicted share, all pop, NO FE model"
+drop shr2
+
 save "${birthdata}modelcheckwhole.dta", replace
 
 use "${birthdata}modelcheckwhole.dta", clear
 merge 1:1 fid using "${birthdata}modelchecksub.dta"
-replace totalcountwhole = 0 if _merge == 2
-replace fidcountwhole = 0 if _merge == 2
-replace PREDshare_allpop = 0 if _merge == 2
-replace totalcountnicu = 0 if _merge == 1
-replace fidcountsubpop = 0 if _merge == 1
-replace PREDshare_subpop = 0 if _merge == 1
+	* variables from the whole population model
+	* Think about replacing these with negative values if they are missing, so that can be tracked...  Or just leave them missing.
+*replace totalcountwhole = 0 if _merge == 2
+*replace fidcountwhole = 0 if _merge == 2
+*replace PREDshare_allpop = 0 if _merge == 2
+*replace PREDshare_allpop_var = 0 if _merge == 2
+	* variables from the sub population model
+*replace totalcountnicu = 0 if _merge == 1
+*replace fidcountsubpop = 0 if _merge == 1
+*replace PREDshare_subpop = 0 if _merge == 1
+*replace PREDshare_subpop_nofes = 0 if _merg == 1
+
 replace totalcountwhole = totalcountwhole*4
 label variable totalcountwhole "whole model volume prediction, x 4"
+
 replace fidcountwhole = fidcountwhole*4
 label variable fidcountwhole "whole population actual volume, x 4"
+
+replace PREDshare_allpop = PREDshare_allpop*4
+replace PREDshare_allpop_var = PREDshare_allpop_var*4
+rename PREDshare_allpop_var PREDshare_allpop_nofes
+
+
 rename fidcountwhole ACTUALvol_allpop
 rename totalcountwhole PREDvol_allpop
 rename totalcountnicu PREDvol_subset
