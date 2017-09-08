@@ -10,9 +10,13 @@ forval nm = 2005/2010{
 
 * Use whole years:
 	use "${inpatient}`nm' 1 Quarter PUDF.dta"
-	append using "${inpatient}`nm' 2 Quarter PUDF.dta"
-	append using "${inpatient}`nm' 3 Quarter PUDF.dta"
-	append using "${inpatient}`nm' 4 Quarter PUDF.dta"
+	append using "${inpatient}`nm' 2 Quarter PUDF.dta", force
+	append using "${inpatient}`nm' 3 Quarter PUDF.dta", force
+	append using "${inpatient}`nm' 4 Quarter PUDF.dta", force
+	
+	/*
+	There are variable type mismatches in the 2, 3, and 4 quarters of 2010 (only), but these do not matter since only thcic_id and pat_zip are kept.  
+	*/
 
 * change variable case:
 	rename *, lower
@@ -67,7 +71,11 @@ forval nm = 2005/2010{
 
 	gen zipfacdistancecn2 = zipfacdistancecn^2
 	keep patid fid fidcn PAT_ZIP zipfacdistancecn zipfacdistancecn2 hs
-	
+
+* Try a second model:
+	* this would potentially work with the recreation of "chosen"
+	*clogit chosen zipfacdistancecn zipfacdistancecn2 , group(patid)
+
 	
 	
 * Use existing estimates and predict choice probs:
@@ -92,3 +100,12 @@ forval nm = 2005/2010{
 
 
 }
+
+* Combine all of the results
+	use "${birthdata}predictedshares_2005.dta", clear
+
+	forval nm = 2006/2010{
+		append using "${birthdata}predictedshares_`nm'.dta"
+	}
+	rename yr ncdobyear
+	save "${birthdata}combinedpredictedshares.dta", replace
