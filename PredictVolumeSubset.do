@@ -86,7 +86,7 @@ keep patid PAT_ZIP fid fidcn  chosen zipfacdistancecn zipfacdistancecn2 hs
 
 
 /*
-* Estimating two choice models - first w/out facility FE's, second with.
+* Estimating three choice models - first w/out facility FE's, second with, the final with ONLY fe's.
 
 	clogit chosen zipfacdistancecn zipfacdistancecn2 , group(patid)
 
@@ -99,6 +99,25 @@ keep patid PAT_ZIP fid fidcn  chosen zipfacdistancecn zipfacdistancecn2 hs
 	estimates save "${birthdata}nicuchoicedistancefes", replace
 
 	predict pr2
+		* Simple version of the model with only FE's.  This just reproduces the shares chosen, basicaly.  
+	clogit chosen i.fidcn, group(patid)
+	estimates save "${birthdata}nicuchoicefesonly", replace
+	
+	predict pr3
+	
+	bysort fidcn: gen shr = sum(pr3)
+	bysort fidcn: egen exp_share = max(shr)
+	keep fidcn exp_share
+	duplicates drop fidcn, force
+	rename fidcn fid
+	rename exp_share var_exp_share
+	
+	save "${birthdata}fesharecheck.dta", replace
+	merge 1:1 fid using "${birthdata}subpopfidtest.dta"
+	keep if _merge == 3
+	drop _merge
+	gen diff2 = (var_exp_share - fidcount)^2 
+	summarize diff2 if fid != 0, d
 */
 
 estimates use "${birthdata}nicuchoicedistanceonly"
