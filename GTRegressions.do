@@ -68,6 +68,17 @@ replace `st1' = `st1'/wts
 regress neonataldeath `v1' 
 
 
+/*
+- distance to units
+- indicator for the designated level of care of the nearest neonatal unit 
+- indicator for high volume, 
+- the distance to the nearest neonatal unit 
+- interactions of the level of care indicators with distance
+- interactions of high volume indicator with distance
+
+*/
+
+
 
 * Note the filepath is someplace weird, like in the full versions of the PUDF, I think.  
 
