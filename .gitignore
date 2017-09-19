@@ -1,6 +1,7 @@
+*.pdf
 *.dta
 *.ster
 Data Dictionary for IRB 17-019.*
 County Code.csv
 FilePathGlobal.do
-
+Paper.*
