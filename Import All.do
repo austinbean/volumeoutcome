@@ -258,10 +258,24 @@ label variable capex_trans "utilization mins transfers out"
 gen bddays = NeoIntensiveCapacity*30 if NeoIntensiveCapacity != . & NeoIntensiveCapacity != 0
 
 gen avg_util = (month_count+transin - transout)*13 + transout if (NeoIntensiveCapacity != 0 & NeoIntensiveCapacity != .) 
-label variable avg_util "average util 13 days for non-transferred"
+label variable avg_util "days util 13 days pp for non-transferred"
+
+gen avg_util2 = (month_count+transin - transout)*26 + transout if (NeoIntensiveCapacity != 0 & NeoIntensiveCapacity != .) 
+label variable avg_util2 "days util 26 days pp for non-transferred"
 
 gen used_days = bddays - avg_util if (NeoIntensiveCapacity != 0 & NeoIntensiveCapacity != .)
+label variable used_days "bed days utilized assuming 13 days/patient"
 
+gen used_days2 = bddays - avg_util2 if (NeoIntensiveCapacity != 0 & NeoIntensiveCapacity != .)
+label variable used_days2 "bed days utilized assuming 26 days/patient"
+
+* Normalize these by beds 
+
+gen extra_bed_days = used_days/NeoIntensiveCapacity if (NeoIntensiveCapacity != 0 & NeoIntensiveCapacity != .)
+label variable extra_bed_days "total unused bed days (at 13 pp) divided by Capacity"
+
+gen extra_bed_days2 = used_days2/NeoIntensiveCapacity if (NeoIntensiveCapacity != 0 & NeoIntensiveCapacity != .)
+label variable extra_bed_days2 "total unused bed days (at 26 pp) divided by Capacity"
 
 
 * Add the THCIC_ID from the Inpatient Discharge Records to get distances:
