@@ -67,8 +67,9 @@ foreach nm of numlist 2006(1)2012{
 append using "${birthdata}FacCount`nm'.dta", gen(yr`nm')
 
 replace yr`nm' = `nm' if yr`nm' == 1
-
 }
+
+
 
 foreach nm of numlist 2005(1)2012{
 replace yr`nm' = 0 if yr`nm' == .
@@ -77,6 +78,13 @@ replace yr`nm' = 0 if yr`nm' == .
 egen year = rowtotal(yr*)
 drop yr*
 label variable year "Year"
+
+* Fix first quarters...
+bysort facname (year ncdobmonth): replace prev_q = q4_ad[_n-1] if prev_q == . & ncdobmonth == 1
+bysort facname (year ncdobmonth): replace prev_q = prev_q[_n-1] if prev_q == . & ncdobmonth == 2
+bysort facname (year ncdobmonth): replace prev_q = prev_q[_n-1] if prev_q == . & ncdobmonth == 3
+drop q4_ad
+
 
 * 1 - 6 month counts:
 bysort facname (year ncdobmonth): gen total_1_months = month_count[_n-1] 
