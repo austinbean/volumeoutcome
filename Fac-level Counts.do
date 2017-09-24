@@ -26,6 +26,31 @@ drop f_c_i
 label variable month_count "Total NICU admits in month INC transfers"
 
 
+* NICU admits by quarter:
+	gen q1_i = 0
+	gen q2_i = 0
+	gen q3_i = 0
+	gen q4_i = 0
+	bysort facname ncdobmonth: replace q1_i = 1 if adm_nicu == 1 & ncdobmonth <= 3
+	bysort facname ncdobmonth: replace q2_i = 1 if adm_nicu == 1 & ncdobmonth <= 6 & ncdobmonth > 3
+	bysort facname ncdobmonth: replace q3_i = 1 if adm_nicu == 1 & ncdobmonth <= 9 & ncdobmonth > 6
+	bysort facname ncdobmonth: replace q4_i = 1 if adm_nicu == 1 & ncdobmonth <= 12 & ncdobmonth > 9
+	bysort facname q1_i: gen q11 = sum(q1_i)
+	bysort facname q2_i: gen q21 = sum(q2_i)
+	bysort facname q3_i: gen q31 = sum(q3_i)
+	bysort facname q4_i: gen q41 = sum(q4_i)
+	bysort facname: egen q1_ad = max(q11)
+	bysort facname: egen q2_ad = max(q21)
+	bysort facname: egen q3_ad = max(q31)
+	bysort facname: egen q4_ad = max(q41)
+	gen prev_q = .
+	replace prev_q = q1_ad if ncdobmonth <= 6 & ncdobmonth > 3
+	replace prev_q = q2_ad if ncdobmonth <= 9 & ncdobmonth > 6
+	replace prev_q = q3_ad if ncdobmonth <= 12 & ncdobmonth > 9
+	drop q*_i q11 q21 q31 q41 q1_ad q2_ad q3_ad 
+	label variable prev_q "prior quarter total NICU admits"
+
+
 * Count of NICU admits by month, EX transfers
 gen nic_ad = 0
 replace nic_ad = 1 if adm_nicu == 1 & transferred == 0
@@ -132,7 +157,7 @@ duplicates drop facname ncdobmonth, force
 
 * Keep subset:
 
-keep facname ncdobmonth b_bcntyc month_count month_count_ex lbw_month lbw_month_ex vlbw_month vlbw_month_ex lbw_month_mort vlbw_month_mort vlbw_month_mort_ex lbw_month_mort_ex
+keep facname ncdobmonth b_bcntyc month_count month_count_ex lbw_month lbw_month_ex vlbw_month vlbw_month_ex lbw_month_mort vlbw_month_mort vlbw_month_mort_ex lbw_month_mort_ex prev_q q4_ad
 
 * Count of LBW, VLBW in year:
 
