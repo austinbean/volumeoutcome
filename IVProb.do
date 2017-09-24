@@ -20,6 +20,7 @@ bysort fid: gen fc = _n
 bysort fid: egen brtotal = max(fc)
 
 drop if brtotal < 25
+drop if b_wt_cgr < 500
 
 gen qr = 0
 replace qr = 1 if ncdobmonth == 1 | ncdobmonth == 2 | ncdobmonth == 3
