@@ -11,7 +11,7 @@ do "/Users/austinbean/Desktop/Birth2005-2012/FilePathGlobal.do"
 use "${birthdata}/Births2005-2012wCounts.dta"
 
 * Drop home births.
-drop if b_bplace != 1
+*drop if b_bplace != 1
 
 * drop those never admitted to nicu.
 drop if adm_nicu == 0
@@ -33,21 +33,21 @@ keep if _merge == 3
 
 * Previous quarter... 
 
-probit neonataldeath  prev_q i.pay
+probit neonataldeath  prev_q 
 
-ivprobit neonataldeath  (prev_q = exp_share ) i.pay
+ivprobit neonataldeath  (prev_q = exp_share ) 
 
-probit neonataldeath lag_1_months i.pay
+probit neonataldeath lag_1_months
 
-ivprobit neonataldeath  (lag_1_months = exp_share ) i.pay
+ivprobit neonataldeath  (lag_1_months = exp_share ) 
 
-probit neonataldeath  lag3months  i.pay
+probit neonataldeath  lag3months  
 
 ivprobit neonataldeath  (lag3months = exp_share) i.pay
 
 
 gen mnth2 = mnthly_share^2
-ivprobit neonataldeath i.ncdobyear (lag_1_months lag_1_months_sq = mnthly_share mnth2) b_m_educ i.pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple 
+ivprobit neonataldeath (lag_1_months lag_1_months_sq = mnthly_share mnth2) 
 
 
 * Use three month shares:
