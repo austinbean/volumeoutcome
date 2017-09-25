@@ -32,32 +32,11 @@ merge m:1 ncdobyear qr fid using "${birthdata}allyearfidshares.dta"
 
 keep if _merge == 3
 
-* Previous quarter... 
-
-probit neonataldeath  prev_q 
-
-ivprobit neonataldeath  (prev_q = exp_share ) 
-
-probit neonataldeath lag_1_months
-
-ivprobit neonataldeath  (lag_1_months = exp_share ) 
-
-probit neonataldeath  lag3months  
-
-ivprobit neonataldeath  (lag3months = exp_share) i.pay
-
-
-gen mnth2 = mnthly_share^2
-ivprobit neonataldeath (lag_1_months lag_1_months_sq = mnthly_share mnth2) 
-
 
 * Use three month shares:
 * These do not correspond exactly to the correct quarterly values...
 * But these work, though in the iv the main effect is not significant.
 gen lag3months = lag_1_months + lag_2_months + lag_3_months
-
-
-
 
 * W/ quadratic lagged volume terms:
 foreach nm of numlist 1(1)6{
@@ -66,6 +45,30 @@ gen lag_`nm'_months_sq = lag_`nm'_months^2
 label variable lag_`nm'_months_sq " squared lagged `nm' month volume "
 
 }
+
+gen mnth2 = mnthly_share^2
+
+
+
+* Previous quarter... 
+
+probit neonataldeath  prev_q i.b_es_ges
+
+ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges
+
+probit neonataldeath lag_1_months i.b_es_ges
+
+ivprobit neonataldeath  (lag_1_months = exp_share )  i.b_es_ges
+
+probit neonataldeath  lag3months  i.b_es_ges
+
+ivprobit neonataldeath  (lag3months = exp_share) i.b_es_ges
+
+
+ivprobit neonataldeath (lag_1_months lag_1_months_sq = mnthly_share mnth2) 
+
+
+
 probit neonataldeath i.ncdobyear b_m_educ lag_*_months lag_*_months_sq i.pay bca_aeno-hypsospa i.fid w500599-w12501499 m_hisnot m_rwhite m_rblack multiple 
 estimates save "/Users/austinbean/Desktop/Birth2005-2012/probit_nndlev3fullsq"
 
