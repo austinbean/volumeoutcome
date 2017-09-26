@@ -10,7 +10,8 @@ capture quietly do "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/T
 
 
 * Predict Volume for all quarters:
-
+* This may not get it right, because this is all patients, whereas I want nicu patients only.  
+* But this can be done for those patients only, using the other dataset.  
 
 
 foreach yr of numlist 2005(1)2010{
