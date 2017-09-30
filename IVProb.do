@@ -54,6 +54,10 @@ gen mnth2 = mnthly_share^2
 * These work...
 
 * Previous Quarter:
+
+probit neonataldeath prev_q
+
+ivprobit neonataldeath (prev_q = exp_share)
  
 probit neonataldeath  prev_q i.b_es_ges 
 
@@ -66,6 +70,34 @@ ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay
 probit neonataldeath  prev_q i.b_es_ges i.pay bca_aeno-hypsospa
 
 ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay bca_aeno-hypsospa
+
+* full set of health states
+
+probit neonataldeath  prev_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+* prev_q |  -.0005672   .0000728    -7.79
+
+ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+* prev_q |  -.0002086   .0000985    -2.12   0.034
+estimates save "/Users/austinbean/Desktop/Birth2005-2012/ivprobfull.ster", replace
+
+
+* would be better to do this at some gestational age.  and a payment status.  
+margins, dydx(prev_q) predict(pr) atmeans
+
+
+preserve
+keep neonataldeath prev_q exp_share b_es_ges pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+collapse (mean) *
+gen id = _n
+expand = 11
+bysort id: replace prev_q = 20*(_n-1)
+replace pay = 1
+
+estimates use "/Users/austinbean/Desktop/Birth2005-2012/ivprobfullsq.ster"
+
+
+
+
 
 	* These are fine, but failure is perfectly predicted for many facilities since no one dies.  Not that informative.
 probit neonataldeath  prev_q i.b_es_ges i.pay bca_aeno-hypsospa i.fid
@@ -100,6 +132,31 @@ ivprobit neonataldeath  (lag_1_months = exp_share )  i.b_es_ges i.pay bca_aeno-h
 
 
 */
+
+
+* 09/30/2017 - 
+
+
+probit neonataldeath  prev_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+
+margins, dydx(prev_q) predict(pr) atmeans
+
+
+margins, at((mean) _all  prev_q = (0(20)460) )
+marginsplot, recastci(rline) ciopts(color(*0.6)) recast(line) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits")
+
+
+* partial effect at means, varying volume between 1 and 95 percentile, for Medicaid patients.
+margins, at((mean) _all prev_q = (0(20)460) pay = 1)
+
+
+ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+
+estimates save "/Users/austinbean/Desktop/Birth2005-2012/ivprobfull.ster", replace
+
+
+
+
 
 
 * Previous quarter... 
