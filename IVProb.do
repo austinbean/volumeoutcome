@@ -143,14 +143,51 @@ margins, dydx(prev_q) predict(pr) atmeans
 
 
 margins, at((mean) _all  prev_q = (0(20)460) )
-marginsplot, recastci(rline) ciopts(color(*0.6)) recast(line) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits")
-
+marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability")
 
 * partial effect at means, varying volume between 1 and 95 percentile, for Medicaid patients.
+* Future... overlay these for two insurance types.
 margins, at((mean) _all prev_q = (0(20)460) pay = 1)
+marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability") subtitle( "No IV, Medcaid Patients")
 
 
+
+* W/ IV for volume... 
 ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+	* this takes a HUGE amount of time.  
+*margins, at((mean) _all prev_q = (0(20)460) pay = 1) pred(pr)
+
+* The following does finish...
+margins, at((mean) _all) dydx(prev_q)  nose
+
+* Removing SE's saves a ton of time.  
+* Trying w/ prediction
+ margins, at((mean) _all) dydx(prev_q) predict(pr) nose
+ 
+* This one also works
+ margins, at((mean) _all prev_q = (0(20)460)) nose
+
+* adding prediction:
+ margins, at((mean) _all prev_q = (0(20)460)) predict(pr) saving("/Users/austinbean/Desktop/ivprbmarg.dta", replace)
+ marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability") subtitle( "Volume IV")
+
+ * Fixing some categorical variables:
+ 
+ margins, at((mean) _all prev_q = (0(20)460) b_es_ges = 35 pay = 1) predict(pr) nose
+ 
+ /*
+ 
+ See IV Prob Margins Results.do for the  command results...
+ margins, at((mean) _all prev_q = (0(20)460)) predict(pr) saving("/Users/austinbean/Desktop/ivprbmarg.dta", replace)
+ 
+ 
+ */
+ 
+ 
+ 
+marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability") subtitle( "Medcaid Patients")
+
+
 
 estimates save "/Users/austinbean/Desktop/Birth2005-2012/ivprobfull.ster", replace
 
