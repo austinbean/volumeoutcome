@@ -136,14 +136,12 @@ ivprobit neonataldeath  (lag_1_months = exp_share )  i.b_es_ges i.pay bca_aeno-h
 
 * 09/30/2017 - 
 
-
-probit neonataldeath  prev_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
-
-margins, dydx(prev_q) predict(pr) atmeans
-
-
-margins, at((mean) _all  prev_q = (0(20)460) )
-marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability")
+* Without IV for Volume...
+probit neonataldeath  prev_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+margins, at((mean) _all  prev_q = (0(20)460) ) post
+est store prob_margins_no_iv
+estimates save "/Users/austinbean/Desktop/Birth2005-2012/prob_margins_no_iv.ster", replace
+marginsplot, recastci(rarea) ciopts(color(gray*0.6))  recast(line) plot1opts(lcolor(black)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability") saving("/Users/austinbean/Desktop/Birth2005-2012/volumeprobit_noiv.gph", replace)
 
 * partial effect at means, varying volume between 1 and 95 percentile, for Medicaid patients.
 * Future... overlay these for two insurance types.
@@ -151,26 +149,39 @@ margins, at((mean) _all prev_q = (0(20)460) pay = 1)
 marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability") subtitle( "No IV, Medcaid Patients")
 
 
-
 * W/ IV for volume... 
 ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
-	* this takes a HUGE amount of time.  
-*margins, at((mean) _all prev_q = (0(20)460) pay = 1) pred(pr)
+* takes a LONG time. started at: 12:40, finished at: 2:30.  Ugh.  
+margins, at((mean) _all prev_q = (0(20)460)) predict(pr) post saving("/Users/austinbean/Desktop/ivprbmarg.dta", replace)
+est store prob_margins_w_iv
+estimates save "/Users/austinbean/Desktop/Birth2005-2012/prob_margins_w_iv.ster", replace
+marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability") subtitle( "Volume IV") saving("/Users/austinbean/Desktop/Birth2005-2012/Volume IV Probit.gph", replace)
 
-* The following does finish...
+
+* Plotting both of the sets of marginal effects:
+
+
+* legend(order(1 "No IV" 2 "With IV")) 
+coefplot prob_margins_no_iv prob_margins_w_iv,  recast(line) vertical title("Effect of Volume on Outcome") subtitle("With and Without Volume IV") ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits")  xlabel(   1 "0" 2 "20" 3 "40" 4 "60" 5 "80" 6 "100" 7 "120" 8 "140" 9 "160" 10 "180" 11 "200" 12 "220" 13 "240" 14 "260" 15 "280" 16 "300" 17 "320" 18 "340" 19 "360" 20 "380" 21 "400" 22 "420" 23 "440" 24 "460", angle(45)) graphregion(color(white))
+ graph save Graph "/Users/austinbean/Desktop/Birth2005-2012/Combined IV Prob Volume.gph"
+
+ 
+	
+* The following do finish, but save time by skipping SE's
 margins, at((mean) _all) dydx(prev_q)  nose
-
-* Removing SE's saves a ton of time.  
 * Trying w/ prediction
  margins, at((mean) _all) dydx(prev_q) predict(pr) nose
- 
-* This one also works
+ * This one also works
  margins, at((mean) _all prev_q = (0(20)460)) nose
 
-* adding prediction:
- margins, at((mean) _all prev_q = (0(20)460)) predict(pr) saving("/Users/austinbean/Desktop/ivprbmarg.dta", replace)
- marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability") subtitle( "Volume IV")
 
+ 
+ 
+ * Overlay graphs of volume IV and regular: 
+ * combines them side by side...
+ 
+graph combine "/Users/austinbean/Desktop/Birth2005-2012/volumeprobit_noiv.gph" "/Users/austinbean/Desktop/Birth2005-2012/Volume IV Probit.gph", xcommon ycommon
+ 
  * Fixing some categorical variables:
  
  margins, at((mean) _all prev_q = (0(20)460) b_es_ges = 35 pay = 1) predict(pr) nose
