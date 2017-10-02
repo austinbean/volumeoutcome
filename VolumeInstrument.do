@@ -5,7 +5,7 @@ do "/Users/austinbean/Desktop/Birth2005-2012/FilePathGlobal.do"
 capture quietly do "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/TX Global Filepath Names.do"
 
 * Want somewhat more info about these, like levels. 
-* use "/Users/austinbean/Google Drive/Texas Inpatient Discharge/Full Versions/2007 1 Quarter PUDF.dta", clear
+* use "/Users/austinbean/Google Drive/Texas Inpatient Discharge/Full Versions/2005 1 Quarter PUDF.dta", clear
 
 
 
@@ -23,6 +23,18 @@ foreach qr of numlist 1(1)4{
 	capture rename cms_mdc hcfa_mdc
 	capture rename patient_age pat_age
 
+* Label Medicaid and Privately Insured
+
+	gen medicaid = 0
+	replace medicaid = 1 if first_payment_source == "MC"
+	label variable medicaid "0/1 for Medicaid status, taken from FIRST_PAY.. == MC"
+
+	gen private_ins = 0
+	replace private_ins = 1 if first_payment_source == "12" | first_payment_source == "14" | first_payment_source == "CI" | first_payment_source == "BL" | first_payment_source == "HM" | first_payment_source == "LI" | first_payment_source == "LM" 
+	label variable private_ins "0/1 for privately insured patient, taken from FIRST_PAY..."
+	
+	
+
 * Keep pregnancy and delivery related
 	keep if hcfa_mdc == 14 | hcfa_mdc == 15
 
@@ -35,7 +47,7 @@ foreach qr of numlist 1(1)4{
 	drop if pat_zip == .
 
 * Keep only necessary variables.  
-	keep thcic_id pat_zip
+	keep thcic_id pat_zip private_ins medicaid
 
 
 * Add Hospital FID
@@ -107,7 +119,7 @@ foreach qr of numlist 1(1)4{
 
 	gen zipfacdistancecn2 = zipfacdistancecn^2
 
-	keep patid fid fidcn PAT_ZIP chosen zipfacdistancecn zipfacdistancecn2 hs
+	keep patid fid fidcn PAT_ZIP chosen zipfacdistancecn zipfacdistancecn2 hs private_ins medicaid
 	
 	
 * Add more info about these, using FID, I think.  
@@ -128,10 +140,33 @@ foreach qr of numlist 1(1)4{
 	replace SoloIntermediate = 0 if fidcn == 0
 	replace ObstetricCare = 0 if fidcn == 0
 	replace ObstetricsLevel = 0 if fidcn == 0
-	replace ObstetricCare = 0 if fidcn == 0
 	
 
 
+* To check the features of the choice model with a 50 firm threshold (as in TX Merge Hospital Choices Variant.do)
+/*
+	* Closest variable...
+	bysort patid: egen mind = min(zipfacdistancecn) if zipfacdistancecn > 0
+	gen closest = 0
+	bysort patid: replace closest = 1 if zipfacdistancecn == mind
+	
+	* check... for duplicates of closest.  There are none.
+	bysort patid: gen dd = sum(closest)
+	tab closest
+	drop dd
+	
+	* distance*beds/100
+	replace TotalBeds = 0 if fidcn == 0
+	gen dist_bed = (TotalBeds*zipfacdistancecn)/100
+
+	clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate closest dist_bed, group(patid)
+	clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate closest dist_bed if medicaid == 1, group(patid)
+	clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate closest dist_bed if private == 1, group(patid)
+
+	
+*/	
+	
+	
 
 * Estimating two choice models - first w/out facility FE's, second with.
 
