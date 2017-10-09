@@ -138,6 +138,13 @@ ivprobit neonataldeath  (lag_1_months = exp_share )  i.b_es_ges i.pay bca_aeno-h
 
 * Without IV for Volume...
 probit neonataldeath  prev_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+eststo: probit neonataldeath  prev_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+
+* With FE for year
+probit neonataldeath  prev_q i.b_es_ges i.pay i.ncdobyear as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+eststo: probit neonataldeath  prev_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+
+
 margins, at((mean) _all  prev_q = (0(20)460) ) post
 est store prob_margins_no_iv
 estimates save "/Users/austinbean/Desktop/Birth2005-2012/prob_margins_no_iv.ster", replace
@@ -151,11 +158,25 @@ marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(r
 
 * W/ IV for volume... 
 ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+eststo: ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+
+* w/ IV for volume and year FE's:
+ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay i.ncdobyear as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+eststo:  ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay i.ncdobyear as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+
+
 * takes a LONG time. started at: 12:40, finished at: 2:30.  Ugh.  
 margins, at((mean) _all prev_q = (0(20)460)) predict(pr) post saving("/Users/austinbean/Desktop/ivprbmarg.dta", replace)
 est store prob_margins_w_iv
 estimates save "/Users/austinbean/Desktop/Birth2005-2012/prob_margins_w_iv.ster", replace
 marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability") subtitle( "Volume IV") saving("/Users/austinbean/Desktop/Birth2005-2012/Volume IV Probit.gph", replace)
+
+
+
+* Saving the Probit and IV probit results out as a table:
+esttab using "/Users/austinbean/Desktop/Birth2005-2012/ivprobresults.tex", se ar2 label title("Results") nonumbers mtitles("Probit" "IV Probit") replace
+
+
 
 
 * Plotting both of the sets of marginal effects:
