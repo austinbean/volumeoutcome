@@ -15,7 +15,7 @@ do "${birthdo}/Label Variables.do"
 gen year = `nm'
 
 * Add FIDS to patient records:
-* Merge now on names using hosps.csv, which was matched to FIDS by hand.  
+* Merge now on names using hosps.csv, which were matched to FIDS by hand.  
 
 merge m:1 fid year using "${birthdata}LevelInfo.dta", gen(facinfo)
 drop if facinfo == 2
