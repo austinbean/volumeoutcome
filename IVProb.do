@@ -148,6 +148,7 @@ eststo: probit neonataldeath  prev_q i.b_es_ges i.pay as_vent rep_ther antibiot 
 margins, at((mean) _all  prev_q = (0(20)460) ) post
 est store prob_margins_no_iv
 estimates save "/Users/austinbean/Desktop/Birth2005-2012/prob_margins_no_iv.ster", replace
+* estimates use "/Users/austinbean/Desktop/Birth2005-2012/prob_margins_no_iv.ster"
 marginsplot, recastci(rarea) ciopts(color(gray*0.6))  recast(line) plot1opts(lcolor(black)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability") saving("/Users/austinbean/Desktop/Birth2005-2012/volumeprobit_noiv.gph", replace)
 
 * partial effect at means, varying volume between 1 and 95 percentile, for Medicaid patients.
@@ -169,6 +170,7 @@ eststo:  ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay i.ncdoby
 margins, at((mean) _all prev_q = (0(20)460)) predict(pr) post saving("/Users/austinbean/Desktop/ivprbmarg.dta", replace)
 est store prob_margins_w_iv
 estimates save "/Users/austinbean/Desktop/Birth2005-2012/prob_margins_w_iv.ster", replace
+* estimates use "/Users/austinbean/Desktop/Birth2005-2012/prob_margins_w_iv.ster"
 marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability") subtitle( "Volume IV") saving("/Users/austinbean/Desktop/Birth2005-2012/Volume IV Probit.gph", replace)
 
 
