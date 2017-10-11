@@ -177,14 +177,16 @@
 	bysort b_bcntyc : egen q11 = max(q1_i)
 	bysort b_bcntyc : egen q21 = max(q2_i)
 	bysort b_bcntyc : egen q31 = max(q3_i)
-	bysort b_bcntyc : egen q4_ad = max(q4_i)
+	bysort b_bcntyc : egen q41 = max(q4_i)
 
 	gen total_q_nicu = .
-	replace total_q_nicu = q11 if ncdobmonth <= 6 & ncdobmonth > 3
-	replace total_q_nicu = q21 if ncdobmonth <= 9 & ncdobmonth > 6
-	replace total_q_nicu = q31 if ncdobmonth <= 12 & ncdobmonth > 9
-	label variable total_q_nicu "prior quarter total county NICU admits"
-	drop q*_i q11 q21 q31  
+	replace total_q_nicu = q11 if ncdobmonth <= 3  
+	replace total_q_nicu = q21 if ncdobmonth <= 6 & ncdobmonth > 3
+	replace total_q_nicu = q31 if ncdobmonth <= 9 & ncdobmonth > 6
+	replace total_q_nicu = q41 if ncdobmonth <= 12 & ncdobmonth > 9
+
+	label variable total_q_nicu "quarter total county NICU admits"
+	drop q*_i q11 q21 q31 q41
 	
 * County deaths by quarter:
 
@@ -198,11 +200,12 @@
 	bysort b_bcntyc : egen q4_ad = max(q4_i)
 
 	gen  = .
-	replace  = q11 if ncdobmonth <= 6 & ncdobmonth > 3
-	replace  = q21 if ncdobmonth <= 9 & ncdobmonth > 6
-	replace  = q31 if ncdobmonth <= 12 & ncdobmonth > 9
-	label variable  "prior quarter total county NICU admits"
-	drop q*_i q11 q21 q31 
+	replace  = q11 if ncdobmonth <= 3  
+	replace  = q21 if ncdobmonth <= 6 & ncdobmonth > 3
+	replace  = q31 if ncdobmonth <= 9 & ncdobmonth > 6
+	replace  = q41 if ncdobmonth <= 12 & ncdobmonth > 9
+	label variable  "quarter total county NICU admits"
+	drop q*_i q11 q21 q31 q41
 	
 	
 	
