@@ -16,7 +16,7 @@
 
 	sort b_bcntyc ncdobmonth ncdobyear
 
-* keep if b_bcntyc == 227
+* keep if b_bcntyc == 227 - 86 per quarter on average per facility, but 345 across facilities (2010 Q 4)
 * Gen track of quarter
 	gen quarter = 0
 	replace quarter = 1 if ncdobmonth == 1 | ncdobmonth == 2 | ncdobmonth == 3
