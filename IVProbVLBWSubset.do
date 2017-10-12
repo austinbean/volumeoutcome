@@ -68,16 +68,18 @@ sort ncdobyear qr fid
 
 * Plotting both of the sets of marginal effects:
 	coefplot prob_marg_no_iv_vlbw prob_marg_w_iv_vlbw,  recast(line) vertical title("Effect of Volume on Outcome, All Patient Model") subtitle("With and Without Volume IV - VLBW Patients Only") ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits")  xlabel(   1 "0" 2 "20" 3 "40" 4 "60" 5 "80" 6 "100" 7 "120" 8 "140" 9 "160" 10 "180" 11 "200" 12 "220" 13 "240" 14 "260" 15 "280" 16 "300" 17 "320" 18 "340" 19 "360" 20 "380" 21 "400" 22 "420" 23 "440" 24 "460", angle(45)) graphregion(color(white))
-	graph save Graph "/Users/austinbean/Desktop/Birth2005-2012/Combined IV Prob Volume VLBW.gph"
+	graph save Graph "/Users/austinbean/Desktop/Birth2005-2012/Combined IV Prob Volume VLBW.gph", replace
 
 	
 	
 	
 * Regular and IV Probit - VLBW PATIENTS ONLY:
 * No IV for Volume: 
+	preserve
+	keep if vlbw == 1
 	probit neonataldeath  prev_q i.b_es_ges i.pay i.ncdobyear as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa if vlbw == 1  
 	eststo: probit neonataldeath  prev_q i.b_es_ges i.pay i.ncdobyear as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa if vlbw == 1
-	margins, at((mean) _all  prev_q = (0(20)460) vlbw = 1 ) post
+	margins, at((mean) _all  prev_q = (0(20)460) ) post
 	est store prob_marg_no_iv_vlbw_only
 	estimates save "/Users/austinbean/Desktop/Birth2005-2012/prob_marg_noiv_vlb_on.ster", replace
 	* estimates use "/Users/austinbean/Desktop/Birth2005-2012/prob_marg_noiv_vlb_on.ster"
@@ -88,18 +90,16 @@ sort ncdobyear qr fid
 	ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay i.ncdobyear as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa if vlbw == 1
 	eststo:  ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay i.ncdobyear as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa if vlbw == 1
 	* takes a LONG time. started at: 12:40, finished at: 2:30.  Ugh.  
-	margins, at((mean) _all vlbw = 1 prev_q = (0(20)460)) predict(pr) post saving("/Users/austinbean/Desktop/ivprbmarg_vlbwonly.dta", replace)
+	margins, at((mean) _all prev_q = (0(20)460)) predict(pr) post saving("/Users/austinbean/Desktop/ivprbmarg_vlbwonly.dta", replace)
 	est store prob_marg_w_iv_vlbwonly
 	estimates save "/Users/austinbean/Desktop/Birth2005-2012/prob_marg_wiv_vlbon.ster", replace
 	* estimates use "/Users/austinbean/Desktop/Birth2005-2012/prob_marg_wiv_vlbon.ster"
 	marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability") subtitle( "Volume IV") saving("/Users/austinbean/Desktop/Birth2005-2012/Volume IV Probit, VLBW Only.gph", replace)
 
-
-
 * Saving the Probit and IV probit results out as a table:
 	esttab using "/Users/austinbean/Desktop/Birth2005-2012/ivprobresults_vlbwonly.tex", se ar2 label title("Results - VLBW Only Model") nonumbers mtitles("Probit" "IV Probit") replace
 
 * Plotting both of the sets of marginal effects:
-	coefplot prob_marg_no_iv_vlbwonly prob_marg_w_iv_vlbwonly,  recast(line) vertical title("Effect of Volume on Outcome") subtitle("With and Without Volume IV - VLBW Patients Only") ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits")  xlabel(   1 "0" 2 "20" 3 "40" 4 "60" 5 "80" 6 "100" 7 "120" 8 "140" 9 "160" 10 "180" 11 "200" 12 "220" 13 "240" 14 "260" 15 "280" 16 "300" 17 "320" 18 "340" 19 "360" 20 "380" 21 "400" 22 "420" 23 "440" 24 "460", angle(45)) graphregion(color(white))
-	graph save Graph "/Users/austinbean/Desktop/Birth2005-2012/Combined IV Prob Volume VLBW Only.gph"
- 
+	coefplot prob_marg_no_iv_vlbw_only prob_marg_w_iv_vlbwonly,  recast(line) vertical title("Effect of Volume on Outcome") subtitle("With and Without Volume IV - VLBW Patients Only") ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits")  xlabel(   1 "0" 2 "20" 3 "40" 4 "60" 5 "80" 6 "100" 7 "120" 8 "140" 9 "160" 10 "180" 11 "200" 12 "220" 13 "240" 14 "260" 15 "280" 16 "300" 17 "320" 18 "340" 19 "360" 20 "380" 21 "400" 22 "420" 23 "440" 24 "460", angle(45)) graphregion(color(white))
+	graph save Graph "/Users/austinbean/Desktop/Birth2005-2012/Combined IV Prob Volume VLBW Only.gph", replace
+	restore
