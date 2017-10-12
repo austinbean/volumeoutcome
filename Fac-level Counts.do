@@ -221,16 +221,18 @@
 	replace total_q_deaths = q41 if ncdobmonth <= 12 & ncdobmonth > 9
 	label variable total_q_deaths "quarter total county nn deaths"
 	drop q*_i qs* q11 q21 q31 q41
-	
-	
-	
-	
 
 * Keep subset:
 
 	keep facname ncdobmonth b_bcntyc month_count month_count_ex lbw_month lbw_month_ex vlbw_month vlbw_month_ex lbw_month_mort vlbw_month_mort vlbw_month_mort_ex lbw_month_mort_ex prev_q q4_ad monthly_admit_deaths yearly_admit_deaths total_q_deaths total_q_nicu month_mort_all
 
-* Count of LBW, VLBW in year:
+* Count of nicu admits, LBW, VLBW, deaths in year:
+
+	bysort facname : gen na_y_i = sum(month_count)
+	bysort facname : egen nicu_year = max(na_y_i)
+	drop na_y_i
+	label variable nicu_year "Fac. Spec. nicu admits in Year"
+
 
 	bysort facname : gen lbw_y_i = sum(lbw_month)
 	bysort facname : egen lbw_year = max(lbw_y_i)
@@ -241,7 +243,64 @@
 	bysort facname : egen vlbw_year = max(vlbw_y_i)
 	drop vlbw_y_i
 	label variable vlbw_year "Fac. Spec. Very Low Birth Weight Infants in Year"
+	
+	bysort facname : gen d_y_i = sum(monthly_admit_deaths)
+	bysort facname : egen deaths_year = max(d_y_i)
+	drop d_y_i
+	label variable deaths_year "Fac. Spec. deaths in Year, among nicu admits"
 
 
-	sort facname ncdobmonth
+* Count of  LBW, VLBW, deaths by quarter
+* Note that quarter total nicu admits are "prev_q"
 
+* LBW patients per quarter, hosp specific:
+	bysort facname: gen q1_i = sum(lbw_month) if ncdobmonth <= 3  
+	bysort facname: gen q2_i = sum(lbw_month) if ncdobmonth <= 6 & ncdobmonth > 3
+	bysort facname: gen q3_i = sum(lbw_month) if ncdobmonth <= 9 & ncdobmonth > 6
+	bysort facname: gen q4_i = sum(lbw_month) if ncdobmonth <= 12 & ncdobmonth > 9
+	gen lbw_q = 0
+	bysort facname: egen q11 = max(q1_i)
+	bysort facname: egen q21 = max(q2_i)
+	bysort facname: egen q31 = max(q3_i)
+	bysort facname: egen q41 = max(q4_i)
+	bysort facname: replace lbw_q = q11 if ncdobmonth <= 3
+	bysort facname: replace lbw_q = q21 if ncdobmonth <= 6 & ncdobmonth > 3
+	bysort facname: replace lbw_q = q31 if ncdobmonth <= 9 & ncdobmonth > 6
+	bysort facname: replace lbw_q = q41 if ncdobmonth <= 12 & ncdobmonth > 9
+	label variable lbw_q "hosp spec. lbw patients per quarter"
+	drop q*_i q11 q21 q31 q41
+
+* VLBW by quarter, hosp specific:	
+	bysort facname: gen q1_i = sum(vlbw_month) if ncdobmonth <= 3  
+	bysort facname: gen q2_i = sum(vlbw_month) if ncdobmonth <= 6 & ncdobmonth > 3
+	bysort facname: gen q3_i = sum(vlbw_month) if ncdobmonth <= 9 & ncdobmonth > 6
+	bysort facname: gen q4_i = sum(vlbw_month) if ncdobmonth <= 12 & ncdobmonth > 9
+	gen vlbw_q = 0
+	bysort facname: egen q11 = max(q1_i)
+	bysort facname: egen q21 = max(q2_i)
+	bysort facname: egen q31 = max(q3_i)
+	bysort facname: egen q41 = max(q4_i)
+	bysort facname: replace vlbw_q = q11 if ncdobmonth <= 3
+	bysort facname: replace vlbw_q = q21 if ncdobmonth <= 6 & ncdobmonth > 3
+	bysort facname: replace vlbw_q = q31 if ncdobmonth <= 9 & ncdobmonth > 6
+	bysort facname: replace vlbw_q = q41 if ncdobmonth <= 12 & ncdobmonth > 9
+	label variable vlbw_q "hosp spec. vlbw patients per quarter"
+	drop q*_i q11 q21 q31 q41
+	
+* Deaths per quarter, hosp specific:
+	bysort facname: gen q1_i = sum(monthly_admit_deaths) if ncdobmonth <= 3  
+	bysort facname: gen q2_i = sum(monthly_admit_deaths) if ncdobmonth <= 6 & ncdobmonth > 3
+	bysort facname: gen q3_i = sum(monthly_admit_deaths) if ncdobmonth <= 9 & ncdobmonth > 6
+	bysort facname: gen q4_i = sum(monthly_admit_deaths) if ncdobmonth <= 12 & ncdobmonth > 9
+	gen deaths_q = 0
+	bysort facname: egen q11 = max(q1_i)
+	bysort facname: egen q21 = max(q2_i)
+	bysort facname: egen q31 = max(q3_i)
+	bysort facname: egen q41 = max(q4_i)
+	bysort facname: replace vlbw_q = q11 if ncdobmonth <= 3
+	bysort facname: replace vlbw_q = q21 if ncdobmonth <= 6 & ncdobmonth > 3
+	bysort facname: replace vlbw_q = q31 if ncdobmonth <= 9 & ncdobmonth > 6
+	bysort facname: replace vlbw_q = q41 if ncdobmonth <= 12 & ncdobmonth > 9
+	label variable vlbw_q "hosp spec. deaths ps per quar, nicu ads only"
+	drop q*_i q11 q21 q31 q41
+	
