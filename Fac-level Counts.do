@@ -150,14 +150,14 @@
 	bysort facname ncdobmonth: replace nd = 1 if adm_nicu == 1 & neonataldeath == 1
 	bysort facname ncdobmonth: gen nnd_i = sum(nd)
 	bysort facname ncdobmonth: egen monthly_admit_deaths = max(nnd_i)
-	drop nnd_i 
+	drop nnd_i nd
 	label variable monthly_admit_deaths "monthly deaths among nicu admits"
 	
-* Annual mortality among admits:
-	bysort facname: gen yra_i = sum(monthly_admit_deaths)
-	bysort facname: egen yearly_admit_deaths = max(yra_i)
-	drop yra_i
-	label variable yearly_admit_deaths "yearly deaths among nicu admits"
+* All mortality by month:
+	bysort facname ncdobmonth: gen mm = sum(neonataldeath)
+	bysort facname ncdobmonth: egen month_mort_all = max(mm)
+	drop mm
+	label variable month_mort_all "all monthly mortality, inc. non-nicu-admits"
 	
 	
 * dropping home births
@@ -168,6 +168,14 @@
 * browse if b_bcntyc == 227
  
 	duplicates drop facname ncdobmonth, force
+	
+	
+* Annual mortality among admits:
+	bysort facname: gen yra_i = sum(monthly_admit_deaths)
+	bysort facname: egen yearly_admit_deaths = max(yra_i)
+	drop yra_i
+	label variable yearly_admit_deaths "yearly deaths among nicu admits"
+	
 	
 * Make county level counts by quarter
 	bysort b_bcntyc : gen q1_i = sum(month_count) if ncdobmonth <= 3
@@ -189,23 +197,30 @@
 	drop q*_i q11 q21 q31 q41
 	
 * County deaths by quarter:
-
-	bysort b_bcntyc : gen q1_i = sum() if ncdobmonth <= 3
-	bysort b_bcntyc : gen q2_i = sum() if ncdobmonth <= 6 & ncdobmonth > 3
-	bysort b_bcntyc : gen q3_i = sum() if ncdobmonth <= 9 & ncdobmonth > 6
-	bysort b_bcntyc : gen q4_i = sum() if ncdobmonth <= 12 & ncdobmonth > 9
-	bysort b_bcntyc : egen q11 = max(q1_i)
-	bysort b_bcntyc : egen q21 = max(q2_i)
-	bysort b_bcntyc : egen q31 = max(q3_i)
-	bysort b_bcntyc : egen q4_ad = max(q4_i)
-
-	gen  = .
-	replace  = q11 if ncdobmonth <= 3  
-	replace  = q21 if ncdobmonth <= 6 & ncdobmonth > 3
-	replace  = q31 if ncdobmonth <= 9 & ncdobmonth > 6
-	replace  = q41 if ncdobmonth <= 12 & ncdobmonth > 9
-	label variable  "quarter total county NICU admits"
-	drop q*_i q11 q21 q31 q41
+	gen q1_i = 0
+	gen q2_i = 0
+	gen q3_i = 0
+	gen q4_i = 0
+	bysort b_bcntyc ncdobmonth: replace q1_i = monthly_admit_deaths if ncdobmonth <= 3
+	bysort b_bcntyc ncdobmonth: replace q2_i = monthly_admit_deaths if ncdobmonth <= 6 & ncdobmonth > 3
+	bysort b_bcntyc ncdobmonth: replace q3_i = monthly_admit_deaths if ncdobmonth <= 9 & ncdobmonth > 6
+	bysort b_bcntyc ncdobmonth: replace q4_i = monthly_admit_deaths if ncdobmonth <= 12 & ncdobmonth > 9
+	bysort b_bcntyc ncdobmonth: egen qs1 = sum(q1_i)
+	bysort b_bcntyc : egen qs2 = sum(q2_i)
+	bysort b_bcntyc : egen qs3 = sum(q3_i)
+	bysort b_bcntyc : egen qs4 = sum(q4_i)
+	
+	bysort b_bcntyc : egen q11 = max(qs1)
+	bysort b_bcntyc : egen q21 = max(qs2)
+	bysort b_bcntyc : egen q31 = max(qs3)
+	bysort b_bcntyc : egen q41 = max(qs4)
+	gen total_q_deaths = .
+	replace total_q_deaths = q11 if ncdobmonth <= 3  
+	replace total_q_deaths = q21 if ncdobmonth <= 6 & ncdobmonth > 3
+	replace total_q_deaths = q31 if ncdobmonth <= 9 & ncdobmonth > 6
+	replace total_q_deaths = q41 if ncdobmonth <= 12 & ncdobmonth > 9
+	label variable total_q_deaths "quarter total county nn deaths"
+	drop q*_i qs* q11 q21 q31 q41
 	
 	
 	
@@ -213,19 +228,19 @@
 
 * Keep subset:
 
-	keep facname ncdobmonth b_bcntyc month_count month_count_ex lbw_month lbw_month_ex vlbw_month vlbw_month_ex lbw_month_mort vlbw_month_mort vlbw_month_mort_ex lbw_month_mort_ex prev_q q4_ad monthly_admit_deaths yearly_admit_deaths
+	keep facname ncdobmonth b_bcntyc month_count month_count_ex lbw_month lbw_month_ex vlbw_month vlbw_month_ex lbw_month_mort vlbw_month_mort vlbw_month_mort_ex lbw_month_mort_ex prev_q q4_ad monthly_admit_deaths yearly_admit_deaths total_q_deaths total_q_nicu month_mort_all
 
 * Count of LBW, VLBW in year:
 
 	bysort facname : gen lbw_y_i = sum(lbw_month)
 	bysort facname : egen lbw_year = max(lbw_y_i)
 	drop lbw_y_i
-	label variable lbw_year "Low Birth Weight Infants in Year"
+	label variable lbw_year "Fac. Spec. Low Birth Weight Infants in Year"
 
 	bysort facname : gen vlbw_y_i = sum(vlbw_month)
 	bysort facname : egen vlbw_year = max(vlbw_y_i)
 	drop vlbw_y_i
-	label variable vlbw_year "Very Low Birth Weight Infants in Year"
+	label variable vlbw_year "Fac. Spec. Very Low Birth Weight Infants in Year"
 
 
 	sort facname ncdobmonth
