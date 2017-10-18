@@ -62,7 +62,7 @@ Run some regular and IV probits with the goal of creating a table with the coeff
 	estadd local VLBW "No"
 	estadd local HealthStates "No"
 	* Lagged volume and year
-	eststo iv_vy: ivprobit neonataldeath (prev_q = exp_share ) i.ncdobyear
+	eststo iv_vy: ivprobit neonataldeath (prev_q = exp_share ) i.ncdobyear i.vlbw
 	estadd local IV "Yes"
 	estadd local Year "Yes"
 	estadd local Gestation "No"
@@ -101,11 +101,9 @@ Run some regular and IV probits with the goal of creating a table with the coeff
 	estadd local Insurance "Yes"
 	estadd local VLBW "Yes"
 	estadd local HealthStates "Yes"
-		
-	esttab noiv_v iv_vyg iv_vygp iv_vygpw iv_vygpwh, keep(prev_q) stats(IV Year Gestation Insurance VLBW HealthStates)	mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV")
-		
+				
 		
 * Table: 		
 		
-	esttab noiv_v iv_vyg iv_vygp iv_vygpw iv_vygpwh, keep(prev_q) mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Year Gestation Insurance VLBW HealthStates r2 N, fmt(%9.3f %9.0g) labels(R-sq)) style(tex) cells(b se) legend eqlabels(none) collabels(none)
+	esttab noiv_v iv_vyg iv_vygp iv_vygpw iv_vygpwh, keep(prev_q) mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Year Gestation Insurance VLBW HealthStates r2 N, fmt(%9.3f %9.0g)) style(tex) cells(b se) legend eqlabels(none) collabels(none)
 	
