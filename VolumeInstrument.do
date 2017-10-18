@@ -1,5 +1,7 @@
 
 * Volume Instrument:
+* See the second version of this in NICUVolumeInstrument.do
+* That file also measures the correlation of the two instruments.  
 
 do "/Users/austinbean/Desktop/Birth2005-2012/FilePathGlobal.do"
 capture quietly do "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/TX Global Filepath Names.do"
@@ -14,14 +16,16 @@ capture quietly do "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/T
 * But this can be done for those patients only, using the other dataset.  
 
 
-foreach yr of numlist 2005(1)2010{
+foreach yr of numlist 2005(1)2008 2010{
 
 foreach qr of numlist 1(1)4{
 
 	use "${inpatient}`yr' `qr' Quarter PUDF.dta", clear
 	rename *, lower
 	capture rename cms_mdc hcfa_mdc
+	capture rename hcfa_drg cms_drg
 	capture rename patient_age pat_age
+	capture rename first_payment_src first_payment_source
 
 * Label Medicaid and Privately Insured
 
@@ -37,6 +41,9 @@ foreach qr of numlist 1(1)4{
 
 * Keep pregnancy and delivery related
 	keep if hcfa_mdc == 14 | hcfa_mdc == 15
+	
+* Optional: keep if DRG != 391 (Normal Newborn)
+*	drop if cms_drg == 391 | cms_drg == 795
 
 * keep only those below 1 year
 	destring pat_age, replace force
@@ -209,7 +216,7 @@ save "${birthdata}`yr'_fidshares.dta", replace
 
 use "${birthdata}2005_fidshares.dta", clear
 
-foreach yr of numlist 2006(1)2010{
+foreach yr of numlist 2006(1)2008 2010{
 
 append using "${birthdata}`yr'_fidshares.dta"
 
@@ -218,6 +225,23 @@ append using "${birthdata}`yr'_fidshares.dta"
 rename yr ncdobyear
 
 save "${birthdata}allyearfidshares.dta", replace
+
+
+
+/*
+
+*gen 2009... 
+use "${birthdata}allyearfidshares.dta", clear
+sort fid ncdobyear
+expand 2 if ncdobyear == 2008, gen(ttt)
+replace ncdobyear = 2009 if ttt == 1
+sort fid  qr ncdobyear
+bysort fid qr (ncdobyear) : replace exp_share = 0.5*(exp_share + exp_share[_n+1]) if ttt == 1
+drop ttt
+*/
+
+
+
 
 
 
