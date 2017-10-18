@@ -1,5 +1,6 @@
 * NICU patients only volume instrument.  
-
+* See other version in VolumeInstrument.do
+* This file measures the correlation between the two instruments.  
 
 do "/Users/austinbean/Desktop/Birth2005-2012/FilePathGlobal.do"
 capture quietly do "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/TX Global Filepath Names.do"
@@ -142,4 +143,21 @@ rename yr ncdobyear
 
 save "${birthdata}allyearnicufidshares.dta", replace
 
+/*
+* Checking correlation across the two instruments:
+
+use "${birthdata}allyearnicufidshares.dta", clear
+rename exp_share ex2
+rename mnthly_share mn2
+merge 1:m fid ncdobyear using "${birthdata}allyearfidshares.dta"
+corr ex2 exp_share
+  
+             |      ex2 exp_sh~e
+-------------+------------------
+         ex2 |   1.0000
+   exp_share |   0.9376   1.0000
+
+
+
+*/
 	
