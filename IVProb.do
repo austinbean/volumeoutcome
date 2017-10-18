@@ -28,6 +28,8 @@ replace qr = 2 if ncdobmonth == 4 | ncdobmonth == 5 | ncdobmonth == 6
 replace qr = 3 if ncdobmonth == 7 | ncdobmonth == 8 | ncdobmonth == 9
 replace qr = 4 if ncdobmonth == 10 | ncdobmonth == 11 | ncdobmonth == 12
 sort ncdobyear qr fid
+merge m:1 ncdobyear fid qr using "${birthdata}allyearfidshares.dta"
+
 */
 merge m:1 ncdobyear fid using "${birthdata}allyearnicufidshares.dta"
 
