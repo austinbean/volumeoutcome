@@ -273,8 +273,8 @@ label define cnty_l 254 "Zavala", add
 label values b_bcntyc cnty_l
 
 label variable b_citynm "City or Town"     
-label variable b_btype   "Plurality - Single, Twin, Triplet, etc."    
-label variable b_bplace  "Place of Birth - Clinic/Doctor's Office" 
+label variable b_btype   "Plurality"    
+label variable b_bplace  "Place of Birth" 
 label define place_l 1 "Hospital"
 label define place_l 2 "Licensed Birth Center", add
 label define place_l 3 "Clinic/Dr.s Off", add
@@ -385,31 +385,31 @@ label define pay_l 8 "Other", add
 label define pay_l 9 "Unknown", add
 label values pay pay_l
 
-label variable bo_tra1 "Mother Transferred for Maternal Medical or Fetus Indications for this Delivery?"  
+label variable bo_tra1 "Mother Transferred"  
 replace bo_tra1 = 0 if bo_tra1 == 2
 replace bo_tra1 = . if bo_tra1 == 9
 label values bo_tra1 yn_l
       
-label variable bo_fac1 "If Transferred, Enter the Name of Facility Mother Transferred From:"      
-label variable diab_pre " Diabetes Prepregnancy (Diagnosis prior to this pregnancy)"
+label variable bo_fac1 "Mother Transferred From:"      
+label variable diab_pre " Diabetes Prepregnancy"
 replace diab_pre = 0 if diab_pre == 2
 label values diab_pre yn_l
     
-label variable diab_ges  "Diabetes Gestational (Diagnosis in this pregnancy) "
+label variable diab_ges  "Diabetes Gestational "
 replace diab_ges = 0 if diab_ges == 2
 label define yn2_l 1 "Yes"
 label define yn2_l 2 "No", add
 label values diab_ges yn_l
 
-label variable brf_crhy "Hypertension  Prepregnancy (Chronic)" 
+label variable brf_crhy "Hypertension Prepregnancy" 
 replace brf_crhy = 0 if brf_crhy == 2     
 label values brf_crhy yn_l
 
-label variable brf_pghy  "Hypertension  Gestational (PIH preeclampsia)" 
+label variable brf_pghy  "Hypertension Gestational" 
 replace brf_pghy = 0 if brf_pghy == 2  
 label values brf_pghy  yn_l
    
-label variable brf_eclm "Hypertension  Eclampsia" 
+label variable brf_eclm "Hypertension Eclampsia" 
 replace brf_eclm = 0 if brf_eclm == 2
 label values brf_eclm yn_l
       
@@ -421,16 +421,16 @@ label variable pre_poor "Other Previous Poor Pregnancy Outcome "
 replace pre_poor = 0 if pre_poor == 2
 label values pre_poor yn_l
       
-label variable pre_csec "Mother had Previous Cesarean Delivery. "
+label variable pre_csec "Previous Cesarean Delivery. "
 replace pre_csec = 0 if pre_csec == 2
 label values pre_csec yn_l
 
 
-label variable cerv_crc "Obstetric Procedures Cervical Cerclage"
+label variable cerv_crc "Cervical Cerclage"
 replace cerv_crc = 0 if cerv_crc == 2
 label values cerv_crc yn_l
 
-label variable bob_toco "Obstetric Procedures Tocolysis"
+label variable bob_toco "Tocolysis"
 replace bob_toco = 0 if bob_toco == 2
 label values bob_toco yn_l
 
@@ -444,15 +444,15 @@ replace ceph_fai = 0 if ceph_fai == 2
 label values ceph_fai  yn_l
 
 
-label variable pre_rupt "Onset of Labor: Premature Rupture of the Membranes (Prolonged ? 12 hrs.)"
+label variable pre_rupt "Premature Rupture of the Membranes"
 replace pre_rupt = 0 if pre_rupt == 2
 label values pre_rupt yn_l
 
-label variable lab_prec "Onset of Labor: Precipitous Labor (? 3 hrs.) "
+label variable lab_prec "Precipitous Labor"
 replace lab_prec = 0 if lab_prec == 2
 label values lab_prec yn_l
 
-label variable lab_prol "Onset of Labor: Prolonged Labor (? 20 hrs.)"
+label variable lab_prol "Prolonged Labor"
 replace lab_prol = 0 if lab_prol == 2
 label values lab_prol yn_l
 
@@ -461,47 +461,47 @@ replace ons_none = 0 if ons_none == 2
 label values ons_none yn_l
 
 
-label variable bob_ilbr "Characteristics of Labor and Delivery: Induction of Labor"
+label variable bob_ilbr "Induction of Labor"
 replace bob_ilbr = 0 if bob_ilbr == 2
 label values bob_ilbr yn_l
 
-label variable bob_albr "Characteristics of Labor and Delivery: Augmentation of Labor"
+label variable bob_albr "Augmentation of Labor"
 replace bob_albr = 0 if bob_albr == 2
 label values bob_albr yn_l
 
-label variable lab_nonv "Characteristics of Labor and Delivery: Non-Vertex of Labor"
+label variable lab_nonv "Non-Vertex Labor"
 replace lab_nonv = 0 if lab_nonv == 2
 label values lab_nonv yn_l
 
-label variable lab_ster "Char Labor and Del: Steroids  Lung Maturation Prior to Del"
+label variable lab_ster "Steroids Lung Maturation Prior to Del"
 replace lab_ster = 0 if lab_ster == 2
 label values lab_ster yn_l
 
-label variable lab_anti "Characteristics of Labor and Delivery: Antibiotics Mother During Labor"
+label variable lab_anti "Antibiotics Mother During Labor"
 replace lab_anti = 0 if lab_anti == 2
 label values lab_anti yn_l
 
-label variable lab_clin "Characteristics of Labor and Delivery: Chorioamnionitis or Maternal Temperature ?38C (100.4F)"
+label variable lab_clin "Chorioamnionitis or Maternal Temperature ?38C (100.4F)"
 replace lab_clin = 0 if lab_clin == 2
 label values lab_clin yn_l
 
-label variable modhvy_m "Characteristics of Labor and Delivery: Moderate/Heavy Meconium Staining of the Amniotic Fluid"
+label variable modhvy_m "Moderate/Heavy Meconium Staining"
 replace modhvy_m = 0 if modhvy_m == 2
 label values modhvy_m yn_l
 
-label variable lab_feti "Characteristics of Labor and Delivery: Fetal Intolerance of Labor Such That One or More of the Following Actions was Taken: In-Utero Resuscitative Measures, Further Fetal Assessment or Operative Delivery"
+label variable lab_feti "Fetal Intolerance of Labor Such That One or More of the Following Actions was Taken: In-Utero Resuscitative Measures, Further Fetal Assessment or Operative Delivery"
 replace lab_feti = 0 if lab_feti == 2
 label values lab_feti yn_l
 
-label variable lab_epid "Characteristics of Labor and Delivery: Epidural or Spinal Anesthesia During Labor"
+label variable lab_epid "Epidural or Spinal Anesthesia During Labor"
 replace lab_epid = 0 if lab_epid == 2
 label values lab_epid yn_l
 
-label variable del_forc "Method of Delivery: Was Delivery with Forceps Attempted but Unsuccessful?"
+label variable del_forc "Delivery with Forceps Attempted but Unsuccessful?"
 replace del_forc = 0 if del_forc == 2
 label values del_forc yn_l
 
-label variable del_vac "Method of Delivery: Was Delivery with Vacuum Extraction Attempted but Unsuccessful?"
+label variable del_vac "Delivery with Vacuum Extraction Attempted but Unsuccessful?"
 replace del_vac = 0 if del_vac == 2
 label values del_vac yn_l
 
@@ -512,7 +512,7 @@ label define fet_l 2 "Breech", add
 label define fet_l 3 "Other", add
 label values fet_pres fet_l
 
-label variable final_rt "Final Route and Method of Delivery (Check One)"
+label variable final_rt "Final Route and Method of Delivery"
 label define rt_l 1 "Vaginal/Spontaneous"
 label define rt_l 2 "Vaginal/Forceps", add
 label define rt_l 3 "Vaginal/Vacuum", add
@@ -525,33 +525,33 @@ replace trial_at = 0 if trial_at == 2
 replace trial_at = . if trial_at == 9
 label values trial_at yn_l
 
-label variable b_es_ges "Obstetric Estimate of Gestation (completed weeks)"
+label variable b_es_ges "Obs. Est. Gest."
 
-label variable as_vent "Abnormal Conditions: Assisted Ventilation Required Immediately Following Delivery"
+label variable as_vent "Assisted Ventilation Immediately Following Delivery"
 replace as_vent = 0 if as_vent == 2
 label values as_vent yn_l
 
-label variable as_vent6 "Abnormal Conditions: Assisted Ventilation Required for more than 6 hours"
+label variable as_vent6 "Assisted Ventilation Required for more than 6 hours"
 replace as_vent6 = 0 if as_vent == 2
 label values as_vent6 yn_l
 
-label variable adm_nicu "Abnormal Conditions: NICU Admission"
+label variable adm_nicu "NICU Admission"
 replace adm_nicu = 0 if adm_nicu == 2
 label values adm_nicu  yn_l
 
-label variable rep_ther "Abnormal Conditions: Newborn Given Surfactant Replacement Therapy"
+label variable rep_ther "Surfactant Replacement Therapy"
 replace rep_ther = 0 if rep_ther == 2
 label values rep_ther yn_l
 
-label variable antibiot "Abnormal Conditions: Antibiotics Received by the Newborn for Suspected Neonatal Sepsis"
+label variable antibiot "Antibiotics for Suspected Neonatal Sepsis"
 replace antibiot = 0 if antibiot == 2
 label values antibiot yn_l
 
-label variable seizure "Abnormal Conditions: Seizure or Serious Neurologic Dysfunction"
+label variable seizure "Seizure or Serious Neurologic Dysfunction"
 replace seizure = 0 if seizure == 2
 label values seizure yn_l
 
-label variable b_injury "Abnormal Conditions: Significant Birth Injury"
+label variable b_injury "Significant Birth Injury"
 replace b_injury = 0 if b_injury == 2
 label values b_injury yn_l
 
@@ -560,44 +560,44 @@ replace acn_none = 0 if acn_none == 2
 label values acn_none yn_l
 
 
-label variable bca_aeno "Congenital Anomalies: Anencephaly"
+label variable bca_aeno "Anencephaly"
 replace bca_aeno = 0 if bca_aeno == 2
 label values bca_aeno yn_l
 
-label variable bca_spin "Congenital Anomalies: Meningomyelocele/Spina Bifida"
+label variable bca_spin "Meningomyelocele/Spina Bifida"
 replace bca_spin = 0 if bca_spin == 2
 label values bca_spin yn_l
 
-label variable congenhd "Congenital Anomalies: Cyanotic Congenital Heart Disease"
+label variable congenhd "Cyanotic Congenital Heart Disease"
 replace congenhd = 0 if congenhd == 2
 label values congenhd yn_l
 
-label variable bca_hern "Congenital Anomalies: Congenital Diaphragmatic Hernia"
+label variable bca_hern "Congenital Diaphragmatic Hernia"
 replace bca_hern = 0 if bca_hern == 2
 label values bca_hern yn_l
 
-label variable congenom "Congenital Anomalies: Omphalocele"
+label variable congenom "Omphalocele"
 replace congenom = 0 if congenom == 2
 label values congenom yn_l
 
-label variable congenga "Congenital Anomalies: Gastroschisis"
+label variable congenga "Gastroschisis"
 replace congenga = 0 if congenga == 2
 label values congenga yn_l
 
-label variable bca_limb "Congenital Anomalies: Limb Reduction Defect "
+label variable bca_limb "Limb Reduction Defect "
 replace bca_limb = 0 if bca_limb == 2
 label values bca_limb yn_l
 
-label variable hypsospa "Congenital Anomalies: Hypospadias"
+label variable hypsospa "Hypospadias"
 replace hypsospa = 0 if hypsospa == 2
 label values hypsospa yn_l
 
-label variable bo_trans "Was Infant Transferred Within 24 Hours of Delivery?"
+label variable bo_trans "Infant Transferred Within 24 Hours"
 replace bo_trans = 0 if bo_trans == 2
 replace bo_trans = . if bo_trans == 9
 label values bo_trans yn_l
 
-label variable bo_facil "If Transferred, Name of Facility Infant Transferred to:"
+label variable bo_facil "Name of Facility Infant Transferred to:"
 label variable b_wt_cgr "Birth Weight Calculated in Grams"
 
 label variable d_placty "Place of Death (check only one)"

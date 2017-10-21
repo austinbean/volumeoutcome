@@ -80,6 +80,7 @@ drop yr*
 label variable year "Year"
 
 * Fix first quarters...
+label variable prev_q "Previous Q. Volume"
 bysort facname (year ncdobmonth): replace prev_q = q4_ad[_n-1] if prev_q == . & ncdobmonth == 1
 bysort facname (year ncdobmonth): replace prev_q = prev_q[_n-1] if prev_q == . & ncdobmonth == 2
 bysort facname (year ncdobmonth): replace prev_q = prev_q[_n-1] if prev_q == . & ncdobmonth == 3
