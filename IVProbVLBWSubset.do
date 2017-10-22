@@ -45,7 +45,7 @@ sort ncdobyear qr fid
 * Regular and IV Probit - ALL PATIENTS:
 * No IV for Volume: 
 	probit neonataldeath  prev_q i.b_es_ges i.pay i.ncdobyear i.vlbw as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
-	eststo: probit neonataldeath  prev_q i.b_es_ges i.pay i.ncdobyear i.vlbw as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+	eststo allp_noiv: probit neonataldeath  prev_q i.b_es_ges i.pay i.ncdobyear i.vlbw as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
 	margins, at((mean) _all  prev_q = (0(20)460) vlbw = 1 ) post
 	est store prob_marg_no_iv_vlbw
 	estimates save "/Users/austinbean/Desktop/Birth2005-2012/prob_marg_no_iv_vlbw.ster", replace
@@ -55,7 +55,7 @@ sort ncdobyear qr fid
 
 * w/ IV for volume and year FE's:
 	ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay i.ncdobyear i.vlbw as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
-	eststo:  ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay i.ncdobyear i.vlbw as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+	eststo allp_iv:  ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay i.ncdobyear i.vlbw as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
 	* takes a LONG time. started at: 12:40, finished at: 2:30.  Ugh.  
 	margins, at((mean) _all vlbw = 1 prev_q = (0(20)460)) predict(pr) post saving("/Users/austinbean/Desktop/ivprbmarg_vlbw.dta", replace)
 	est store prob_marg_w_iv_vlbw
