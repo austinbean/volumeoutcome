@@ -13,12 +13,12 @@ capture quietly do "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/T
 
 * Predict Volume for all quarters:
 * This may not get it right, because this is all patients, whereas I want nicu patients only.  
-* But this can be done for those patients only, using the other dataset.  
+* But this can be done for those patients only, using the other dataset.  (1)4
 
 
 foreach yr of numlist 2005(1)2008 2010{
 
-foreach qr of numlist 1(1)4{
+foreach qr of numlist 1{
 
 	use "${inpatient}`yr' `qr' Quarter PUDF.dta", clear
 	rename *, lower
@@ -36,14 +36,25 @@ foreach qr of numlist 1(1)4{
 	gen private_ins = 0
 	replace private_ins = 1 if first_payment_source == "12" | first_payment_source == "14" | first_payment_source == "CI" | first_payment_source == "BL" | first_payment_source == "HM" | first_payment_source == "LI" | first_payment_source == "LM" 
 	label variable private_ins "0/1 for privately insured patient, taken from FIRST_PAY..."
+* Medicaid and Private Ins Counts
+	count
+	local tpc = `r(N)'
+	count if medicaid == 1
+	local tmc = `r(N)'
+	count if private_ins == 1
+	local tprc = `r(N)'
+	count if medicaid == 0 & private_ins == 0
+	local toc = `r(N)'
 	
-	
+	local q`qr'_fm = `tmc'/`tpc'
+	local q`qr'_fp = `tprc'/`tpc'
+	local q`qr'_fo = `toc'/`tpc'
 
 * Keep pregnancy and delivery related
 	keep if hcfa_mdc == 14 | hcfa_mdc == 15
 	
 * Optional: keep if DRG != 391 (Normal Newborn)
-*	drop if cms_drg == 391 | cms_drg == 795
+	drop if cms_drg == 391 | cms_drg == 795
 
 * keep only those below 1 year
 	destring pat_age, replace force
@@ -104,9 +115,17 @@ foreach qr of numlist 1(1)4{
 	gen chdist2 = chdist^2
 	gen patid = _n
 
+* Track distances traveled:	
+	summarize chdist, d
+	local q`qr'_dt = `r(mean)'
+	local q`qr'_5p = `r(p5)'
+	local q`qr'_95p = `r(p95)'
+	
+	
 * Reshape
 	reshape long fidcn faclatcn faclongcn zipfacdistancecn, i(patid) j(hs)
-
+	
+	
 * Record Choice
 	gen chosen = 0
 	bysort patid: replace chosen = 1 if fid == fidcn
@@ -179,8 +198,18 @@ foreach qr of numlist 1(1)4{
 	
 
 * Estimating two choice models - first w/out facility FE's, second with.
+	label variable zipfacdistancecn "Distance to Chosen"
+	label variable zipfacdistancecn2 "Squared Distance to Chosen"
+	label variable NeoIntensive "Level 3"
+	label variable SoloIntermediate "Level 2"
+	*label variable closest "Closest Hospital"
+	label variable dist_bed "Distance x Beds"
+	label variable chosen "Hosp. Chosen"
+	label variable ObstetricsLevel "Obstetrics Level"
 
-	clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate i.ObstetricsLevel, group(patid)
+	eststo c_lg_`yr'_`qr': clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate i.ObstetricsLevel, group(patid)
+	summarize patid, d
+	estadd local pN "`r(max)'"
 
 	*mat a1 = e(b)
 	*estimates save "${birthdata}`yr' `qr' hospchoicedistanceonly", replace
@@ -200,7 +229,8 @@ foreach qr of numlist 1(1)4{
 	gen yr = `yr'
 	gen qr = `qr'
 	save "${birthdata}`yr'_`qr'_fidshares.dta", replace
-		
+	
+	
 	
 }
 
@@ -212,7 +242,29 @@ append using "${birthdata}`yr'_4_fidshares.dta"
 
 save "${birthdata}`yr'_fidshares.dta", replace
 
+noi di "`yr' fraction medicaid: "
+noi di 0.25*(`q1_fm')+0.25*(`q2_fm')+0.25*(`q3_fm')+0.25*(`q4_fm')
+
+noi di "`yr' fraction private: "
+noi di 0.25*(`q1_fp')+0.25*(`q2_fp')+0.25*(`q3_fp')+0.25*(`q4_fp')
+
+noi di "`yr' fraction other: "
+noi di 0.25*(`q1_fo')+0.25*(`q2_fo')+0.25*(`q3_fo')+0.25*(`q4_fo')
+
+noi di "`yr' distance traveled: "
+noi di 0.25*(`q1_dt')+0.25*(`q2_dt')+0.25*(`q3_dt')+0.25*(`q4_dt')
+
+noi di "`yr' distance traveled 5th percentile: "
+noi di 0.25*(`q1_5p')+0.25*(`q2_5p')+0.25*(`q3_5p')+0.25*(`q4_5p')
+
+noi di "`yr' distance traveled: "
+noi di 0.25*(`q1_95p')+0.25*(`q2_95p')+0.25*(`q3_95p')+0.25*(`q4_95p')
+
 }
+
+
+
+esttab c_lg_2005_1 c_lg_2006_1 c_lg_2007_1 c_lg_2008_4 c_lg_2010_1 using "/Users/austinbean/Desktop/Birth2005-2012/instrumentschoice.tex",  label replace mtitle("Q1 2005" "Q1 2006" "Q1 2007" "Q1 2008" "Q1 2010") style(tex) stats(pN) cells(b se) legend eqlabels(none) collabels(none)
 
 use "${birthdata}2005_fidshares.dta", clear
 
