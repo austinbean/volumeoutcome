@@ -105,9 +105,18 @@ foreach yr of numlist 2005(1)2012{
 
 
 * Estimating two choice models - first w/out facility FE's, second with.
-
-	clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate i.ObstetricsLevel, group(patid)
-
+	label variable zipfacdistancecn "Distance to Chosen"
+	label variable zipfacdistancecn2 "Squared Distance to Chosen"
+	label variable NeoIntensive "Level 3"
+	label variable SoloIntermediate "Level 2"
+	label variable ObstetricsLevel "Obstetrics Level"
+	label variable chosen "Hosp. Chosen"
+	
+	eststo cnicu_`yr': clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate i.ObstetricsLevel, group(patid)
+	unique patid
+	estadd local pN "`r(N)'"
+	
+	
 	*mat a1 = e(b)
 	estimates save "${birthdata}`yr' nicuchoices", replace
 
@@ -130,6 +139,11 @@ foreach yr of numlist 2005(1)2012{
 	
 }
 
+esttab cnicu_2005 cnicu_2006 cnicu_2007 cnicu_2008 cnicu_2009 cnicu_2010 using "/Users/austinbean/Desktop/Birth2005-2012/nicuinstruments.tex",  label replace mtitle("2005" "2006" "2007" "2008" "2009" "2010") style(tex) stats(pN) cells(b se) legend eqlabels(none) collabels(none) 
+
+
+
+
 
 use "${birthdata}2005_nicufidshares.dta", clear
 
@@ -142,6 +156,25 @@ append using "${birthdata}`yr'_nicufidshares.dta"
 rename yr ncdobyear
 
 save "${birthdata}allyearnicufidshares.dta", replace
+
+
+
+
+
+
+foreach yr of numlist 2005(1)2012{
+
+
+	use "${birthdata}Birth`yr'.dta", clear
+	di "`yr'"
+	count
+	
+}
+
+
+
+
+
 
 /*
 * Checking correlation across the two instruments:
