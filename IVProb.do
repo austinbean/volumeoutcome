@@ -147,7 +147,7 @@ probit neonataldeath  prev_q i.b_es_ges i.pay i.ncdobyear as_vent rep_ther antib
 eststo: probit neonataldeath  prev_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
 
 
-margins, at((mean) _all  prev_q = (0(20)460) ) post
+margins, at((mean) _all  prev_q = (0(20)460) ) post 
 est store prob_margins_no_iv
 estimates save "/Users/austinbean/Desktop/Birth2005-2012/prob_margins_no_iv.ster", replace
 * estimates use "/Users/austinbean/Desktop/Birth2005-2012/prob_margins_no_iv.ster"
@@ -168,7 +168,7 @@ ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay i.ncdobyear as_ve
 eststo:  ivprobit neonataldeath  (prev_q = exp_share ) i.b_es_ges i.pay i.ncdobyear as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
 
 
-* takes a LONG time. started at: 12:40, finished at: 2:30.  Ugh.  
+* takes a LONG time. started at: 12:40, finished at: 2:30.  Ugh.  ADD NOSE (nose) to save a lot of time.  
 margins, at((mean) _all prev_q = (0(20)460)) predict(pr) post saving("/Users/austinbean/Desktop/ivprbmarg.dta", replace)
 est store prob_margins_w_iv
 estimates save "/Users/austinbean/Desktop/Birth2005-2012/prob_margins_w_iv.ster", replace
@@ -190,6 +190,12 @@ esttab using "/Users/austinbean/Desktop/Birth2005-2012/ivprobresults.tex", se ar
 coefplot prob_margins_no_iv prob_margins_w_iv,  recast(line) vertical title("Effect of Volume on Outcome") subtitle("With and Without Volume IV") ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits")  xlabel(   1 "0" 2 "20" 3 "40" 4 "60" 5 "80" 6 "100" 7 "120" 8 "140" 9 "160" 10 "180" 11 "200" 12 "220" 13 "240" 14 "260" 15 "280" 16 "300" 17 "320" 18 "340" 19 "360" 20 "380" 21 "400" 22 "420" 23 "440" 24 "460", angle(45)) graphregion(color(white))
  graph save Graph "/Users/austinbean/Desktop/Birth2005-2012/Combined IV Prob Volume.gph"
 
+ 
+ * Plot w/ vertical lines after adding nose to the commands to create prob_margins_no_iv and prob_margins_w_iv
+ * This creates the graph with vertical lines at volume means and labels
+ coefplot prob_margins_no_iv prob_margins_w_iv, recast(line) vertical title("Effect of Volume on Outcome") subtitle("With and Without Volume IV") ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits")  xlabel(   1 "0" 2 "20" 3 "40" 4 "60" 5 "80" 6 "100" 7 "120" 8 "140" 9 "160" 10 "180" 11 "200" 12 "220" 13 "240" 14 "260" 15 "280" 16 "300" 17 "320" 18 "340" 19 "360" 20 "380" 21 "400" 22 "420" 23 "440" 24 "460", angle(45)) graphregion(color(white)) xline(5.5) xline(18.5) text(0.007 7.6 "Travis County" "Quarterly" "Hospital Mean") text(0.012 21 "Travis County" "Quarterly" "Total Admits")
+ 
+ 
  
 	
 * The following do finish, but save time by skipping SE's
