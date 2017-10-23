@@ -29,6 +29,7 @@ Run some regular and IV probits with the goal of creating a table with the coeff
 	gen vlbw = 0
 	replace vlbw = 1 if b_wt_cgr <= 1500
 	label variable vlbw "VLBW"
+	label variable prev_q "Prev. Q. Vol."
 
 	
 * Run the probits without the IV:
@@ -127,18 +128,79 @@ Run some regular and IV probits with the goal of creating a table with the coeff
 	h = health states
 	*/
 	
-* short table:
-	esttab noiv_vyg iv_vyg iv_vygp iv_vygpw iv_vygpwh, label keep(prev_q) mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Insurance VLBW HealthStates ExogeneityPval N, fmt(%9.3f %9.0g)) style(tex) cells(b se) legend eqlabels(none) collabels(none)
+* short table:, fmt(%9.3f %9.0g)
+	esttab noiv_vyg iv_vyg iv_vygp iv_vygpw iv_vygpwh, label keep(prev_q)  mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Insurance VLBW HealthStates ExogeneityPval N, labels("IV" "Ins." "VLBW" "Health States" "Hausman Test") fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
 	
-	esttab noiv_vyg iv_vyg iv_vygp iv_vygpw iv_vygpwh using "/Users/austinbean/Desktop/Birth2005-2012/ivshorttable.tex", replace label keep(prev_q) mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Insurance VLBW HealthStates ExogeneityPval N, fmt(%9.3f %9.0g)) style(tex) cells(b se) legend eqlabels(none) collabels(none)
+	esttab noiv_vyg iv_vyg iv_vygp iv_vygpw iv_vygpwh using "/Users/austinbean/Desktop/Birth2005-2012/ivshorttable.tex", replace label keep(prev_q)  mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Insurance VLBW HealthStates ExogeneityPval N, labels("IV" "Ins." "VLBW" "Health States" "Hausman Test") fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
 	
 * long table
 	esttab noiv_vyg iv_vyg iv_vygp iv_vygpw iv_vygpwh , drop(*year *b_es_ges) label mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Insurance VLBW HealthStates ExogeneityPval N, fmt(%9.3f %9.0g)) style(tex) cells(b se) legend eqlabels(none) collabels(none)
 
-	esttab noiv_vyg iv_vyg iv_vygp iv_vygpw iv_vygpwh using "/Users/austinbean/Desktop/Birth2005-2012/ivslongtable.tex", drop(*year *b_es_ges) longtable replace label mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Insurance VLBW HealthStates ExogeneityPval N, fmt(%9.3f %9.0g)) style(tex) cells(b se) legend eqlabels(none) collabels(none)
+	esttab noiv_vyg iv_vyg iv_vygp iv_vygpw iv_vygpwh using "/Users/austinbean/Desktop/Birth2005-2012/ivslongtable.tex", drop(*year *b_es_ges) longtable replace label mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Insurance VLBW HealthStates ExogeneityPval N, fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
 	
 	
+* How about some simple 2SLS...
+	eststo lr_v: regress neonataldeath prev_q
+	estadd local IV "No"
+	estadd local Year "No"
+	estadd local Gestation "No"
+	estadd local Insurance "No"
+	estadd local VLBW "No"
+	estadd local HealthStates "No"
+	
+	eststo tsls_v: ivregress 2sls neonataldeath (prev_q = exp_share)
+	estadd local IV "Yes"
+	estadd local Year "No"
+	estadd local Gestation "No"
+	estadd local Insurance "No"
+	estadd local VLBW "No"
+	estadd local HealthStates "No"
+	* Lagged volume and year
+	eststo tsls_vy: ivregress 2sls neonataldeath (prev_q = exp_share ) i.ncdobyear i.vlbw
+	estadd local IV "Yes"
+	estadd local Year "Yes"
+	estadd local Gestation "No"
+	estadd local Insurance "No"
+	estadd local VLBW "No"
+	estadd local HealthStates "No"
+	* lagged volume, year, estimated gestation
+	eststo tsls_vyg: ivregress 2sls neonataldeath (prev_q = exp_share ) i.ncdobyear i.b_es_ges
+	estadd local IV "Yes"
+	estadd local Year "Yes"
+	estadd local Gestation "Yes"
+	estadd local Insurance "No"
+	estadd local VLBW "No"
+	estadd local HealthStates "No"
+	* lagged volume, year, estimated gestation, payment status
+	eststo tsls_vygp: ivregress 2sls neonataldeath (prev_q = exp_share ) i.ncdobyear i.b_es_ges i.pay
+	estadd local IV "Yes"
+	estadd local Year "Yes"
+	estadd local Gestation "Yes"
+	estadd local Insurance "Yes"
+	estadd local VLBW "No"
+	estadd local HealthStates "No"
+	* lagged volume, year, estimated gestation, payment status, vlbw status
+	eststo tsls_vygpw: ivregress 2sls neonataldeath (prev_q = exp_share ) i.ncdobyear i.b_es_ges i.pay i.vlbw
+	estadd local IV "Yes"
+	estadd local Year "Yes"
+	estadd local Gestation "Yes"
+	estadd local Insurance "Yes"
+	estadd local VLBW "Yes"
+	estadd local HealthStates "No"
+	* lagged volume, year, estimated gestation, payment status, vlbw status, health states
+	eststo tsls_vygpwh :ivregress 2sls neonataldeath (prev_q = exp_share) i.ncdobyear i.b_es_ges i.pay i.vlbw as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+	estadd local IV "Yes"
+	estadd local Year "Yes"
+	estadd local Gestation "Yes"
+	estadd local Insurance "Yes"
+	estadd local VLBW "Yes"
+	estadd local HealthStates "Yes"
+
+
+	esttab lr_v tsls_v tsls_vy tsls_vygp tsls_vygpw tsls_vygpwh
 	
 	
+	, drop(*year *b_es_ges) label mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Insurance VLBW HealthStates, fmt(%9.3f %9.0g)) style(tex) (b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
+
 
 	
