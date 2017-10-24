@@ -136,7 +136,7 @@ ivprobit neonataldeath  (lag_1_months = exp_share )  i.b_es_ges i.pay bca_aeno-h
 */
 
 
-* 09/30/2017 - 
+* These models and this graph are in the paper.  
 
 * Without IV for Volume...
 probit neonataldeath  prev_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
@@ -194,6 +194,38 @@ coefplot prob_margins_no_iv prob_margins_w_iv,  recast(line) vertical title("Eff
  * Plot w/ vertical lines after adding nose to the commands to create prob_margins_no_iv and prob_margins_w_iv
  * This creates the graph with vertical lines at volume means and labels
  coefplot prob_margins_no_iv prob_margins_w_iv, recast(line) vertical title("Effect of Volume on Outcome") subtitle("With and Without Volume IV") ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits")  xlabel(   1 "0" 2 "20" 3 "40" 4 "60" 5 "80" 6 "100" 7 "120" 8 "140" 9 "160" 10 "180" 11 "200" 12 "220" 13 "240" 14 "260" 15 "280" 16 "300" 17 "320" 18 "340" 19 "360" 20 "380" 21 "400" 22 "420" 23 "440" 24 "460", angle(45)) graphregion(color(white)) xline(5.5) xline(18.5) text(0.007 7.6 "Travis County" "Quarterly" "Hospital Mean") text(0.012 21 "Travis County" "Quarterly" "Total Admits")
+ 
+ 
+ 
+* some probits with lagged hospital volume by month: 
+* next: Hospital FE's
+ 
+ probit neonataldeath prev_*_month i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+
+ 
+* Hospital FE models:
+	* With previous month:
+  probit neonataldeath prev_*_month i.fid 
+  probit neonataldeath prev_*_month i.fid i.b_es_ges
+  probit neonataldeath prev_*_month i.fid i.b_es_ges i.pay
+  probit neonataldeath prev_*_month i.fid i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+
+	* With Previous Quarter
+  probit neonataldeath prev_q i.fid 
+  probit neonataldeath prev_q i.fid i.b_es_ges
+  probit neonataldeath prev_q i.fid i.b_es_ges i.pay
+  probit neonataldeath prev_q i.fid i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+
+	* And IV...  For these the sign is still as expected, but the estimate is less precise and not significant.  
+  ivprobit neonataldeath i.fid (prev_q = exp_share)  
+  ivprobit neonataldeath i.fid i.b_es_ges (prev_q = exp_share) 
+  ivprobit neonataldeath i.fid i.b_es_ges i.pay (prev_q = exp_share) 
+  ivprobit neonataldeath (prev_q = exp_share) i.fid i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+
+ 
+ 
+ 
+ 
  
  
  
