@@ -112,6 +112,17 @@ drop q4_ad
 	label variable prev_11_month "Total NICU Admits 12 months ago"
 	label variable prev_12_month "Total NICU Admits 12 months ago"
 
+	
+* lagged quarters again:
+	bysort facname (year ncdobmonth): gen prev_1_q = prev_1_month + prev_2_month + prev_3_month
+	bysort facname (year ncdobmonth): gen prev_2_q = prev_4_month + prev_5_month + prev_6_month
+	bysort facname (year ncdobmonth): gen prev_3_q = prev_7_month + prev_8_month + prev_9_month
+	bysort facname (year ncdobmonth): gen prev_4_q = prev_10_month + prev_11_month + prev_12_month
+	label variable prev_1_q "1 lagged quarter admits"
+	label variable prev_2_q "2 lagged quarter admits"
+	label variable prev_3_q "3 lagged quarter admits"
+	label variable prev_4_q "4 lagged quarter admits"
+	
 
 * 1 - 6 month counts:
 	bysort facname (year ncdobmonth): gen total_1_months = month_count[_n-1] 
@@ -120,25 +131,25 @@ drop q4_ad
 	bysort facname (year ncdobmonth): gen total_4_months = month_count[_n-1] + month_count[_n-2] + month_count[_n-3] + month_count[_n-4] 
 	bysort facname (year ncdobmonth): gen total_5_months = month_count[_n-1] + month_count[_n-2] + month_count[_n-3] + month_count[_n-4] + month_count[_n-5] 
 	bysort facname (year ncdobmonth): gen total_6_months = month_count[_n-1] + month_count[_n-2] + month_count[_n-3] + month_count[_n-4] + month_count[_n-5] + month_count[_n-6]
-	label variable total_1_months "Total NICU Admits Prior 1 months"
-	label variable total_2_months "Total NICU Admits Prior 2 months"
-	label variable total_3_months "Total NICU Admits Prior 3 Months"
-	label variable total_4_months "Total NICU Admits Prior 4 months"
-	label variable total_5_months "Total NICU Admits Prior 5 months"
-	label variable total_6_months "Total NICU Admits Prior 6 Months"
+	label variable total_1_months "Cumulative NICU Admits Prior 1 months"
+	label variable total_2_months "Cumulative NICU Admits Prior 2 months"
+	label variable total_3_months "Cumulative NICU Admits Prior 3 Months"
+	label variable total_4_months "Cumulative NICU Admits Prior 4 months"
+	label variable total_5_months "Cumulative NICU Admits Prior 5 months"
+	label variable total_6_months "Cumulative NICU Admits Prior 6 Months"
 
-bysort facname (year ncdobmonth): gen total_1_lbw = lbw_month[_n-1] 
-bysort facname (year ncdobmonth): gen total_2_lbw = lbw_month[_n-1] + lbw_month[_n-2]
-bysort facname (year ncdobmonth): gen total_3_lbw = lbw_month[_n-1] + lbw_month[_n-2] + lbw_month[_n-3]
-bysort facname (year ncdobmonth): gen total_4_lbw = lbw_month[_n-1] + lbw_month[_n-2] + lbw_month[_n-3] + lbw_month[_n-4] 
-bysort facname (year ncdobmonth): gen total_5_lbw = lbw_month[_n-1] + lbw_month[_n-2] + lbw_month[_n-3] + lbw_month[_n-4] + lbw_month[_n-5] 
-bysort facname (year ncdobmonth): gen total_6_lbw = lbw_month[_n-1] + lbw_month[_n-2] + lbw_month[_n-3] + lbw_month[_n-4] + lbw_month[_n-5] + lbw_month[_n-6]
-label variable total_1_lbw "Total LBW Prior 1 Months"
-label variable total_2_lbw "Total LBW Prior 2 Months"
-label variable total_3_lbw "Total LBW Prior 3 Months"
-label variable total_4_lbw "Total LBW Prior 4 Months"
-label variable total_5_lbw "Total LBW Prior 5 Months"
-label variable total_6_lbw "Total LBW Prior 6 Months"
+	bysort facname (year ncdobmonth): gen total_1_lbw = lbw_month[_n-1] 
+	bysort facname (year ncdobmonth): gen total_2_lbw = lbw_month[_n-1] + lbw_month[_n-2]
+	bysort facname (year ncdobmonth): gen total_3_lbw = lbw_month[_n-1] + lbw_month[_n-2] + lbw_month[_n-3]
+	bysort facname (year ncdobmonth): gen total_4_lbw = lbw_month[_n-1] + lbw_month[_n-2] + lbw_month[_n-3] + lbw_month[_n-4] 
+	bysort facname (year ncdobmonth): gen total_5_lbw = lbw_month[_n-1] + lbw_month[_n-2] + lbw_month[_n-3] + lbw_month[_n-4] + lbw_month[_n-5] 
+	bysort facname (year ncdobmonth): gen total_6_lbw = lbw_month[_n-1] + lbw_month[_n-2] + lbw_month[_n-3] + lbw_month[_n-4] + lbw_month[_n-5] + lbw_month[_n-6]
+	label variable total_1_lbw "Total LBW Prior 1 Months"
+	label variable total_2_lbw "Total LBW Prior 2 Months"
+	label variable total_3_lbw "Total LBW Prior 3 Months"
+	label variable total_4_lbw "Total LBW Prior 4 Months"
+	label variable total_5_lbw "Total LBW Prior 5 Months"
+	label variable total_6_lbw "Total LBW Prior 6 Months"
 
 bysort facname (year ncdobmonth): gen total_1_vlbw = vlbw_month[_n-1] 
 bysort facname (year ncdobmonth): gen total_2_vlbw = vlbw_month[_n-1] + vlbw_month[_n-2]
@@ -195,7 +206,12 @@ label variable lag_6_vlbw " VLBW lag 6 Months"
 
 rename year ncdobyear
 
+gen THCIC_ID = .
+do "${TXhospital}TX Hospital Code Match.do"
+
 save "${birthdata}CombinedFacCount.dta", replace
+
+* here collapse some measures down to quarter to merge with inpatient data.  
 
 
 * Create Transferred Patients files:
