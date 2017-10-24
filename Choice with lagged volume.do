@@ -77,13 +77,13 @@ foreach yr of numlist 2005(1)2012{
 
 	gen zipfacdistancecn2 = zipfacdistancecn^2
 
-	keep patid fid fidcn PAT_ZIP chosen zipfacdistancecn zipfacdistancecn2 hs
+	keep patid ncdobmonth ncdobyear fid fidcn PAT_ZIP chosen zipfacdistancecn zipfacdistancecn2 hs
 
 	
 * Add more info about these, using FID, I think.  
 	rename fid fiddd
 	rename fidcn fid
-
+	gen year = `yr'
 	merge m:1 fid year using  "${birthdata}AllHospInfo1990-2012.dta"
 	drop if _merge == 2
 	* remember: cannot drop if fid == 0!
@@ -115,13 +115,14 @@ foreach yr of numlist 2005(1)2012{
 	eststo cnicu_`yr': clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate i.ObstetricsLevel, group(patid)
 	unique patid
 	estadd local pN "`r(N)'"
-	
+
+* Merge predicted shares
 	drop _merge
 	merge m:1 ncdobyear fid using "${birthdata}allyearnicufidshares.dta"
 	drop if _merge != 3
 	drop _merge
 
-	* trap and store actual fid
+* Merge facility level counts 
 	rename fid fid_cc
 	rename fidcn fid
 	merge m:1 fid ncdobyear ncdobmonth using "${birthdata}FacCountMissingFidDropped.dta"
@@ -135,6 +136,10 @@ foreach yr of numlist 2005(1)2012{
 	
 	
 	clogit chosen prev_q zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate i.ObstetricsLevel, group(patid)
+	
+	clogit chosen prev_*_month zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate i.ObstetricsLevel, group(patid)
+
+	
 	
 	/*
 * Compute Shares and save
