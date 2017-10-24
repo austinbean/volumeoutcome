@@ -224,7 +224,7 @@
 
 * Keep subset:
 
-	keep facname ncdobmonth b_bcntyc month_count month_count_ex lbw_month lbw_month_ex vlbw_month vlbw_month_ex lbw_month_mort vlbw_month_mort vlbw_month_mort_ex lbw_month_mort_ex prev_q q4_ad monthly_admit_deaths yearly_admit_deaths total_q_deaths total_q_nicu month_mort_all
+	keep facname fid ncdobmonth b_bcntyc month_count month_count_ex lbw_month lbw_month_ex vlbw_month vlbw_month_ex lbw_month_mort vlbw_month_mort vlbw_month_mort_ex lbw_month_mort_ex prev_q q4_ad monthly_admit_deaths yearly_admit_deaths total_q_deaths total_q_nicu month_mort_all
 
 * Count of nicu admits, LBW, VLBW, deaths in year:
 
