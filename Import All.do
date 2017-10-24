@@ -86,20 +86,46 @@ bysort facname (year ncdobmonth): replace prev_q = prev_q[_n-1] if prev_q == . &
 bysort facname (year ncdobmonth): replace prev_q = prev_q[_n-1] if prev_q == . & ncdobmonth == 3
 drop q4_ad
 
+* lagged months:
+	bysort facname (year ncdobmonth): gen prev_1_month = month_count[_n-1]
+	bysort facname (year ncdobmonth): gen prev_2_month = month_count[_n-2]
+	bysort facname (year ncdobmonth): gen prev_3_month = month_count[_n-3]
+	bysort facname (year ncdobmonth): gen prev_4_month = month_count[_n-4]
+	bysort facname (year ncdobmonth): gen prev_5_month = month_count[_n-5]
+	bysort facname (year ncdobmonth): gen prev_6_month = month_count[_n-6]
+	bysort facname (year ncdobmonth): gen prev_7_month = month_count[_n-7]
+	bysort facname (year ncdobmonth): gen prev_8_month = month_count[_n-8]
+	bysort facname (year ncdobmonth): gen prev_9_month = month_count[_n-9]
+	bysort facname (year ncdobmonth): gen prev_10_month = month_count[_n-10]
+	bysort facname (year ncdobmonth): gen prev_11_month = month_count[_n-11]
+	bysort facname (year ncdobmonth): gen prev_12_month = month_count[_n-12]
+	label variable prev_1_month "Total NICU Admits 1 months ago"
+	label variable prev_2_month "Total NICU Admits 2 months ago"
+	label variable prev_3_month "Total NICU Admits 3 months ago"
+	label variable prev_4_month "Total NICU Admits 4 months ago"
+	label variable prev_5_month "Total NICU Admits 5 months ago"
+	label variable prev_6_month "Total NICU Admits 6 months ago"
+	label variable prev_7_month "Total NICU Admits 7 months ago"
+	label variable prev_8_month "Total NICU Admits 8 months ago"
+	label variable prev_9_month "Total NICU Admits 9 months ago"
+	label variable prev_10_month "Total NICU Admits 10 months ago"
+	label variable prev_11_month "Total NICU Admits 12 months ago"
+	label variable prev_12_month "Total NICU Admits 12 months ago"
+
 
 * 1 - 6 month counts:
-bysort facname (year ncdobmonth): gen total_1_months = month_count[_n-1] 
-bysort facname (year ncdobmonth): gen total_2_months = month_count[_n-1] + month_count[_n-2]
-bysort facname (year ncdobmonth): gen total_3_months = month_count[_n-1] + month_count[_n-2] + month_count[_n-3]
-bysort facname (year ncdobmonth): gen total_4_months = month_count[_n-1] + month_count[_n-2] + month_count[_n-3] + month_count[_n-4] 
-bysort facname (year ncdobmonth): gen total_5_months = month_count[_n-1] + month_count[_n-2] + month_count[_n-3] + month_count[_n-4] + month_count[_n-5] 
-bysort facname (year ncdobmonth): gen total_6_months = month_count[_n-1] + month_count[_n-2] + month_count[_n-3] + month_count[_n-4] + month_count[_n-5] + month_count[_n-6]
-label variable total_1_months "Total NICU Admits Prior 1 months"
-label variable total_2_months "Total NICU Admits Prior 2 months"
-label variable total_3_months "Total NICU Admits Prior 3 Months"
-label variable total_4_months "Total NICU Admits Prior 4 months"
-label variable total_5_months "Total NICU Admits Prior 5 months"
-label variable total_6_months "Total NICU Admits Prior 6 Months"
+	bysort facname (year ncdobmonth): gen total_1_months = month_count[_n-1] 
+	bysort facname (year ncdobmonth): gen total_2_months = month_count[_n-1] + month_count[_n-2]
+	bysort facname (year ncdobmonth): gen total_3_months = month_count[_n-1] + month_count[_n-2] + month_count[_n-3]
+	bysort facname (year ncdobmonth): gen total_4_months = month_count[_n-1] + month_count[_n-2] + month_count[_n-3] + month_count[_n-4] 
+	bysort facname (year ncdobmonth): gen total_5_months = month_count[_n-1] + month_count[_n-2] + month_count[_n-3] + month_count[_n-4] + month_count[_n-5] 
+	bysort facname (year ncdobmonth): gen total_6_months = month_count[_n-1] + month_count[_n-2] + month_count[_n-3] + month_count[_n-4] + month_count[_n-5] + month_count[_n-6]
+	label variable total_1_months "Total NICU Admits Prior 1 months"
+	label variable total_2_months "Total NICU Admits Prior 2 months"
+	label variable total_3_months "Total NICU Admits Prior 3 Months"
+	label variable total_4_months "Total NICU Admits Prior 4 months"
+	label variable total_5_months "Total NICU Admits Prior 5 months"
+	label variable total_6_months "Total NICU Admits Prior 6 Months"
 
 bysort facname (year ncdobmonth): gen total_1_lbw = lbw_month[_n-1] 
 bysort facname (year ncdobmonth): gen total_2_lbw = lbw_month[_n-1] + lbw_month[_n-2]
