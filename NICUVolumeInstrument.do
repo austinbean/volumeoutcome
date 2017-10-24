@@ -1,6 +1,7 @@
 * NICU patients only volume instrument.  
 * See other version in VolumeInstrument.do
 * This file measures the correlation between the two instruments.  
+*  use "${birthdata}Birth2005.dta", clear
 
 do "/Users/austinbean/Desktop/Birth2005-2012/FilePathGlobal.do"
 capture quietly do "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/TX Global Filepath Names.do"
@@ -101,7 +102,8 @@ foreach yr of numlist 2005(1)2012{
 	replace ObstetricsLevel = 0 if fidcn == 0
 	replace ObstetricCare = 0 if fidcn == 0
 	
-
+* Fix dumb errors in Obstetrics Level
+	replace ObstetricsLevel = . if ObstetricsLevel == -9
 
 
 * Estimating two choice models - first w/out facility FE's, second with.
