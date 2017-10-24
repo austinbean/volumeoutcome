@@ -1,9 +1,9 @@
 * Estimating versions of the model with lagged volume in them.
 /*
 For questions related to 10/24 presentation: 
-	- choice model with lagged volume
-	- instrumenting given choice w/ lagged volume
-	- total population choice w/ lagged volume
+	- choice model with lagged volume - see VolumeInstrument.do
+	- instrumenting given choice w/ lagged volume - see this file.
+	- total population choice w/ lagged volume - see VolumeInstrument.do
 */
 
 
@@ -243,6 +243,7 @@ foreach yr of numlist 2005(1)2012{
 * drop non-quarterly variables.	
 	drop month_count* lbw_month* vlbw_month* monthly_admit_deaths month_mort_all prev_*_q
 	
+	duplicates drop fid ncdobyear quarter, force
 	
 	save "${birthdata}QuarterlyFacCount.dta", replace
 	
