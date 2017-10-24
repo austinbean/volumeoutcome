@@ -203,9 +203,17 @@ foreach qr of numlist 1{
 	label variable NeoIntensive "Level 3"
 	label variable SoloIntermediate "Level 2"
 	*label variable closest "Closest Hospital"
-	label variable dist_bed "Distance x Beds"
+	*label variable dist_bed "Distance x Beds"
 	label variable chosen "Hosp. Chosen"
 	label variable ObstetricsLevel "Obstetrics Level"
+	
+* merge information about the hospital volume quantities of patients treated.  Merge on other firm fid.
+	drop _merge
+	gen quarter = `qr'
+	gen ncdobyear = year
+	merge m:1 fid ncdobyear quarter using "${birthdata}QuarterlyFacCount.dta"
+	
+	
 
 	eststo c_lg_`yr'_`qr': clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate i.ObstetricsLevel, group(patid)
 	summarize patid, d
@@ -215,6 +223,8 @@ foreach qr of numlist 1{
 	*estimates save "${birthdata}`yr' `qr' hospchoicedistanceonly", replace
 
 	predict pr1
+	gen ncdobyear = year
+	merge m:1 fid year quarter using "${birthdata}QuarterlyFacCount.dta", gen(fcount)
 
 
 	
