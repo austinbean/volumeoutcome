@@ -54,7 +54,20 @@ foreach qr of numlist 1{
 	keep if hcfa_mdc == 14 | hcfa_mdc == 15
 	
 * Optional: keep if DRG != 391 (Normal Newborn)
-	drop if cms_drg == 391 | cms_drg == 795
+	*drop if cms_drg == 391 | cms_drg == 795
+	
+* Drop DRG's which are not relevant	
+	if  `yr' < 2008 {
+		keep if cms_drg == 385 | cms_drg == 386 | cms_drg == 387 | cms_drg == 388 | cms_drg == 389 | cms_drg == 390 | cms_drg == 391
+	}
+
+	else if `yr' >=2008 {
+	* TODO - fix this.  
+		drop if cms_drg  == 780
+		drop if cms_drg >= 981
+		drop if cms_drg < 765 | cms_drg > 795
+	}
+
 
 * keep only those below 1 year
 	destring pat_age, replace force
@@ -65,7 +78,7 @@ foreach qr of numlist 1{
 	drop if pat_zip == .
 
 * Keep only necessary variables.  
-	keep thcic_id pat_zip private_ins medicaid
+	keep thcic_id pat_zip private_ins medicaid cms_drg
 
 
 * Add Hospital FID
@@ -145,7 +158,7 @@ foreach qr of numlist 1{
 
 	gen zipfacdistancecn2 = zipfacdistancecn^2
 
-	keep patid fid fidcn PAT_ZIP chosen zipfacdistancecn zipfacdistancecn2 hs private_ins medicaid
+	keep patid fid fidcn PAT_ZIP chosen zipfacdistancecn zipfacdistancecn2 hs private_ins medicaid cms_drg
 	
 	
 * Add more info about these, using FID, I think.  
@@ -211,9 +224,15 @@ foreach qr of numlist 1{
 	drop _merge
 	gen quarter = `qr'
 	gen ncdobyear = year
-	merge m:1 fid ncdobyear quarter using "${birthdata}QuarterlyFacCount.dta"
-	
-	
+	rename fid fidddd
+	rename fidcn fid
+	merge m:1 fid ncdobyear quarter using "${birthdata}QuarterlyFacCount.dta", gen(fcount)
+	rename fid fidcn
+	rename fiddd fid
+	* BE CAREFUL with the outside option here!  Don't drop it by accident.  There are 33 unique facilities without information.  Plus one outside option 
+	gen ddrp  = 1 if fcount != 3 & fidcn != 0
+	drop if ddrp == 1	
+	drop fcount ddrp
 
 	eststo c_lg_`yr'_`qr': clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate i.ObstetricsLevel, group(patid)
 	summarize patid, d
@@ -222,12 +241,29 @@ foreach qr of numlist 1{
 	*mat a1 = e(b)
 	*estimates save "${birthdata}`yr' `qr' hospchoicedistanceonly", replace
 
-	predict pr1
-	gen ncdobyear = year
-	merge m:1 fid year quarter using "${birthdata}QuarterlyFacCount.dta", gen(fcount)
-
-
+*	predict pr1
 	
+* Set values used in regressions below to zero for the outside option	
+	local vl1 zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate qr_tot ObstetricsLevel
+	foreach v1 of local vl1{
+		replace `v1' = 0 if fidcn == 0
+	}
+	
+	* Distance, Squared, Facility, Quarterly Total
+	clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate qr_tot , group(patid)
+	* Distance, Squared, Facility, Quarterly Total, Obstetrics Level
+	clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate qr_tot i.ObstetricsLevel, group(patid)
+	* Distance, Squared, Facility, Quarterly Total, Obstetrics Level, Facility FE
+	clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate qr_tot i.ObstetricsLevel i.fid, group(patid)
+	
+	
+	clogit chosen i.cms_drg#NeoIntensive, group(patid)
+	
+	* DRG interactions - DOES NOT CONVERGE, 
+	clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate qr_tot i.cms_drg#NeoIntensive, group(patid)
+	
+	* Some ASClogits with interactions for characteristics...zipfacdistancecn2 qr_tot
+	asclogit chosen zipfacdistancecn NeoIntensive SoloIntermediate qr_tot, case(patid) alternatives(hs)
 	
 * Compute Shares and save
 	bysort fidcn: gen shr = sum(pr1)
