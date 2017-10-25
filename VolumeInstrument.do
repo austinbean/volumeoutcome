@@ -181,9 +181,6 @@ foreach qr of numlist 1{
 	replace ObstetricsLevel = 0 if fidcn == 0
 	
 
-
-* To check the features of the choice model with a 50 firm threshold (as in TX Merge Hospital Choices Variant.do)
-/*
 	* Closest variable...
 	bysort patid: egen mind = min(zipfacdistancecn) if zipfacdistancecn > 0
 	gen closest = 0
@@ -198,6 +195,11 @@ foreach qr of numlist 1{
 	replace TotalBeds = 0 if fidcn == 0
 	gen dist_bed = (TotalBeds*zipfacdistancecn)/100
 
+	
+
+* To check the features of the choice model with a 50 firm threshold (as in TX Merge Hospital Choices Variant.do)
+/*
+	
 	clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate closest dist_bed, group(patid)
 	clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate closest dist_bed if medicaid == 1, group(patid)
 	clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate closest dist_bed if private == 1, group(patid)
@@ -250,12 +252,20 @@ foreach qr of numlist 1{
 	}
 	
 	* Distance, Squared, Facility, Quarterly Total
-	clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate qr_tot , group(patid)
+	eststo c_lg_`yr'_`qr': clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate qr_tot , group(patid)
 	* Distance, Squared, Facility, Quarterly Total, Obstetrics Level
-	clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate qr_tot i.ObstetricsLevel, group(patid)
+	eststo c_lg_`yr'_`qr': clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate qr_tot i.ObstetricsLevel, group(patid)
 	* Distance, Squared, Facility, Quarterly Total, Obstetrics Level, Facility FE
-	clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate qr_tot i.ObstetricsLevel i.fid, group(patid)
+	eststo c_lg_`yr'_`qr': clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate qr_tot i.ObstetricsLevel i.fid, group(patid)
 	
+	eststo cl_`yr'`qr'_pvfe: clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate qr_tot closest dist_bed i.fidcn, group(patid)
+
+	* no fid FE's
+	clogit chosen zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate qr_tot closest dist_bed , group(patid)
+
+	* small model with fe's
+	clogit chosen zipfacdistancecn NeoIntensive SoloIntermediate qr_tot i.fidcn, group(patid)
+
 	
 	clogit chosen i.cms_drg#NeoIntensive, group(patid)
 	
