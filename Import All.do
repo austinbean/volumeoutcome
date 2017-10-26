@@ -112,6 +112,9 @@ drop q4_ad
 	label variable prev_11_month "Total NICU Admits 12 months ago"
 	label variable prev_12_month "Total NICU Admits 12 months ago"
 
+* prior 11 months:
+	bysort facname (year ncdobmonth): gen prev_11_months = month_count[_n-1]+month_count[_n-2]+month_count[_n-3]+month_count[_n-4]+month_count[_n-5]+month_count[_n-6]+month_count[_n-7]+month_count[_n-8]+month_count[_n-9]+month_count[_n-10]+month_count[_n-11]
+	label variable prev_11_months "Prior 11 months"
 	
 * lagged quarters again:
 	bysort facname (year ncdobmonth): gen prev_1_q = prev_1_month + prev_2_month + prev_3_month
