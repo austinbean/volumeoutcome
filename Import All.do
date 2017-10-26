@@ -112,6 +112,10 @@ drop q4_ad
 	label variable prev_11_month "Total NICU Admits 12 months ago"
 	label variable prev_12_month "Total NICU Admits 12 months ago"
 
+* months (n-2) - (n-12).  IE - not last month, but the month before.  If it is December, then I want this to be October back through January.
+	bysort facname (year ncdobmonth): gen exper_10 = month_count[_n-2]+month_count[_n-3]+month_count[_n-4]+month_count[_n-5]+month_count[_n-6]+month_count[_n-7]+month_count[_n-8]+month_count[_n-9]+month_count[_n-10]+month_count[_n-11]
+	label variable exper_10 "10 months prior experience, not including last month"
+	
 * prior 11 months:
 	bysort facname (year ncdobmonth): gen prev_11_months = month_count[_n-1]+month_count[_n-2]+month_count[_n-3]+month_count[_n-4]+month_count[_n-5]+month_count[_n-6]+month_count[_n-7]+month_count[_n-8]+month_count[_n-9]+month_count[_n-10]+month_count[_n-11]
 	label variable prev_11_months "Prior 11 months"
