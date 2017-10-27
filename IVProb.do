@@ -229,31 +229,56 @@ coefplot prob_margins_no_iv prob_margins_w_iv,  recast(line) vertical title("Eff
 	* Whole Sample
 		* Quarterly
 		probit neonataldeath  prev_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+		est sto prb_pq_fs
 		margins, at((mean) _all prev_1_month = (0(20)460)) nose predict(pr)
 		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability") 
 	
 		* Yearly
 		probit neonataldeath  nicu_year i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa 
+		est sto prb_py_fs
 		margins, at((mean) _all nicu_year = (10(100)2000)) nose predict(pr)
 		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Year NICU Admits") title("Effect of Volume on Mortality Probability") 
 	
 		* Monthly
 		probit neonataldeath  prev_*_month i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+		est sto prb_pm_fs
 		margins, at((mean) _all prev_1_month = (0(10)200)) nose predict(pr)
 		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Month NICU Admits") title("Effect of Volume on Mortality Probability") 
-	* w/ Fid FE	
+		
+		* Monthly WITH CURRENT MONTH
+		probit neonataldeath month_count prev_*_month i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+		est sto prb_cm_fs
+		margins, at((mean) _all prev_1_month = (0(10)200)) nose predict(pr)
+		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Month NICU Admits") title("Effect of Volume on Mortality Probability") 
+		* Combine Estimates
+		suest prb_cm_fs prb_pm_fs prb_py_fs prb_pq_fs
+		* Test equality of prev 1 month w/ prev year
+		test [prb_pm_fs_neonataldeath]prev_1_month = [prb_py_fs_neonataldeath]nicu_year
+		* Test for Equality of Prev_q and Prev 1 month
+		test [prb_pq_fs_neonataldeath]prev_q = [prb_pm_fs_neonataldeath]prev_1_month
+		* Test for Equality of prev_q and sum of prev 3 months
+		test [prb_pq_fs_neonataldeath]prev_q = ([prb_pm_fs_neonataldeath]prev_1_month + [prb_pm_fs_neonataldeath]prev_2_month + [prb_pm_fs_neonataldeath]prev_3_month)
+		* Test for Equality of prior q and prior year
+		test [prb_pq_fs_neonataldeath]prev_q = [prb_py_fs_neonataldeath]nicu_year
+		
+		
+		
+		* w/ Fid FE	
 		* Quarterly
 		probit neonataldeath  prev_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa i.fid
+		
 		margins, at((mean) _all prev_1_month = (0(20)460)) nose predict(pr)
 		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability") 
 	
 		* Yearly
 		probit neonataldeath  nicu_year i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa i.fid
+		
 		margins, at((mean) _all nicu_year = (10(100)2000)) nose predict(pr)
 		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Year NICU Admits") title("Effect of Volume on Mortality Probability") 
 	
 		* Monthly
 		probit neonataldeath  prev_*_month i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa i.fid
+		
 		margins, at((mean) _all prev_1_month = (0(10)200)) nose predict(pr)
 		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Month NICU Admits") title("Effect of Volume on Mortality Probability") 
 	  
@@ -263,18 +288,40 @@ coefplot prob_margins_no_iv prob_margins_w_iv,  recast(line) vertical title("Eff
 	* without fid FE's
 		* Quarterly
 		probit neonataldeath  prev_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa 
+		est sto prb_pq_sub
 		margins, at((mean) _all prev_1_month = (0(20)460)) nose predict(pr)
 		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability") 
 	
 		* Yearly
 		probit neonataldeath  nicu_year i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+		est sto prb_py_sub
 		margins, at((mean) _all nicu_year = (10(100)2000)) nose predict(pr)
 		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Year NICU Admits") title("Effect of Volume on Mortality Probability") 
 	
 		* Monthly
 		probit neonataldeath  prev_*_month i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa 
+		est sto prb_pm_sub
 		margins, at((mean) _all prev_1_month = (0(10)200)) nose predict(pr)
 		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Month NICU Admits") title("Effect of Volume on Mortality Probability") 
+		
+		* Monthly WITH CURRENT MONTH
+		probit neonataldeath month_count  prev_*_month i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa 
+		est sto prb_cm_sub
+		margins, at((mean) _all prev_1_month = (0(10)200)) nose predict(pr)
+		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Month NICU Admits") title("Effect of Volume on Mortality Probability") 
+		
+		* Combine estimates
+		suest prb_pq_sub prb_py_sub prb_pm_sub prb_cm_sub
+		
+		* Test for Equality of Prev_1_month coeff and year coeff
+		test [prb_pm_sub_neonataldeath]prev_1_month = [prb_py_sub_neonataldeath]nicu_year
+		* Test for Equality of Prev_q and Prev 1 month
+		test [prb_pq_sub_neonataldeath]prev_q = [prb_pm_sub_neonataldeath]prev_1_month
+		* Test for Equality of prev_q and sum of prev 3 months
+		test [prb_pq_sub_neonataldeath]prev_q = ([prb_pm_sub_neonataldeath]prev_1_month + [prb_pm_sub_neonataldeath]prev_2_month + [prb_pm_sub_neonataldeath]prev_3_month)
+		* Test for Equality of prior q and prior year
+		test [prb_pq_sub_neonataldeath]prev_q = [prb_py_sub_neonataldeath]nicu_year
+		
 		
 	* Also with fid FE's  
 		* Quarterly
@@ -291,7 +338,16 @@ coefplot prob_margins_no_iv prob_margins_w_iv,  recast(line) vertical title("Eff
 		probit neonataldeath  prev_*_month i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa i.fid  
 		margins, at((mean) _all prev_1_month = (0(10)200)) nose predict(pr)
 		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Month NICU Admits") title("Effect of Volume on Mortality Probability") 
-			
+		
+		* Monthly WITH CURRENT MONTH
+		probit neonataldeath month_count  prev_*_month i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa i.fid  
+		margins, at((mean) _all prev_1_month = (0(10)200)) nose predict(pr)
+		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Month NICU Admits") title("Effect of Volume on Mortality Probability") 
+		
+	
+* TODO: specification tests...
+	
+	
 	
 * The following do finish, but save time by skipping SE's
 margins, at((mean) _all) dydx(prev_q)  nose
