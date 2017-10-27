@@ -226,7 +226,7 @@ label variable lag_6_vlbw " VLBW lag 6 Months"
 
 
 rename year ncdobyear
-
+di "generating here"
 gen THCIC_ID = .
 do "${TXhospital}TX Hospital Code Match.do"
 
@@ -357,9 +357,10 @@ TX Choice Model Extras.do contains a call to this function.
 This also makes use of TX Merge Hospital Choices VARIANT.do.
 */
 
-
+/*
 gen THCIC_ID = .
 quietly do "${TXhospital}TX Hospital Code Match.do"
+*/
 
 * Zip codes choice sets - 10 closest hospitals: 
 * about 2% of the sample is not matched - most are from out of state.
