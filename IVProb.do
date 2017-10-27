@@ -215,6 +215,21 @@ coefplot prob_margins_no_iv prob_margins_w_iv,  recast(line) vertical title("Eff
   probit neonataldeath prev_q i.fid i.b_es_ges
   probit neonataldeath prev_q i.fid i.b_es_ges i.pay
   probit neonataldeath prev_q i.fid i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+  est sto prob_pq_fs
+  
+  	* With FOUR lagged Quarters
+  probit neonataldeath prev_1_q-prev_4_q i.fid 
+  probit neonataldeath prev_1_q-prev_4_q i.fid i.b_es_ges
+  probit neonataldeath prev_1_q-prev_4_q i.fid i.b_es_ges i.pay
+  probit neonataldeath prev_1_q-prev_4_q i.fid i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+  est sto prob_aq_fs
+  
+	* With previous year
+  probit neonataldeath nicu_year i.fid
+  probit neonataldeath nicu_year i.fid i.b_es_ges
+  probit neonataldeath nicu_year i.fid i.b_es_ges i.pay
+  probit neonataldeath nicu_year i.fid i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+  est sto prob_yr_fs
 
 	* And IV...  For these the sign is still as expected, but the estimate is less precise and not significant.  
   ivprobit neonataldeath i.fid (prev_q = exp_share)  
@@ -222,7 +237,10 @@ coefplot prob_margins_no_iv prob_margins_w_iv,  recast(line) vertical title("Eff
   ivprobit neonataldeath i.fid i.b_es_ges i.pay (prev_q = exp_share) 
   ivprobit neonataldeath (prev_q = exp_share) i.fid i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
 
- 
+  * Combine estimates, compare coeffs:
+  suest prob_pq_fs prob_yr_fs prob_aq_fs
+  test [prob_pq_fs_neonataldeath]prev_q = [prob_yr_fs_neonataldeath]nicu_year
+
  
  
 * Compare months separately, year, prior quarter: 
@@ -263,24 +281,30 @@ coefplot prob_margins_no_iv prob_margins_w_iv,  recast(line) vertical title("Eff
 		
 		
 		
-		* w/ Fid FE	
+		* w/ Fid FE's
 		* Quarterly
 		probit neonataldeath  prev_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa i.fid
-		
+		est sto prb_pq_fs_fe
 		margins, at((mean) _all prev_1_month = (0(20)460)) nose predict(pr)
 		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability") 
 	
 		* Yearly
 		probit neonataldeath  nicu_year i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa i.fid
-		
+		est sto prb_py_fs_fe
 		margins, at((mean) _all nicu_year = (10(100)2000)) nose predict(pr)
 		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Year NICU Admits") title("Effect of Volume on Mortality Probability") 
-	
+		est sto prb_pq_fs
+		
 		* Monthly
 		probit neonataldeath  prev_*_month i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa i.fid
-		
+		est sto prb_mn_fs_fe
 		margins, at((mean) _all prev_1_month = (0(10)200)) nose predict(pr)
 		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Month NICU Admits") title("Effect of Volume on Mortality Probability") 
+	  
+		* Combine Estimates
+		suest prb_mn_fs_fe prb_py_fs_fe prb_pq_fs_fe 
+		* Test equality:
+		test [prb_py_fs_fe_neonataldeath]nicu_year = [prb_mn_fs_fe_neonataldeath]prev_1_month
 	  
 * Subset of VLBW
 	keep if b_wt_cgr <= 1500
