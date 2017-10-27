@@ -86,6 +86,14 @@ bysort facname (year ncdobmonth): replace prev_q = prev_q[_n-1] if prev_q == . &
 bysort facname (year ncdobmonth): replace prev_q = prev_q[_n-1] if prev_q == . & ncdobmonth == 3
 drop q4_ad
 
+* more lagged quarters 
+	bysort facname (year ncdobmonth): gen lag_2_quarters = prev_q[_n-3]
+	bysort facname (year ncdobmonth): gen lag_3_quarters = prev_q[_n-6]
+	bysort facname (year ncdobmonth): gen lag_4_quarters = prev_q[_n-9]
+	label variable lag_2_quarters "2 quarters ago NICU vol"
+	label variable lag_3_quarters "3 quarters ago NICU vol"
+	label variable lag_4_quarters "4 quarters ago NICU vol"
+
 * lagged months:
 	bysort facname (year ncdobmonth): gen prev_1_month = month_count[_n-1]
 	bysort facname (year ncdobmonth): gen prev_2_month = month_count[_n-2]
@@ -210,6 +218,12 @@ label variable lag_3_vlbw " VLBW lag 3 Months"
 label variable lag_4_vlbw " VLBW lag 4 Months"
 label variable lag_5_vlbw " VLBW lag 5 Months"
 label variable lag_6_vlbw " VLBW lag 6 Months"
+
+
+* Add prior year measures:
+	bysort facname (year ncdobmonth): gen nicu_prior_year = nicu_year[_n-12]
+	label variable nicu_prior_year "total nicu admits prior year"
+
 
 rename year ncdobyear
 
