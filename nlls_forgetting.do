@@ -71,7 +71,7 @@ save "${birthdata}FacCountMissingFidDropped.dta",replace
 	gen otherins = 0
 	replace otherins = 1 if pay != 2 & pay != 1
 
-	* You need to add the constant manually:
+* You need to add the constant manually:
 	gen b_const = 1
 	
 	
@@ -503,4 +503,78 @@ foreach fd of local fff{
  {b4975091 = 1.0}*ind4975091 +  ///
  {b4992851 = 1.0}*ind4992851 +  ///
  {b5035018 = 1.0}*ind5035018)
+* this works, but the FE's are all not significant and many are estimated to have similar values.  I am not convinced.
+
+
+* Constant depreciation rate...
+*	nl (neonataldeath = {V=1.0}*ln( {FR=0.7}*prev_11_months + month_count + 1) + {bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012)
+
+foreach nn of numlist 1/12{
+	drop if prev_`nn'_month == .
+}
+
+* Constant V:
+	nl (neonataldeath = {V=1.0}*prev_1_month + ({V}^2)*prev_2_month + ({V}^3)*prev_3_month + ({V}^4)*prev_4_month + ({V}^5)*prev_5_month + ({V}^6)*prev_6_month + ({V}^7)*prev_7_month + ({V}^8)*prev_8_month + ({V}^9)*prev_9_month + ({V}^10)*prev_10_month + ({V}^11)*prev_11_month +({V}^12)*prev_12_month )
+
+
+* This simple one works:
+	nl (neonataldeath = {rd=1.0}*prev_1_month + ({V=1.0}^2)*prev_2_month + ({V}^3)*prev_3_month + ({V}^4)*prev_4_month + ({V}^5)*prev_5_month + ({V}^6)*prev_6_month + ({V}^7)*prev_7_month + ({V}^8)*prev_8_month + ({V}^9)*prev_9_month + ({V}^10)*prev_10_month + ({V}^11)*prev_11_month +({V}^12)*prev_12_month )
+
+	
+*	Some health states: - this one DOES work
+	nl (neonataldeath = {rd=1.0}*prev_1_month + ({V=1.0}^2)*prev_2_month + ({V}^3)*prev_3_month + ({V}^4)*prev_4_month + ({V}^5)*prev_5_month + ({V}^6)*prev_6_month + ({V}^7)*prev_7_month + ({V}^8)*prev_8_month + ({V}^9)*prev_9_month + ({V}^10)*prev_10_month + ({V}^11)*prev_11_month +({V}^12)*prev_12_month + ///
+	{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin)
+/*
+Results for the above:
+  Source |      SS            df       MS
+-------------+----------------------------------    Number of obs =     25,946
+       Model |  42.228461         15  2.81523073    R-squared     =     0.0171
+    Residual |  2420.2399      25930  .093337444    Adj R-squared =     0.0166
+-------------+----------------------------------    Root MSE      =   .3055118
+       Total |  2462.4684      25945  .094911096    Res. dev.     =   12083.73
+
+------------------------------------------------------------------------------
+neonatalde~h |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         /rd |   .0001183   .0000535     2.21   0.027     .0000135    .0002231
+          /V |  -9.33e-10          .        .       .            .           .
+        /bhy |  -.0462781   .0476257    -0.97   0.331    -.1396271     .047071
+      /bbcal |  -.5859407          .        .       .            .           .
+        /bcl |   .9419168   .0730253    12.90   0.000     .7987832     1.08505
+      /bcona |   .1166032   .0518421     2.25   0.025     .0149898    .2182166
+      /bconm |   .3790693   .1184529     3.20   0.001      .146895    .6112435
+       /bchn |   .4376658   .1028429     4.26   0.000     .2360879    .6392436
+       /bchd |   .3644205   .0621037     5.87   0.000     .2426937    .4861473
+        /bpc |   .2035728   .0052868    38.51   0.000     .1932104    .2139352
+         /bw |  -.0001206   4.60e-06   -26.24   0.000    -.0001296   -.0001116
+         /b4 |   .0404641   .0041339     9.79   0.000     .0323615    .0485668
+         /b5 |   .0156532    .006567     2.38   0.017     .0027814     .028525
+         /b6 |  -.0159095   .0056107    -2.84   0.005    -.0269068   -.0049122
+         /b7 |   .1168977   .0454223     2.57   0.010     .0278675    .2059278
+         /b8 |   .0130412   .0584325     0.22   0.823    -.1014898    .1275722
+         /b9 |   .4966105   .0661047     7.51   0.000     .3670416    .6261794
+        /b10 |  -.1453377   .1043668    -1.39   0.164    -.3499024    .0592269
+------------------------------------------------------------------------------
+  Parameter V taken as constant term in model & ANOVA table
+
+
+
+*/
+	
+	
+	
+	
+* The fully complicated one does not
+	nl (neonataldeath = {rd=1.0}*prev_1_month + ({V=1.0}^2)*prev_2_month + ({V}^3)*prev_3_month + ({V}^4)*prev_4_month + ({V}^5)*prev_5_month + ({V}^6)*prev_6_month + ({V}^7)*prev_7_month + ({V}^8)*prev_8_month + ({V}^9)*prev_9_month + ({V}^10)*prev_10_month + ({V}^11)*prev_11_month +({V}^12)*prev_12_month + {b2=1.0}*NeoIntensive +{b3=1.0}*SoloIntermediate + {boc=1.0}*ObstetricCare + ///
+		{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
+		{bhis=1.0}*white + {bafam=1.0}*afam + {basn=1.0}*asian + {bpacs=1.0}*pacis + {bhisp=1.0}*hispanic + /// 
+		{bmed=1.0}*medicaid + {bpriv=1.0}*privateins + {boins=1.0}*otherins + ///
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 + ///
+		{bdiab = 1.0}*diab_pre + {bdig=1.0}*diab_ges + {bcrh=1.0}*brf_crhy + {bpgh=1.0}*brf_pghy + {brfe=1.0}*brf_eclm + {bprem=1.0}*pre_prem + ///
+		{btrs=1.0}*bo_trans + {bster=1.0}*lab_ster)
+
+	
+nl (neonataldeath = {rd=1.0}*prev_1_month + ({V=1.0}^2)*prev_2_month + ({V}^3)*prev_3_month + ({V}^4)*prev_4_month + ({V}^5)*prev_5_month + ({V}^6)*prev_6_month + ({V}^7)*prev_7_month + ({V}^8)*prev_8_month + ({V}^9)*prev_9_month + ({V}^10)*prev_10_month + ({V}^11)*prev_11_month +({V}^12)*prev_12_month + ///
+   	{b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 ) 
+	
 
