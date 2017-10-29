@@ -205,131 +205,163 @@ save "${birthdata}FacCountMissingFidDropped.dta",replace
 	
 	
 * FOR THE PRESENTATION ... 
-di "YEAR FE AND CONSTANT"
-nl (neonataldeath = {V=1.0}*ln( {FR=0.7}*prev_11_months + month_count + 1) + {bcons=1.0}*b_const+ {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012)
+di "YEAR FE AND CONSTANT EXPER_10"
+
+
+	nl (neonataldeath = {V=1.0}*ln( invlogit({FR=0.7})*exper_10 + prev_1_month + 1) + ///
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 )
+
+*	nl, coeflegend
+	nlcom disc: invlogit(_b[FR:_cons])
 
 	
 /*
-Iteration 14:  residual SS =  2460.449
-
-
-      Source |      SS            df       MS
--------------+----------------------------------    Number of obs =     25,946
-       Model |  2.0196072          8  .252450904    R-squared     =     0.0008
-    Residual |  2460.4488      25937  .094862505    Adj R-squared =     0.0005
--------------+----------------------------------    Root MSE      =   .3079976
-       Total |  2462.4684      25945  .094911096    Res. dev.     =   12511.25
-
-------------------------------------------------------------------------------
-neonatalde~h |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
--------------+----------------------------------------------------------------
-          /V |  -.0081832   .0023093    -3.54   0.000    -.0127096   -.0036568
-         /FR |   .0911944   .2666661     0.34   0.732     -.431486    .6138748
-      /bcons |   1.000041          .        .       .            .           .
-      /b2006 |  -.8568431   .0130514   -65.65   0.000    -.8824246   -.8312616
-      /b2007 |  -.8578851   .0130239   -65.87   0.000    -.8834128   -.8323575
-      /b2008 |   -.863828   .0130993   -65.94   0.000    -.8895033   -.8381527
-      /b2009 |   -.860184   .0131232   -65.55   0.000    -.8859063   -.8344617
-      /b2010 |  -.8598933   .0133336   -64.49   0.000    -.8860279   -.8337587
-      /b2011 |  -.8577522   .0132304   -64.83   0.000    -.8836845   -.8318198
-      /b2012 |  -.8731404   .0132171   -66.06   0.000    -.8990465   -.8472342
-------------------------------------------------------------------------------
-  Parameter bcons taken as constant term in model & ANOVA table
 
 */
-di " NO HOSPITAL CHARS"
-	nl (neonataldeath = {V=1.0}*ln( {FR=0.7}*exper_10 + prev_1_month + 1)  + ///
-	{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
-	{bhis=1.0}*white + {bafam=1.0}*afam + {basn=1.0}*asian + {bpacs=1.0}*pacis + {bhisp=1.0}*hispanic + /// 
-	{bmed=1.0}*medicaid + {bpriv=1.0}*privateins + {boins=1.0}*otherins + ///
-	{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 )
-	
+di " NO HOSPITAL CHARS EXPER_10"
+
+	nl (neonataldeath = {V=1.0}*ln( invlogit({FR=0.7})*exper_10 + prev_1_month + 1) +  ///
+		{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
+		{bhis=1.0}*white + {bafam=1.0}*afam + {basn=1.0}*asian + {bpacs=1.0}*pacis + {bhisp=1.0}*hispanic + /// 
+		{bmed=1.0}*medicaid + {bpriv=1.0}*privateins + {boins=1.0}*otherins + ///
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 + ///
+		{bdiab = 1.0}*diab_pre + {bdig=1.0}*diab_ges + {bcrh=1.0}*brf_crhy + {bpgh=1.0}*brf_pghy + {brfe=1.0}*brf_eclm + {bprem=1.0}*pre_prem + ///
+		{btrs=1.0}*bo_trans + {bster=1.0}*lab_ster)
+*	nl, coeflegend
+	nlcom disc: invlogit(_b[FR:_cons])
+
+
 /*
-Iteration 7:  residual SS =  2104.556
-
-
-      Source |      SS            df       MS
--------------+----------------------------------    Number of obs =     25,946
-       Model |  357.91284         38  9.41875901    R-squared     =     0.1453
-    Residual |  2104.5556      25907  .081235016    Adj R-squared =     0.1441
--------------+----------------------------------    Root MSE      =   .2850176
-       Total |  2462.4684      25945  .094911096    Res. dev.     =    8457.46
-
-------------------------------------------------------------------------------
-neonatalde~h |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
--------------+----------------------------------------------------------------
-          /V |  -.0084717   .0021839    -3.88   0.000    -.0127522   -.0041911
-         /FR |   .0573298   .1576183     0.36   0.716    -.2516108    .3662704
-        /bhy |  -.0213739   .0444603    -0.48   0.631    -.1085186    .0657708
-      /bbcal |  -.5988977          .        .       .            .           .
-        /bcl |   .9999539   .0681601    14.67   0.000     .8663563    1.133551
-      /bcona |   .1123668   .0484127     2.32   0.020     .0174751    .2072584
-      /bconm |   .3278777   .1105419     2.97   0.003     .1112094     .544546
-       /bchn |   .4308749   .0959804     4.49   0.000      .242748    .6190017
-       /bchd |   .3761588   .0579662     6.49   0.000     .2625419    .4897757
-        /bpc |  -.0243372   .0065698    -3.70   0.000    -.0372144     -.01146
-         /bw |  -.0003548   5.85e-06   -60.62   0.000    -.0003663   -.0003433
-         /b4 |   -.002949   .0039289    -0.75   0.453    -.0106499    .0047519
-         /b5 |   .0024886   .0061491     0.40   0.686    -.0095641    .0145413
-         /b6 |  -.0142156   .0052853    -2.69   0.007     -.024575   -.0038562
-         /b7 |   .0876199   .0424179     2.07   0.039     .0044785    .1707612
-         /b8 |   .0087582   .0545404     0.16   0.872     -.098144    .1156604
-         /b9 |   .4209678   .0617206     6.82   0.000     .2999919    .5419436
-        /b10 |   -.153693   .0974237    -1.58   0.115    -.3446489    .0372629
-       /bhis |   .0175791   .0058275     3.02   0.003      .006157    .0290013
-      /bafam |   -.008816   .0074295    -1.19   0.235    -.0233783    .0057462
-       /basn |   .0071527   .0108345     0.66   0.509    -.0140835    .0283889
-      /bpacs |   .0081647   .0505862     0.16   0.872    -.0909871    .1073166
-      /bhisp |   .0032061   .0046678     0.69   0.492    -.0059431    .0123552
-       /bmed |   .9706745   .0053915   180.04   0.000     .9601069    .9812421
-      /bpriv |   .9727404   .0057975   167.79   0.000      .961377    .9841038
-      /boins |   1.004529          .        .       .            .           .
-      /bcons |   1.003722          .        .       .            .           .
-      /b2006 |  -1.446514   .0169313   -85.43   0.000      -1.4797   -1.413328
-      /b2007 |  -1.450137      .0169   -85.81   0.000    -1.483262   -1.417012
-      /b2008 |  -1.453401   .0170293   -85.35   0.000    -1.486779   -1.420022
-      /b2009 |  -1.449476   .0170508   -85.01   0.000    -1.482896   -1.416055
-      /b2010 |  -1.445535   .0172902   -83.60   0.000    -1.479425   -1.411645
-      /b2011 |  -1.446632   .0172087   -84.06   0.000    -1.480362   -1.412902
-      /b2012 |  -1.460895    .017114   -85.36   0.000     -1.49444   -1.427351
-      /bdiab |  -.0096194   .0144175    -0.67   0.505    -.0378785    .0186397
-       /bdig |   .0025552   .0090764     0.28   0.778    -.0152351    .0203454
-       /bcrh |  -.0421444    .009343    -4.51   0.000    -.0604572   -.0238316
-       /bpgh |  -.0465716   .0048919    -9.52   0.000    -.0561601   -.0369832
-       /brfe |   -.064992   .0214259    -3.03   0.002     -.106988    -.022996
-      /bprem |   .0085061   .0081005     1.05   0.294    -.0073713    .0243835
-       /btrs |  -.0042695   .0061316    -0.70   0.486    -.0162877    .0077487
-      /bster |  -.0237075   .0051936    -4.56   0.000    -.0338873   -.0135278
-------------------------------------------------------------------------------
-  Parameter bcons taken as constant term in model & ANOVA table
-
 */
 
-di "NO HEALTH STATES"
-	nl (neonataldeath = {V=1.0}*ln( {FR=0.7}*exper_10 + prev_1_month + 1) + {b2=1.0}*NeoIntensive +{b3=1.0}*SoloIntermediate + {boc=1.0}*ObstetricCare + ///
-	{bhis=1.0}*white + {bafam=1.0}*afam + {basn=1.0}*asian + {bpacs=1.0}*pacis + {bhisp=1.0}*hispanic + /// 
-	{bmed=1.0}*medicaid + {bpriv=1.0}*privateins + {boins=1.0}*otherins + ///
-	{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 + ///
-	{bdiab = 1.0}*diab_pre + {bdig=1.0}*diab_ges + {bcrh=1.0}*brf_crhy + {bpgh=1.0}*brf_pghy + {brfe=1.0}*brf_eclm + {bprem=1.0}*pre_prem + ///
-	{btrs=1.0}*bo_trans + {bster=1.0}*lab_ster )
-	
+di "NO HEALTH STATES EXPER_10"
+
+	nl (neonataldeath = {V=1.0}*ln( invlogit({FR=0.7})*exper_10 + prev_1_month + 1) + {b2=1.0}*NeoIntensive +{b3=1.0}*SoloIntermediate + {boc=1.0}*ObstetricCare + ///
+		{bhis=1.0}*white + {bafam=1.0}*afam + {basn=1.0}*asian + {bpacs=1.0}*pacis + {bhisp=1.0}*hispanic + /// 
+		{bmed=1.0}*medicaid + {bpriv=1.0}*privateins + {boins=1.0}*otherins + ///
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 + ///
+		{btrs=1.0}*bo_trans + {bster=1.0}*lab_ster)
+*	nl, coeflegend
+	nlcom disc: invlogit(_b[FR:_cons])
+
+
 /*
 
 
 
 */
 
-di "NO INS STATUS"
+di "NO INS STATUS EXPER_10"
 
-	nl (neonataldeath = {V=1.0}*ln( {FR=0.7}*exper_10 + prev_1_month + 1) + {b2=1.0}*NeoIntensive +{b3=1.0}*SoloIntermediate + {boc=1.0}*ObstetricCare + ///
-	{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
-	{bhis=1.0}*white + {bafam=1.0}*afam + {basn=1.0}*asian + {bpacs=1.0}*pacis + {bhisp=1.0}*hispanic + /// 
-	{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 )		
 
-	
+	nl (neonataldeath = {V=1.0}*ln( invlogit({FR=0.7})*exper_10 + prev_1_month + 1) + {b2=1.0}*NeoIntensive +{b3=1.0}*SoloIntermediate + {boc=1.0}*ObstetricCare + ///
+		{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
+		{bhis=1.0}*white + {bafam=1.0}*afam + {basn=1.0}*asian + {bpacs=1.0}*pacis + {bhisp=1.0}*hispanic + /// 
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 + ///
+		{bdiab = 1.0}*diab_pre + {bdig=1.0}*diab_ges + {bcrh=1.0}*brf_crhy + {bpgh=1.0}*brf_pghy + {brfe=1.0}*brf_eclm + {bprem=1.0}*pre_prem + ///
+		{btrs=1.0}*bo_trans + {bster=1.0}*lab_ster)
+*	nl, coeflegend
+	nlcom disc: invlogit(_b[FR:_cons])
+
+
 /*
 
 */	
+
+di "FULL EXPER_10"
+
+	nl (neonataldeath = {V=1.0}*ln( invlogit({FR=0.7})*exper_10 + prev_1_month + 1) + {b2=1.0}*NeoIntensive +{b3=1.0}*SoloIntermediate + {boc=1.0}*ObstetricCare + ///
+		{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
+		{bhis=1.0}*white + {bafam=1.0}*afam + {basn=1.0}*asian + {bpacs=1.0}*pacis + {bhisp=1.0}*hispanic + /// 
+		{bmed=1.0}*medicaid + {bpriv=1.0}*privateins + {boins=1.0}*otherins + ///
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 + ///
+		{bdiab = 1.0}*diab_pre + {bdig=1.0}*diab_ges + {bcrh=1.0}*brf_crhy + {bpgh=1.0}*brf_pghy + {brfe=1.0}*brf_eclm + {bprem=1.0}*pre_prem + ///
+		{btrs=1.0}*bo_trans + {bster=1.0}*lab_ster)
+*	nl, coeflegend
+	nlcom disc: invlogit(_b[FR:_cons])
+
+	
+	
+	
+* Trying with: {V=1.0}*ln(invlogit({FR=0.7})*prev_11_months + month_count + 1	)
+	
+* FOR THE PRESENTATION ... 
+di "YEAR FE AND CONSTANT PREV 11"
+
+
+qui	nl (neonataldeath = {V=1.0}*ln(invlogit({FR=0.7})*prev_11_months + month_count + 1	) + ///
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 )
+
+*	nl, coeflegend
+	nlcom disc: invlogit(_b[FR:_cons])
+
+	
+/*
+
+*/
+di " NO HOSPITAL CHARS PREV 11"
+
+qui	nl (neonataldeath = {V=1.0}*ln(invlogit({FR=0.7})*prev_11_months + month_count + 1	) +  ///
+		{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
+		{bhis=1.0}*white + {bafam=1.0}*afam + {basn=1.0}*asian + {bpacs=1.0}*pacis + {bhisp=1.0}*hispanic + /// 
+		{bmed=1.0}*medicaid + {bpriv=1.0}*privateins + {boins=1.0}*otherins + ///
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 + ///
+		{bdiab = 1.0}*diab_pre + {bdig=1.0}*diab_ges + {bcrh=1.0}*brf_crhy + {bpgh=1.0}*brf_pghy + {brfe=1.0}*brf_eclm + {bprem=1.0}*pre_prem + ///
+		{btrs=1.0}*bo_trans + {bster=1.0}*lab_ster)
+*	nl, coeflegend
+	nlcom disc: invlogit(_b[FR:_cons])
+
+
+/*
+*/
+
+di "NO HEALTH STATES PREV 11"
+
+qui	nl (neonataldeath = {V=1.0}*ln(invlogit({FR=0.7})*prev_11_months + month_count + 1	) + {b2=1.0}*NeoIntensive +{b3=1.0}*SoloIntermediate + {boc=1.0}*ObstetricCare + ///
+		{bhis=1.0}*white + {bafam=1.0}*afam + {basn=1.0}*asian + {bpacs=1.0}*pacis + {bhisp=1.0}*hispanic + /// 
+		{bmed=1.0}*medicaid + {bpriv=1.0}*privateins + {boins=1.0}*otherins + ///
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 + ///
+		{btrs=1.0}*bo_trans + {bster=1.0}*lab_ster)
+*	nl, coeflegend
+	nlcom disc: invlogit(_b[FR:_cons])
+
+
+/*
+
+
+
+*/
+
+di "NO INS STATUS PREV 11"
+
+
+qui	nl (neonataldeath = {V=1.0}*ln(invlogit({FR=0.7})*prev_11_months + month_count + 1	) + {b2=1.0}*NeoIntensive +{b3=1.0}*SoloIntermediate + {boc=1.0}*ObstetricCare + ///
+		{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
+		{bhis=1.0}*white + {bafam=1.0}*afam + {basn=1.0}*asian + {bpacs=1.0}*pacis + {bhisp=1.0}*hispanic + /// 
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 + ///
+		{bdiab = 1.0}*diab_pre + {bdig=1.0}*diab_ges + {bcrh=1.0}*brf_crhy + {bpgh=1.0}*brf_pghy + {brfe=1.0}*brf_eclm + {bprem=1.0}*pre_prem + ///
+		{btrs=1.0}*bo_trans + {bster=1.0}*lab_ster)
+	*nl, coeflegend
+	nlcom disc: invlogit(_b[FR:_cons])
+
+
+/*
+
+*/	
+
+di "FULL PREV 11"
+
+qui	nl (neonataldeath = {V=1.0}*ln(invlogit({FR=0.7})*prev_11_months + month_count + 1	) + {b2=1.0}*NeoIntensive +{b3=1.0}*SoloIntermediate + {boc=1.0}*ObstetricCare + ///
+		{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
+		{bhis=1.0}*white + {bafam=1.0}*afam + {basn=1.0}*asian + {bpacs=1.0}*pacis + {bhisp=1.0}*hispanic + /// 
+		{bmed=1.0}*medicaid + {bpriv=1.0}*privateins + {boins=1.0}*otherins + ///
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 + ///
+		{bdiab = 1.0}*diab_pre + {bdig=1.0}*diab_ges + {bcrh=1.0}*brf_crhy + {bpgh=1.0}*brf_pghy + {brfe=1.0}*brf_eclm + {bprem=1.0}*pre_prem + ///
+		{btrs=1.0}*bo_trans + {bster=1.0}*lab_ster)
+	*nl, coeflegend
+	nlcom disc: invlogit(_b[FR:_cons])
+	
+	
 	
 	
 * TRY adding FE's
@@ -1023,7 +1055,7 @@ neonatalde~h |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
 		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 + ///
 		{bdiab = 1.0}*diab_pre + {bdig=1.0}*diab_ges + {bcrh=1.0}*brf_crhy + {bpgh=1.0}*brf_pghy + {brfe=1.0}*brf_eclm + {bprem=1.0}*pre_prem + ///
 		{btrs=1.0}*bo_trans + {bster=1.0}*lab_ster)
-
+di "FULL MODEL"
 nl, coeflegend
 nlcom disc: exp(_b[V:_cons])
 
