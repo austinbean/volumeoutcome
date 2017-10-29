@@ -245,10 +245,10 @@ coefplot prob_margins_no_iv prob_margins_w_iv,  recast(line) vertical title("Eff
  
 * Compare months separately, year, prior quarter: 
 	* Whole Sample
-		* Quarterly
-		probit neonataldeath  prev_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+		* Quarterly - four lagged quarters
+		probit neonataldeath prev_1_q-prev_4_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
 		est sto prb_pq_fs
-		margins, at((mean) _all prev_1_month = (0(20)460)) nose predict(pr)
+		margins, at((mean) _all prev_1_q = (0(20)500)) nose predict(pr)
 		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability") 
 	
 		* Yearly
@@ -283,9 +283,12 @@ coefplot prob_margins_no_iv prob_margins_w_iv,  recast(line) vertical title("Eff
 		
 		* w/ Fid FE's
 		* Quarterly
-		probit neonataldeath  prev_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa i.fid
+			* Previous 1 Quarter
+		probit neonataldeath prev_1_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa i.fid
+			* Previous 4 Quarters
+		probit neonataldeath prev_1_q-prev_4_q i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa i.fid
 		est sto prb_pq_fs_fe
-		margins, at((mean) _all prev_1_month = (0(20)460)) nose predict(pr)
+		margins, at((mean) _all prev_1_q = (0(20)460)) nose predict(pr)
 		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Quarter NICU Admits") title("Effect of Volume on Mortality Probability") 
 	
 		* Yearly
@@ -367,8 +370,17 @@ coefplot prob_margins_no_iv prob_margins_w_iv,  recast(line) vertical title("Eff
 		probit neonataldeath month_count  prev_*_month i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa i.fid  
 		margins, at((mean) _all prev_1_month = (0(10)200)) nose predict(pr)
 		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Month NICU Admits") title("Effect of Volume on Mortality Probability") 
-		
 	
+	
+* For stylized graph with NO axis labels:
+		marginsplot, recast(line) plot1opts(lcolor(black)) graphregion(color(white)) xlabel(none) ylabel(none) ytitle("Mortality Probability") xtitle("Patient Volume") title("Effect of Patient Volume on Mortality Probability")  xline(80) xline(100) xline(180) text( 0.007 50 "Two" "Separate" "Hospitals") text( 0.007 220 "Combined" "Patient" "Volume")	saving( "/Users/austinbean/Google Drive/Current Projects/Job Market/StylizedVolume.gph", replace)
+
+		
+		
+* For stylized graph of price effects with no axis labels:		
+		marginsplot, recast(line) plot1opts(lcolor(black)) graphregion(color(white)) xlabel(none) ylabel(none) ytitle("Market Price") xtitle("Number of Firms") title("Number of Firms vs. Market Price")  xline(50) xline(500) xline(1500) text( 0.007 200 "Monopoly" "Price") text( 0.007 650 "Duopoly" "Price") text( 0.007 1650 "N-opoly" "Price")	saving( "/Users/austinbean/Google Drive/Current Projects/Job Market/StylizedPrice.gph", replace)
+
+		
 * TODO: specification tests...
 	
 	
