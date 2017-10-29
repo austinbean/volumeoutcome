@@ -12,7 +12,7 @@ use "${birthdata}/Births2005-2012wCounts.dta", clear
 * Wadley Regional Med Center, Bowie, 2007 - Downgrade 3 to 2
 * Christus St Michael, Bowie, 2010 - Level 3
 * Baylor Medical Center Frisco, Collin, 2007 - Level 3
-* Doctors Hospital White Rock Lake, Dallas, 2010 - Upgrade Level 2 to Level 3
+* Doctors Hospital White Rock Lake, Dallas, 2010 - Upgrade Level 2 to Level 3 -> nearest neighbors... WH WRL: 1136005, Parkland 1130950, Presbyterian 1131050, Baylor Garland 1131616, Dallas Regional 1132528
 * Richardson Regional, Dallas, 2006 - Downgrade 3 to 1
 * Presbyterian Hospital of Denton, Denton, 2006 - Upgrade Level 1 to 3
 * University Medical Center El Paso, El Paso, 2011 - Downgrade 3 to 1
