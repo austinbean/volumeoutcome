@@ -209,14 +209,19 @@ coefplot prob_margins_no_iv prob_margins_w_iv,  recast(line) vertical title("Eff
   probit neonataldeath prev_*_month i.fid i.b_es_ges
   probit neonataldeath prev_*_month i.fid i.b_es_ges i.pay
   probit neonataldeath prev_*_month i.fid i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
-
+  * IV and one lagged month
+  ivprobit neonataldeath (prev_1_month = exp_share) i.fid i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+  ivprobit neonataldeath (prev_1_month = exp_share) i.fid i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+  
+  
 	* With Previous Quarter
   probit neonataldeath prev_q i.fid 
   probit neonataldeath prev_q i.fid i.b_es_ges
   probit neonataldeath prev_q i.fid i.b_es_ges i.pay
   probit neonataldeath prev_q i.fid i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
   est sto prob_pq_fs
-  
+  ivprobit neonataldeath (prev_q = exp_share) i.fid i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+
   	* With FOUR lagged Quarters
   probit neonataldeath prev_1_q-prev_4_q i.fid 
   probit neonataldeath prev_1_q-prev_4_q i.fid i.b_es_ges
@@ -230,6 +235,7 @@ coefplot prob_margins_no_iv prob_margins_w_iv,  recast(line) vertical title("Eff
   probit neonataldeath nicu_year i.fid i.b_es_ges i.pay
   probit neonataldeath nicu_year i.fid i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
   est sto prob_yr_fs
+  ivprobit neonataldeath (nicu_year = exp_share) i.fid i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
 
 	* And IV...  For these the sign is still as expected, but the estimate is less precise and not significant.  
   ivprobit neonataldeath i.fid (prev_q = exp_share)  
