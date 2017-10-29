@@ -1,9 +1,7 @@
-* Nonlinear least squares... Maybe
+* Nonlinear least squares...
 /*
 
-Not as bad as I thought.  BUT:
-- figure out why the coefficient never changes.
-- 
+Not as bad as I thought. 
 
 */
 
