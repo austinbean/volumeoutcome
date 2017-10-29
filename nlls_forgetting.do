@@ -43,8 +43,9 @@ save "${birthdata}FacCountMissingFidDropped.dta",replace
 	
 * drop non nicu admits
 	keep if adm_nicu == 1
-* specialize to VLBW only	
-    keep if b_wt_cgr < 1500
+
+* OPTIONAL: specialize to VLBW only	
+    *keep if b_wt_cgr < 1500
 	
 * Add monthly count	
 	merge m:1 fid ncdobyear ncdobmonth using "${birthdata}FacCountMissingFidDropped.dta"
@@ -525,7 +526,10 @@ foreach nn of numlist 1/12{
 	nl (neonataldeath = {rd=1.0}*prev_1_month + ({V=1.0}^2)*prev_2_month + ({V}^3)*prev_3_month + ({V}^4)*prev_4_month + ({V}^5)*prev_5_month + ({V}^6)*prev_6_month + ({V}^7)*prev_7_month + ({V}^8)*prev_8_month + ({V}^9)*prev_9_month + ({V}^10)*prev_10_month + ({V}^11)*prev_11_month +({V}^12)*prev_12_month + ///
 	{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin)
 /*
-Results for the above:
+Iteration 439:  residual SS =   2420.24
+Iteration 440:  residual SS =   2420.24
+
+Results for the above - VLBW subset:
   Source |      SS            df       MS
 -------------+----------------------------------    Number of obs =     25,946
        Model |  42.228461         15  2.81523073    R-squared     =     0.0171
@@ -560,8 +564,57 @@ neonatalde~h |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 
 
 */
+
+* This one works too - constraints coeff of 1 on previous month:
 	
-	
+	nl (neonataldeath = prev_1_month + ({V=1.0}^2)*prev_2_month + ({V}^3)*prev_3_month + ({V}^4)*prev_4_month + ({V}^5)*prev_5_month + ({V}^6)*prev_6_month + ({V}^7)*prev_7_month + ({V}^8)*prev_8_month + ({V}^9)*prev_9_month + ({V}^10)*prev_10_month + ({V}^11)*prev_11_month +({V}^12)*prev_12_month + ///
+	{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin)
+
+/*
+
+Iteration 20:  residual SS =  6.70e+07
+Iteration 21:  residual SS =  6.70e+07
+
+
+Works - VLBW subset:
+
+
+      Source |      SS            df       MS
+-------------+----------------------------------    Number of obs =     25,946
+       Model |  -67001430         16 -4187589.38    R-squared     = -2.432e+04
+    Residual |   67004185      25930  2584.04108    Adj R-squared = -2.433e+04
+-------------+----------------------------------    Root MSE      =   50.83346
+       Total |       2755      25946   .10618207    Res. dev.     =   277476.1
+
+------------------------------------------------------------------------------
+neonatalde~h |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+          /V |   2.65e-06   37539.35     0.00   1.000    -73579.21    73579.21
+        /bhy |  -.6767903    5.52591    -0.12   0.903    -11.50788     10.1543
+      /bbcal |   3.027634   8.473277     0.36   0.721    -13.58046    19.63573
+        /bcl |   .1311612          .        .       .            .           .
+      /bcona |  -.3933634   6.015567    -0.07   0.948    -12.18421    11.39748
+      /bconm |  -5.170815   13.74335    -0.38   0.707    -32.10854    21.76691
+       /bchn |   .1072584   11.93385     0.01   0.993    -23.28374    23.49826
+       /bchd |  -.1347048   7.206443    -0.02   0.985    -14.25973    13.99032
+        /bpc |  -.5187843   .5997091    -0.87   0.387    -1.694247    .6566788
+         /bw |  -.0003853   .0005292    -0.73   0.467    -.0014226    .0006521
+         /b4 |   .0380139   .4760961     0.08   0.936    -.8951609    .9711887
+         /b5 |  -.4258511   .7515812    -0.57   0.571    -1.898992     1.04729
+         /b6 |    .098777   .6498717     0.15   0.879    -1.175008    1.372562
+         /b7 |  -.4707345    5.27064    -0.09   0.929    -10.80148    9.860012
+         /b8 |   1.075658   6.778874     0.16   0.874    -12.21131    14.36263
+         /b9 |  -1.870087   7.670509    -0.24   0.807    -16.90471    13.16454
+        /b10 |  -.6113419   12.11071    -0.05   0.960      -24.349    23.12631
+------------------------------------------------------------------------------
+
+*/
+
+	nl (neonataldeath = prev_1_month + ({V=1.0}^2)*prev_2_month + ({V}^3)*prev_3_month + ({V}^4)*prev_4_month + ({V}^5)*prev_5_month + ({V}^6)*prev_6_month + ({V}^7)*prev_7_month + ({V}^8)*prev_8_month + ({V}^9)*prev_9_month + ({V}^10)*prev_10_month + ({V}^11)*prev_11_month +({V}^12)*prev_12_month + ///
+	{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
+	{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012)
+
+
 	
 	
 * The fully complicated one does not
@@ -578,3 +631,393 @@ nl (neonataldeath = {rd=1.0}*prev_1_month + ({V=1.0}^2)*prev_2_month + ({V}^3)*p
    	{b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 ) 
 	
 
+	
+	
+	
+	
+* Trying with four lagged quarterly volumes:
+local qrs prev_1_q prev_2_q prev_3_q prev_4_q
+	foreach vll of local qrs{
+	drop if `vll' == .
+	}
+
+
+* With lagged quarters.  
+	nl ( neonataldeath = prev_1_q + {delta=1.0}*prev_2_q + ({delta}^2)*prev_3_q + ({delta}^3)*prev_4_q + {b2=1.0}*NeoIntensive +{b3=1.0}*SoloIntermediate + {boc=1.0}*ObstetricCare + ///
+		{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012)
+
+* With lagged months
+		nl ( neonataldeath = prev_1_month + ({V=1.0}^1)*prev_2_month + ({V}^2)*prev_3_month + ({V}^3)*prev_4_month + ({V}^4)*prev_5_month + ({V}^5)*prev_6_month + ({V}^6)*prev_7_month + ({V}^7)*prev_8_month + ({V}^8)*prev_9_month + ({V}^9)*prev_10_month + ({V}^10)*prev_11_month +({V}^11)*prev_12_month + ///
+		{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012)
+
+
+		
+		
+* constrain positive w/ lagged months:
+
+		nl ( neonataldeath = prev_1_month + (exp({V=1.0}^1))*prev_2_month + (exp({V}^2))*prev_3_month + (exp({V}^3))*prev_4_month + (exp({V}^4))*prev_5_month + (exp({V}^5))*prev_6_month + (exp({V}^6))*prev_7_month + (exp({V}^7))*prev_8_month + (exp({V}^8))*prev_9_month + (exp({V}^9))*prev_10_month + (exp({V}^10))*prev_11_month +(exp({V}^11))*prev_12_month + ///
+		{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012)
+
+/*
+Works but functional form is actually wrong...  Results:
+
+Iteration 2254:  residual SS =  4.34e+09
+Iteration 2255:  residual SS =  4.34e+09
+
+
+      Source |      SS            df       MS
+-------------+----------------------------------    Number of obs =     25,946
+       Model | -4.342e+09         22  -197356260    R-squared     = -1.763e+06
+    Residual |  4.342e+09      25923  167489.881    Adj R-squared = -1.765e+06
+-------------+----------------------------------    Root MSE      =   409.2553
+       Total |  2462.4684      25945  .094911096    Res. dev.     =   385704.6
+
+------------------------------------------------------------------------------
+neonatalde~h |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+          /V |   -.399435   .2678343    -1.49   0.136    -.9244051    .1255352
+        /bhy |   145.6332   63.79965     2.28   0.022     20.58233     270.684
+      /bbcal |   155.1926   97.84135     1.59   0.113    -36.58187    346.9671
+        /bcl |  -24.20084          .        .       .            .           .
+      /bcona |  -83.63192   69.45161    -1.20   0.229    -219.7609    52.49709
+      /bconm |  -346.3432   158.6731    -2.18   0.029    -657.3513   -35.33509
+       /bchn |   80.64904   137.7775     0.59   0.558    -189.4024    350.7005
+       /bchd |   66.02517   83.20923     0.79   0.428    -97.06954    229.1199
+        /bpc |  -124.3193   9.073716   -13.70   0.000    -142.1043   -106.5343
+         /bw |  -.0113336   .0083296    -1.36   0.174    -.0276601    .0049929
+         /b4 |  -95.70033   5.613063   -17.05   0.000    -106.7022   -84.69842
+         /b5 |  -232.0566   8.695305   -26.69   0.000    -249.0999   -215.0133
+         /b6 |   76.93465   7.506104    10.25   0.000     62.22227    91.64703
+         /b7 |   95.04747    60.8508     1.56   0.118    -24.22348    214.3184
+         /b8 |   286.9198   78.26615     3.67   0.000     133.5138    440.3258
+         /b9 |  -62.55583    88.5785    -0.71   0.480    -236.1746    111.0629
+        /b10 |    45.9364   139.8371     0.33   0.743     -228.152    320.0248
+      /bcons |  -236.7429   13.93128   -16.99   0.000     -264.049   -209.4368
+      /b2006 |  -9.111049   9.555208    -0.95   0.340    -27.83979    9.617689
+      /b2007 |  -16.11494    9.52777    -1.69   0.091     -34.7899     2.56002
+      /b2008 |  -16.29983   9.626586    -1.69   0.090    -35.16847    2.568817
+      /b2009 |  -27.08405   9.522098    -2.84   0.004    -45.74789   -8.420211
+      /b2010 |  -.7413419          .        .       .            .           .
+      /b2011 |   2.609895   9.779948     0.27   0.790    -16.55935    21.77913
+      /b2012 |  -1.697991    9.69395    -0.18   0.861    -20.69867    17.30269
+------------------------------------------------------------------------------
+  Parameter bcons taken as constant term in model & ANOVA table
+
+ nl, coeflegend
+
+ nlcom a: exp(_b[V:_cons])
+
+           a:  exp(_b[V:_cons])
+
+------------------------------------------------------------------------------
+neonatalde~h |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           a |   .6706989   .1796362     3.73   0.000     .3186185    1.022779
+------------------------------------------------------------------------------
+
+*/		
+		
+
+* correct functional form...
+
+nl ( neonataldeath = (exp({V=1.0}))*prev_1_month + (exp(2*{V}))*prev_2_month + (exp(3*{V}))*prev_3_month + (exp(4*{V}))*prev_4_month + (exp(5*{V}))*prev_5_month + (exp(6*{V}))*prev_6_month + (exp(7*{V}))*prev_7_month + (exp(8*{V}))*prev_8_month + (exp(9*{V}))*prev_9_month + (exp(10*{V}))*prev_10_month + (exp(11*{V}))*prev_11_month + (exp(12*{V}))*prev_12_month)
+nl, coeflegend
+nlcom disc: exp(_b[V:_cons])
+
+/*
+Iteration 24:  residual SS =  2630.993
+
+
+      Source |      SS            df       MS
+-------------+----------------------------------    Number of obs =     25,946
+       Model |  124.00683          1  124.006829    R-squared     =     0.0450
+    Residual |  2630.9932      25945  .101406559    Adj R-squared =     0.0450
+-------------+----------------------------------    Root MSE      =    .318444
+       Total |       2755      25946   .10618207    Res. dev.     =   14250.09
+
+------------------------------------------------------------------------------
+neonatalde~h |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+          /V |  -6.615479   .0285581  -231.65   0.000    -6.671454   -6.559504
+------------------------------------------------------------------------------
+
+nlcom disc: exp(_b[V:_cons])
+
+        disc:  exp(_b[V:_cons])
+
+------------------------------------------------------------------------------
+neonatalde~h |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        disc |   .0013395   .0000383    35.02   0.000     .0012645    .0014144
+------------------------------------------------------------------------------
+
+
+
+*/
+
+nl ( neonataldeath = (exp({V=1.0}))*prev_1_month + (exp(2*{V}))*prev_2_month + (exp(3*{V}))*prev_3_month + (exp(4*{V}))*prev_4_month + (exp(5*{V}))*prev_5_month + (exp(6*{V}))*prev_6_month + (exp(7*{V}))*prev_7_month + (exp(8*{V}))*prev_8_month + (exp(9*{V}))*prev_9_month + (exp(10*{V}))*prev_10_month + (exp(11*{V}))*prev_11_month + (exp(12*{V}))*prev_12_month + ///
+		{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin )
+nl, coeflegend
+nlcom disc: exp(_b[V:_cons])
+
+
+/*
+Iteration 29:  residual SS =   2420.24
+
+
+      Source |      SS            df       MS
+-------------+----------------------------------    Number of obs =     25,946
+       Model |  334.76006         16  20.9225038    R-squared     =     0.1215
+    Residual |  2420.2399      25930  .093337445    Adj R-squared =     0.1210
+-------------+----------------------------------    Root MSE      =   .3055118
+       Total |       2755      25946   .10618207    Res. dev.     =   12083.73
+
+------------------------------------------------------------------------------
+neonatalde~h |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+          /V |  -9.042331   .4519605   -20.01   0.000    -9.928199   -8.156464
+        /bhy |  -.0462784   .0476087    -0.97   0.331    -.1395941    .0470372
+      /bbcal |  -1.49e+07   .0730294 -2.0e+08   0.000    -1.49e+07   -1.49e+07
+        /bcl |   1.49e+07          .        .       .            .           .
+      /bcona |   .1166033   .0518421     2.25   0.025     .0149898    .2182167
+      /bconm |   .3790696    .118453     3.20   0.001     .1468951    .6112442
+       /bchn |   .4376657   .1028429     4.26   0.000     .2360878    .6392435
+       /bchd |   .3644205   .0621048     5.87   0.000     .2426916    .4861494
+        /bpc |   .2035729   .0052868    38.51   0.000     .1932105    .2139354
+         /bw |  -.0001206   4.60e-06   -26.24   0.000    -.0001296   -.0001116
+         /b4 |   .0404642   .0041339     9.79   0.000     .0323616    .0485668
+         /b5 |   .0156533   .0065671     2.38   0.017     .0027816    .0285251
+         /b6 |  -.0159095   .0056107    -2.84   0.005    -.0269069   -.0049122
+         /b7 |   .1168976   .0454223     2.57   0.010     .0278675    .2059278
+         /b8 |    .013041   .0584326     0.22   0.823    -.1014901    .1275722
+         /b9 |   .4966106   .0661048     7.51   0.000     .3670415    .6261798
+        /b10 |  -.1453378   .1043669    -1.39   0.164    -.3499027    .0592271
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+
+. nlcom disc: exp(_b[V:_cons])
+
+        disc:  exp(_b[V:_cons])
+
+------------------------------------------------------------------------------
+neonatalde~h |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        disc |   .0001183   .0000535     2.21   0.027     .0000135    .0002231
+------------------------------------------------------------------------------
+
+
+
+*/
+
+
+
+nl ( neonataldeath = (exp({V=1.0}))*prev_1_month + (exp(2*{V}))*prev_2_month + (exp(3*{V}))*prev_3_month + (exp(4*{V}))*prev_4_month + (exp(5*{V}))*prev_5_month + (exp(6*{V}))*prev_6_month + (exp(7*{V}))*prev_7_month + (exp(8*{V}))*prev_8_month + (exp(9*{V}))*prev_9_month + (exp(10*{V}))*prev_10_month + (exp(11*{V}))*prev_11_month + (exp(12*{V}))*prev_12_month + ///
+	 {bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012)
+
+nl, coeflegend
+nlcom disc: exp(_b[V:_cons])
+
+
+
+nl ( neonataldeath = (exp({V=1.0}))*prev_1_month + (exp(2*{V}))*prev_2_month + (exp(3*{V}))*prev_3_month + (exp(4*{V}))*prev_4_month + (exp(5*{V}))*prev_5_month + (exp(6*{V}))*prev_6_month + (exp(7*{V}))*prev_7_month + (exp(8*{V}))*prev_8_month + (exp(9*{V}))*prev_9_month + (exp(10*{V}))*prev_10_month + (exp(11*{V}))*prev_11_month + (exp(12*{V}))*prev_12_month + ///
+	{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
+	{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012)
+
+nl, coeflegend
+nlcom disc: exp(_b[V:_cons])
+
+/*
+
+Iteration 41:  residual SS =  2126.247
+
+
+      Source |      SS            df       MS
+-------------+----------------------------------    Number of obs =     25,946
+       Model |  336.22132         21  16.0105388    R-squared     =     0.1365
+    Residual |  2126.2471      25924   .08201848    Adj R-squared =     0.1358
+-------------+----------------------------------    Root MSE      =   .2863887
+       Total |  2462.4684      25945  .094911096    Res. dev.     =   8723.515
+
+------------------------------------------------------------------------------
+neonatalde~h |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+          /V |  -73.19104          .        .       .            .           .
+        /bhy |  -.0319688   .0452953    -0.71   0.480    -.1207501    .0568125
+      /bbcal |  -2.27e+07          .        .       .            .           .
+        /bcl |   2.27e+07   .0684006  3.3e+08   0.000     2.27e+07    2.27e+07
+      /bcona |   .1264899   .0485373     2.61   0.009     .0313541    .2216258
+      /bconm |   .3309861    .111166     2.98   0.003     .1130945    .5488776
+       /bchn |   .4433213   .0962341     4.61   0.000     .2546972    .6319455
+       /bchd |   .3859492   .0581781     6.63   0.000     .2719168    .4999816
+        /bpc |  -.0386572   .0063189    -6.12   0.000    -.0510426   -.0262719
+         /bw |  -.0003565   5.82e-06   -61.23   0.000    -.0003679   -.0003451
+         /b4 |   -.005841    .003803    -1.54   0.125    -.0132951    .0016132
+         /b5 |  -.0031857   .0056697    -0.56   0.574    -.0142986    .0079273
+         /b6 |  -.0120482   .0051593    -2.34   0.020    -.0221608   -.0019356
+         /b7 |   .0952203   .0424491     2.24   0.025     .0120177     .178423
+         /b8 |   .0045634   .0541662     0.08   0.933    -.1016055    .1107322
+         /b9 |    .430235   .0620033     6.94   0.000      .308705    .5517649
+        /b10 |  -.1535136   .0981027    -1.56   0.118    -.3458003     .038773
+      /bcons |   -7592907   .0097147 -7.8e+08   0.000     -7592907    -7592907
+      /b2006 |    7592907    .006685  1.1e+09   0.000      7592907     7592907
+      /b2007 |    7592907   .0066661  1.1e+09   0.000      7592907     7592907
+      /b2008 |    7592907   .0067352  1.1e+09   0.000      7592907     7592907
+      /b2009 |    7592907   .0066629  1.1e+09   0.000      7592907     7592907
+      /b2010 |    7592907          .        .       .            .           .
+      /b2011 |    7592907   .0068432  1.1e+09   0.000      7592907     7592907
+      /b2012 |    7592907   .0067829  1.1e+09   0.000      7592907     7592907
+------------------------------------------------------------------------------
+
+nlcom disc: exp(_b[V:_cons])
+
+        disc:  exp(_b[V:_cons])
+
+------------------------------------------------------------------------------
+neonatalde~h |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        disc |   1.64e-32          .        .       .            .           .
+------------------------------------------------------------------------------
+
+
+
+*/
+
+
+	nl (neonataldeath = {V=1.0}*prev_1_month + exp({V}*2)*prev_2_month + exp({V}*3)*prev_3_month + exp({V}*4)*prev_4_month + exp({V}*5)*prev_5_month + exp({V}*6)*prev_6_month + exp({V}*7)*prev_7_month + exp({V}*8)*prev_8_month + exp({V}*9)*prev_9_month + exp({V}*10)*prev_10_month + exp({V}*11)*prev_11_month +exp({V}*12)*prev_12_month + {b2=1.0}*NeoIntensive +{b3=1.0}*SoloIntermediate + {boc=1.0}*ObstetricCare + ///
+		{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
+		{bhis=1.0}*white + {bafam=1.0}*afam + {basn=1.0}*asian + {bpacs=1.0}*pacis + {bhisp=1.0}*hispanic + /// 
+		{bmed=1.0}*medicaid + {bpriv=1.0}*privateins + {boins=1.0}*otherins + ///
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 + ///
+		{bdiab = 1.0}*diab_pre + {bdig=1.0}*diab_ges + {bcrh=1.0}*brf_crhy + {bpgh=1.0}*brf_pghy + {brfe=1.0}*brf_eclm + {bprem=1.0}*pre_prem + ///
+		{btrs=1.0}*bo_trans + {bster=1.0}*lab_ster)
+
+nl, coeflegend
+nlcom disc: exp(_b[V:_cons])
+
+/*
+
+Iteration 23:  residual SS =  809981.3
+
+
+      Source |      SS            df       MS
+-------------+----------------------------------    Number of obs =     25,946
+       Model | -807518.81         40 -20187.9703    R-squared     =  -327.9306
+    Residual |  809981.28      25905  31.2673723    Adj R-squared =  -328.4385
+-------------+----------------------------------    Root MSE      =   5.591724
+       Total |  2462.4684      25945  .094911096    Res. dev.     =   162911.6
+
+------------------------------------------------------------------------------
+neonatalde~h |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+          /V |  -.6221686   .0003607 -1724.98   0.000    -.6228756   -.6214617
+         /b2 |   .0490656    .170039     0.29   0.773    -.2842202    .3823514
+         /b3 |   .1425217   .2125746     0.67   0.503    -.2741364    .5591798
+        /boc |   .3720952    .335051     1.11   0.267    -.2846232    1.028814
+        /bhy |   1.011052   .8722317     1.16   0.246    -.6985709    2.720674
+      /bbcal |   -5492676   1.337198 -4.1e+06   0.000     -5492678    -5492673
+        /bcl |    5492675          .        .       .            .           .
+      /bcona |  -.2933023   .9495641    -0.31   0.757    -2.154501    1.567896
+      /bconm |   3.362626    2.16897     1.55   0.121    -.8886746    7.613927
+       /bchn |  -.1025491   1.884781    -0.05   0.957    -3.796825    3.591727
+       /bchd |   .8762605   1.137607     0.77   0.441    -1.353513    3.106034
+        /bpc |  -.1195984    .128681    -0.93   0.353    -.3718202    .1326234
+         /bw |  -.0005233   .0001149    -4.55   0.000    -.0007486   -.0002981
+         /b4 |  -.0762471   .0774025    -0.99   0.325    -.2279604    .0754661
+         /b5 |   -.010856   .1179809    -0.09   0.927    -.2421052    .2203932
+         /b6 |  -.0798568   .1035198    -0.77   0.440    -.2827613    .1230476
+         /b7 |   .6124729   .8317235     0.74   0.461    -1.017751    2.242697
+         /b8 |  -.3383195   1.068846    -0.32   0.752    -2.433316    1.756677
+         /b9 |   1.465695   1.211396     1.21   0.226    -.9087087    3.840098
+        /b10 |   .3665391   1.915015     0.19   0.848    -3.386996    4.120074
+       /bhis |   .2453301   .1143435     2.15   0.032     .0212105    .4694498
+      /bafam |   .2865277   .1457863     1.97   0.049     .0007784     .572277
+       /basn |   .1434978   .2126859     0.67   0.500    -.2733784     .560374
+      /bpacs |   1.587586   .9928049     1.60   0.110    -.3583668    3.533539
+      /bhisp |   .2188433   .0916465     2.39   0.017      .039211    .3984756
+       /bmed |    8826406   .1064368  8.3e+07   0.000      8826405     8826406
+      /bpriv |    8826406   .1143882  7.7e+07   0.000      8826405     8826406
+      /boins |    8826406          .        .       .            .           .
+      /bcons |   -7681896   .3829372 -2.0e+07   0.000     -7681897    -7681896
+      /b2006 |   -1144509   .1310264 -8.7e+06   0.000     -1144509    -1144508
+      /b2007 |   -1144509   .1307879 -8.8e+06   0.000     -1144509    -1144509
+      /b2008 |   -1144510   .1316835 -8.7e+06   0.000     -1144510    -1144509
+      /b2009 |   -1144509   .1302727 -8.8e+06   0.000     -1144509    -1144509
+      /b2010 |   -1144509          .        .       .            .           .
+      /b2011 |   -1144509   .1337301 -8.6e+06   0.000     -1144509    -1144509
+      /b2012 |   -1144509   .1327266 -8.6e+06   0.000     -1144510    -1144509
+      /bdiab |   .2766565    .282856     0.98   0.328     -.277757    .8310701
+       /bdig |   -.007954   .1780912    -0.04   0.964    -.3570227    .3411147
+       /bcrh |  -.5016814   .1833986    -2.74   0.006    -.8611528     -.14221
+       /bpgh |  -.1112218   .0959892    -1.16   0.247    -.2993659    .0769223
+       /brfe |   -.147238   .4203078    -0.35   0.726    -.9710647    .6765887
+      /bprem |   .1018291   .1588848     0.64   0.522    -.2095939    .4132521
+       /btrs |   .1329739   .1411742     0.94   0.346    -.1437354    .4096832
+      /bster |  -.1032923   .1023279    -1.01   0.313    -.3038606    .0972761
+------------------------------------------------------------------------------
+  Parameter bcons taken as constant term in model & ANOVA table
+
+. nlcom disc: exp(_b[V:_cons])
+
+        disc:  exp(_b[V:_cons])
+
+------------------------------------------------------------------------------
+neonatalde~h |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        disc |   .5367791   .0001936  2772.52   0.000     .5363996    .5371586
+------------------------------------------------------------------------------
+
+
+
+*/
+
+
+
+	nl (neonataldeath = {V=1.0}*prev_1_month + exp({V}*2)*prev_2_month + exp({V}*3)*prev_3_month + exp({V}*4)*prev_4_month + exp({V}*5)*prev_5_month + exp({V}*6)*prev_6_month + exp({V}*7)*prev_7_month + exp({V}*8)*prev_8_month + exp({V}*9)*prev_9_month + exp({V}*10)*prev_10_month + exp({V}*11)*prev_11_month +exp({V}*12)*prev_12_month + {b2=1.0}*NeoIntensive +{b3=1.0}*SoloIntermediate + {boc=1.0}*ObstetricCare + ///
+		{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
+		{bmed=1.0}*medicaid + {bpriv=1.0}*privateins + {boins=1.0}*otherins + ///
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 + ///
+		{bdiab = 1.0}*diab_pre + {bdig=1.0}*diab_ges + {bcrh=1.0}*brf_crhy + {bpgh=1.0}*brf_pghy + {brfe=1.0}*brf_eclm + {bprem=1.0}*pre_prem + ///
+		{btrs=1.0}*bo_trans + {bster=1.0}*lab_ster)
+di "WITHOUT DEMOGRAPHICS"
+nl, coeflegend
+nlcom disc: exp(_b[V:_cons])
+
+
+
+
+	nl (neonataldeath = {V=1.0}*prev_1_month + exp({V}*2)*prev_2_month + exp({V}*3)*prev_3_month + exp({V}*4)*prev_4_month + exp({V}*5)*prev_5_month + exp({V}*6)*prev_6_month + exp({V}*7)*prev_7_month + exp({V}*8)*prev_8_month + exp({V}*9)*prev_9_month + exp({V}*10)*prev_10_month + exp({V}*11)*prev_11_month +exp({V}*12)*prev_12_month + {b2=1.0}*NeoIntensive +{b3=1.0}*SoloIntermediate + {boc=1.0}*ObstetricCare + ///
+		{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
+		{bhis=1.0}*white + {bafam=1.0}*afam + {basn=1.0}*asian + {bpacs=1.0}*pacis + {bhisp=1.0}*hispanic + /// 
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012 + ///
+		{bdiab = 1.0}*diab_pre + {bdig=1.0}*diab_ges + {bcrh=1.0}*brf_crhy + {bpgh=1.0}*brf_pghy + {brfe=1.0}*brf_eclm + {bprem=1.0}*pre_prem + ///
+		{btrs=1.0}*bo_trans + {bster=1.0}*lab_ster)
+di "WITHOUT INSURANCE STATUS"
+nl, coeflegend
+nlcom disc: exp(_b[V:_cons])
+
+
+
+
+
+
+
+
+
+		
+* With lagged quarters.  
+	nl ( neonataldeath = prev_1_q + exp({delta=1.0})*prev_2_q + (exp({delta}*2))*prev_3_q + (exp({delta}*3))*prev_4_q + {b2=1.0}*NeoIntensive +{b3=1.0}*SoloIntermediate + {boc=1.0}*ObstetricCare + ///
+		{bhy=1.0}*hypsospa + {bbcal=1.0}*bca_limb +{bcl=1.0}*bca_limb + {bcona=1.0}*congenga + {bconm = 1.0}*congenom+ {bchn=1.0}*bca_hern + {bchd=1.0}*congenhd + {bpc=1.0}*pc_y_n + {bw=1.0}*b_wt_cgr + {b4=1.0}*as_vent +{b5=1.0}*rep_ther + {b6=1.0}*antibiot + {b7=1.0}*seizure + {b8=1.0}*b_injury + {b9=1.0}*bca_aeno + {b10=1.0}*bca_spin + ///
+		{bcons=1.0}*b_const + {b2006=1.0}*y2006 + {b2007=1.0}*y2007 + {b2008=1.0}*y2008 + {b2009=1.0}*y2009 + {b2010=1.0}*y2010 + {b2011=1.0}*y2011 + {b2012=1.0}*y2012)
+	nl, coeflegend
+	nlcom d: exp(_b[delta:_cons])
+		
+		
+		
+		
+		
