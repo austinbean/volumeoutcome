@@ -8,7 +8,7 @@ For questions related to 10/24 presentation:
 
 
 /* 
-use "${birthdata}Birth2006.dta", clear
+use "${birthdata}Birth2007.dta", clear
 gen 
 */
 
@@ -150,7 +150,10 @@ foreach yr of numlist 2005(1)2012{
 
 	
 	
-	*clogit chosen prev_q zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate i.ObstetricsLevel, group(patid)
+	clogit chosen prev_q zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate i.ObstetricsLevel, group(patid)
+	mat a1 = e(b)
+	
+	clogit chosen prev_q zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate i.fid i.ObstetricsLevel, group(patid) difficult from(a1)
 	
 	clogit chosen prev_*_month zipfacdistancecn zipfacdistancecn2 NeoIntensive SoloIntermediate i.ObstetricsLevel, group(patid)
 	predict pr1
