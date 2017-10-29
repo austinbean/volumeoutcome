@@ -139,6 +139,90 @@ Run some regular and IV probits with the goal of creating a table with the coeff
 	esttab noiv_vyg iv_vyg iv_vygp iv_vygpw iv_vygpwh using "/Users/austinbean/Desktop/Birth2005-2012/ivslongtable.tex", drop(*year *b_es_ges) longtable replace label mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Insurance VLBW HealthStates ExogeneityPval N, fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
 	
 	
+	
+* More specifications with FE's for the presentation:
+  label variable nicu_year "Admits Yearly"
+  label variable prev_q "Admits Quart."
+  label variable prev_1_month "Admits Pr. Month"
+
+  eststo iv_yfhp: ivprobit neonataldeath (nicu_year = exp_share) i.fid i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+  estadd local IV "Yes"
+  estadd local FEs "Yes"
+  estadd local Time "Yr."
+  estadd local Insurance "Yes"
+  estadd local HealthStates "Yes"  
+  
+  eststo iv_yfp: ivprobit neonataldeath (nicu_year = exp_share) i.fid i.pay 
+  estadd local IV "Yes"
+  estadd local FEs "Yes"
+  estadd local Time "Yr."
+  estadd local Insurance "Yes"
+  estadd local HealthStates "Yes"
+
+  eststo iv_yfh: ivprobit neonataldeath (nicu_year = exp_share) i.fid as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+  estadd local IV "Yes"
+  estadd local FEs "Yes"
+  estadd local Time "Yr."
+  estadd local Insurance "No"
+  estadd local HealthStates "No"
+  
+  eststo iv_qfph: ivprobit neonataldeath (prev_q = exp_share) i.fid i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+  estadd local IV "Yes"
+  estadd local FEs "Yes"
+  estadd local Time "Q."
+  estadd local Insurance "Yes"
+  estadd local HealthStates "Yes"
+
+  eststo iv_qfp: ivprobit neonataldeath (prev_q = exp_share) i.fid i.pay 
+  estadd local IV "Yes"
+  estadd local FEs "Yes"  
+  estadd local Time "Q."
+  estadd local Insurance "Yes"
+  estadd local HealthStates "No"
+ 
+  eststo iv_qfh: ivprobit neonataldeath (prev_q = exp_share) i.fid as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+  estadd local IV "Yes"
+  estadd local FEs "Yes"  
+  estadd local Time "Q."
+  estadd local Insurance "No"
+  estadd local HealthStates "Yes"
+  
+  eststo iv_mfph: ivprobit neonataldeath (prev_1_month = exp_share) i.fid i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+  estadd local IV "Yes"
+  estadd local FEs "Yes"  
+  estadd local Time "Mn."
+  estadd local Insurance "Yes"
+  estadd local HealthStates "Yes"
+
+  eststo iv_mfp: ivprobit neonataldeath (prev_1_month = exp_share) i.fid i.pay 
+  estadd local IV "Yes"
+  estadd local FEs "Yes"
+  estadd local Time "Mn."
+  estadd local Insurance "Yes"
+  estadd local HealthStates "No"
+
+  eststo iv_mfh: ivprobit neonataldeath (prev_1_month = exp_share) i.fid as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+  estadd local IV "Yes"
+  estadd local FEs "Yes"
+  estadd local Time "Mn."
+  estadd local Insurance "No"
+  estadd local HealthStates "Yes"
+
+  esttab iv_yfhp iv_yfp iv_yfh, label keep(nicu_year) stats(IV Insurance FEs Time HealthStates N, labels("IV" "Ins." "FEs" "Time" "Health States" "N") fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
+  esttab iv_yfhp iv_yfp iv_yfh using "/Users/austinbean/Desktop/Birth2005-2012/ivfeyearshorttable.tex", replace label keep(nicu_year) stats(IV Insurance FEs Time HealthStates N, labels("IV" "Ins." "FEs" "Time" "Health States" "N") fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
+ 
+  esttab iv_qfph iv_qfp iv_qfh, label keep(prev_q) stats(IV Insurance FEs Time HealthStates N, labels("IV" "Ins." "FEs" "Time" "Health States" "N") fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
+  esttab iv_qfph iv_qfp iv_qfh using "/Users/austinbean/Desktop/Birth2005-2012/ivfequarshorttable.tex", replace label keep(prev_q) stats(IV Insurance FEs Time HealthStates N, labels("IV" "Ins." "FEs" "Time" "Health States" "N") fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
+
+  esttab iv_mfph iv_mfp iv_mfh, label keep(prev_1_month) stats(IV Insurance FEs Time HealthStates N, labels("IV" "Ins." "FEs" "Time" "Health States" "N") fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
+  esttab iv_mfph iv_mfp iv_mfh using "/Users/austinbean/Desktop/Birth2005-2012/ivfemonthshorttable.tex", replace label keep(prev_1_month) stats(IV Insurance FEs Time HealthStates N, labels("IV" "Ins." "FEs" "Time" "Health States" "N") fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
+
+	
+	
+	
+	
+	
+	
 * How about some simple 2SLS...
 	eststo lr_v: regress neonataldeath prev_q
 	estadd local IV "No"
