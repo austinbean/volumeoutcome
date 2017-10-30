@@ -195,7 +195,7 @@ Run some regular and IV probits with the goal of creating a table with the coeff
 	estadd local HealthStates "No"
 	estadd scalar ExogeneityPval e(p_exog)
 	* lagged volume, year, estimated gestation, payment status, vlbw status, health states
-	eststo ivy_vygpwh: ivprobit neonataldeath (nicu_year = exp_share ) i.ncdobyear i.b_es_ges i.pay i.vlbw as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+	eststo ivy_vygpwh: ivprobit neonataldeath (nicu_year = exp_share ) i.ncdobyear i.b_es_ges i.pay i.vlbw as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa, first
 	estadd local IV "Yes"
 	estadd local Year "Yes"
 	estadd local Gestation "Yes"
