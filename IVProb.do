@@ -136,6 +136,40 @@ ivprobit neonataldeath  (lag_1_months = exp_share )  i.b_es_ges i.pay bca_aeno-h
 */
 
 
+* For the presentation, now going to do IV probit with yearly admission value:
+	
+	* Without the IV
+	eststo: probit neonataldeath nicu_year i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+	est store prob_marg_no_iv_year
+	margins, at((mean) _all  nicu_year = (0(100)2000) ) post saving("/Users/austinbean/Desktop/noivprb_marg_year.dta", replace) 
+	est sto pmarg_noiv_year
+	estimates save "/Users/austinbean/Desktop/Birth2005-2012/prob_marg_no_iv_year.ster", replace
+	marginsplot, recastci(rarea) ciopts(color(gray*0.6))  recast(line) plot1opts(lcolor(black)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Year NICU Admits") title("Effect of Volume on Mortality Probability") saving("/Users/austinbean/Desktop/Birth2005-2012/volprob_noiv_year.gph", replace)
+	
+	* With the IV
+	* takes a LONG time. started at: 12:40, finished at: 2:30.  Ugh.  ADD NOSE (nose) to save a lot of time.  
+	eststo:  ivprobit neonataldeath  (nicu_year = exp_share ) i.b_es_ges i.pay i.ncdobyear as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+	est store prob_marg_w_iv_year
+	margins, at((mean) _all nicu_year = (0(100)2000)) predict(pr) post saving("/Users/austinbean/Desktop/ivprb_marg_year.dta", replace) 
+	est sto pmarg_iv_year
+	estimates save "/Users/austinbean/Desktop/Birth2005-2012/prob_marg_w_iv_year.ster", replace
+	marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Year NICU Admits") title("Effect of Volume on Mortality Probability") subtitle( "Volume IV") saving("/Users/austinbean/Desktop/Birth2005-2012/volprob_iv_year.gph", replace)
+
+	* Graph of Effects w/ CI's
+	coefplot pmarg_noiv_year pmarg_iv_year, recast(line) vertical title("Effect of Volume on Outcome") subtitle("With and Without Volume IV") ytitle("Mortality Probability") xtitle("Prior Year NICU Admits")   graphregion(color(white)) 	xlabel(   1 "0" 2 "100" 3 "200" 4 "300" 5 "400" 6 "500" 7 "600" 8 "700" 9 "800" 10 "900" 11 "1000" 12 "1100" 13 "1200" 14 "1300" 15 "1400" 16 "1500" 17 "1600" 18 "1700" 19 "1800" 20 "1900" 21 "2000" , angle(45))
+	graph save Graph "/Users/austinbean/Desktop/Birth2005-2012/yearly_ivnoiv_comparison.gph", replace
+
+	* simple graph w/out CI w/ Travis County labels.  
+	coefplot pmarg_noiv_year pmarg_iv_year, noci recast(line) vertical title("Effect of Volume on Outcome") subtitle("With and Without Volume IV") ytitle("Mortality Probability") xtitle("Prior Year NICU Admits")  xlabel(   1 "0" 2 "100" 3 "200" 4 "300" 5 "400" 6 "500" 7 "600" 8 "700" 9 "800" 10 "900" 11 "1000" 12 "1100" 13 "1200" 14 "1300" 15 "1400" 16 "1500" 17 "1600" 18 "1700" 19 "1800" 20 "1900" 21 "2000" , angle(45)) graphregion(color(white)) xline(5.5) xline(18.5) text(0.007 7.6 "Travis County" "Yearly Hospital" "Mean Admits") text(0.012 16 "Travis County" "Yearly" "Total Admits")
+	graph save Graph "/Users/austinbean/Desktop/Birth2005-2012/yearly_ivnoiv_travisct.gph", replace
+
+
+
+
+
+
+
+
 * These models and this graph are in the paper.  
 
 * Without IV for Volume...
