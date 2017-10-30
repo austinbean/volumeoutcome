@@ -155,6 +155,9 @@ ivprobit neonataldeath  (lag_1_months = exp_share )  i.b_es_ges i.pay bca_aeno-h
 	estimates save "/Users/austinbean/Desktop/Birth2005-2012/prob_marg_w_iv_year.ster", replace
 	marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Year NICU Admits") title("Effect of Volume on Mortality Probability") subtitle( "Volume IV") saving("/Users/austinbean/Desktop/Birth2005-2012/volprob_iv_year.gph", replace)
 
+	marginsplot, recastci(rarea) noci recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Year NICU Admits") title("Effect of Volume on Mortality Probability") subtitle( "Volume IV") saving("/Users/austinbean/Desktop/Birth2005-2012/volpr_iv_noci_year.gph", replace) xline(450) xline(1700) text(0.007 650 "Travis County" "Yearly Hospital" "Mean Admits") text(0.012 1400 "Travis County" "Yearly" "Total Admits")
+	
+	
 	* Graph of Effects w/ CI's
 	coefplot pmarg_noiv_year pmarg_iv_year, recast(line) vertical title("Effect of Volume on Outcome") subtitle("With and Without Volume IV") ytitle("Mortality Probability") xtitle("Prior Year NICU Admits")   graphregion(color(white)) 	xlabel(   1 "0" 2 "100" 3 "200" 4 "300" 5 "400" 6 "500" 7 "600" 8 "700" 9 "800" 10 "900" 11 "1000" 12 "1100" 13 "1200" 14 "1300" 15 "1400" 16 "1500" 17 "1600" 18 "1700" 19 "1800" 20 "1900" 21 "2000" , angle(45))
 	graph save Graph "/Users/austinbean/Desktop/Birth2005-2012/yearly_ivnoiv_comparison.gph", replace
