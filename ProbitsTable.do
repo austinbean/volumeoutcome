@@ -314,8 +314,175 @@ Run some regular and IV probits with the goal of creating a table with the coeff
 
 	esttab noivm_vyg ivm_vyg ivm_vygp ivm_vygpw ivm_vygpwh using "/Users/austinbean/Desktop/Birth2005-2012/ivslongtable_month.tex", drop(*year *b_es_ges) longtable replace label mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Insurance VLBW HealthStates ExogeneityPval N, fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
 	
+
 	
 	
+
+
+* Run the probits with the volume IV - prev_month:
+	foreach nm of numlist 1(1)12{
+		label variable prev_`nm'_month "Lag `nm' Months NICU Admits"
+	}
+
+
+	eststo am_vyg: probit neonataldeath prev_*_month i.ncdobyear i.b_es_ges
+	estadd local IV "No"
+	estadd local Year "Yes"
+	estadd local Gestation "Yes"
+	estadd local Insurance "No"
+	estadd local VLBW "No"
+	estadd local HealthStates "No"
+	* Lagged volume and year
+	eststo am_vy: probit neonataldeath prev_*_month  i.ncdobyear i.vlbw
+	estadd local IV "No"
+	estadd local Year "Yes"
+	estadd local Gestation "No"
+	estadd local Insurance "No"
+	estadd local VLBW "No"
+	estadd local HealthStates "No"
+	* lagged volume, year, estimated gestation
+	eststo am_vyg: probit neonataldeath prev_*_month i.ncdobyear i.b_es_ges
+	estadd local IV "No"
+	estadd local Year "Yes"
+	estadd local Gestation "Yes"
+	estadd local Insurance "No"
+	estadd local VLBW "No"
+	estadd local HealthStates "No"
+	* lagged volume, year, estimated gestation, payment status
+	eststo am_vygp: probit neonataldeath prev_*_month i.ncdobyear i.b_es_ges i.pay
+	estadd local IV "No"
+	estadd local Year "Yes"
+	estadd local Gestation "Yes"
+	estadd local Insurance "Yes"
+	estadd local VLBW "No"
+	estadd local HealthStates "No"
+	* lagged volume, year, estimated gestation, payment status, vlbw status
+	eststo am_vygpw: probit neonataldeath prev_*_month i.ncdobyear i.b_es_ges i.pay i.vlbw
+	estadd local IV "No"
+	estadd local Year "Yes"
+	estadd local Gestation "Yes"
+	estadd local Insurance "Yes"
+	estadd local VLBW "Yes"
+	estadd local HealthStates "No"
+	* lagged volume, year, estimated gestation, payment status, vlbw status, health states
+	eststo am_vygpwh: probit neonataldeath prev_*_month i.ncdobyear i.b_es_ges i.pay i.vlbw as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+	estadd local IV "No"
+	estadd local Year "Yes"
+	estadd local Gestation "Yes"
+	estadd local Insurance "Yes"
+	estadd local VLBW "Yes"
+	estadd local HealthStates "Yes"
+				
+		
+* Table:
+	/*
+	noiv/iv = without or with IV for volume.  
+	v = volume
+	y = year 
+	g = gestational age 
+	p = insurance type 
+	w = vlbw status 
+	h = health states
+	*/
+	
+* short table:, fmt(%9.3f %9.0g)
+	esttab am_vyg am_vyg am_vygp am_vygpw am_vygpwh, label keep(prev_*_month) stats(IV Insurance VLBW HealthStates N, labels("IV" "Ins." "VLBW" "Health States" ) fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
+	
+	esttab am_vyg am_vyg am_vygp am_vygpw am_vygpwh using "/Users/austinbean/Desktop/Birth2005-2012/ivshorttable_allmonth.tex", replace label keep(prev_*_month) stats(IV Insurance VLBW HealthStates N, labels("IV" "Ins." "VLBW" "Health States" ) fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
+	
+* long table
+	esttab am_vyg am_vyg am_vygp am_vygpw am_vygpwh , drop(*year *b_es_ges) label stats(IV Insurance VLBW HealthStates N, fmt(%9.3f %9.0g)) style(tex) cells(b se) legend eqlabels(none) collabels(none)
+
+	esttab am_vyg am_vyg am_vygp am_vygpw am_vygpwh using "/Users/austinbean/Desktop/Birth2005-2012/ivslongtable_allmonth.tex", drop(*year *b_es_ges) longtable replace label stats(IV Insurance VLBW HealthStates N, fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
+	
+	
+		
+
+
+* Run the probits with the volume IV - prev_month:
+	foreach nm of numlist 1(1)12{
+		label variable prev_`nm'_month "Lag `nm' Months NICU Admits"
+	}
+
+
+	eststo amf_vyg: probit neonataldeath prev_*_month i.ncdobyear i.b_es_ges i.fid
+	estadd local IV "No"
+	estadd local Year "Yes"
+	estadd local Gestation "Yes"
+	estadd local Insurance "No"
+	estadd local VLBW "No"
+	estadd local FEs "Yes"
+	estadd local HealthStates "No"
+	* Lagged volume and year
+	eststo amf_vy: probit neonataldeath prev_*_month  i.ncdobyear i.vlbw i.fid
+	estadd local IV "No"
+	estadd local Year "Yes"
+	estadd local Gestation "No"
+	estadd local Insurance "No"
+	estadd local VLBW "No"
+	estadd local FEs "Yes"
+	estadd local HealthStates "No"
+	* lagged volume, year, estimated gestation
+	eststo amf_vyg: probit neonataldeath prev_*_month i.ncdobyear i.b_es_ges i.fid
+	estadd local IV "No"
+	estadd local Year "Yes"
+	estadd local Gestation "Yes"
+	estadd local Insurance "No"
+	estadd local VLBW "No"
+	estadd local FEs "Yes"	
+	estadd local HealthStates "No"
+	* lagged volume, year, estimated gestation, payment status
+	eststo amf_vygp: probit neonataldeath prev_*_month i.ncdobyear i.b_es_ges i.pay i.fid
+	estadd local IV "No"
+	estadd local Year "Yes"
+	estadd local Gestation "Yes"
+	estadd local Insurance "Yes"
+	estadd local VLBW "No"
+	estadd local FEs "Yes"	
+	estadd local HealthStates "No"
+	* lagged volume, year, estimated gestation, payment status, vlbw status
+	eststo amf_vygpw: probit neonataldeath prev_*_month i.ncdobyear i.b_es_ges i.pay i.vlbw i.fid
+	estadd local IV "No"
+	estadd local Year "Yes"
+	estadd local Gestation "Yes"
+	estadd local Insurance "Yes"
+	estadd local VLBW "Yes"
+	estadd local FEs "Yes"
+	estadd local HealthStates "No"
+	* lagged volume, year, estimated gestation, payment status, vlbw status, health states
+	eststo amf_vygpwh: probit neonataldeath prev_*_month i.ncdobyear i.b_es_ges i.pay i.vlbw i.fid as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa
+	estadd local IV "No"
+	estadd local Year "Yes"
+	estadd local Gestation "Yes"
+	estadd local Insurance "Yes"
+	estadd local VLBW "Yes"
+	estadd local FEs "Yes"
+	estadd local HealthStates "Yes"
+				
+		
+* Table:
+	/*
+	noiv/iv = without or with IV for volume.  
+	v = volume
+	y = year 
+	g = gestational age 
+	p = insurance type 
+	w = vlbw status 
+	h = health states
+	*/
+	
+* short table:, fmt(%9.3f %9.0g)
+	esttab amf_vyg amf_vyg amf_vygp amf_vygpw amf_vygpwh, label keep(prev_*_month) stats(IV Insurance VLBW HealthStates FEs N, labels("IV" "Ins." "VLBW" "Health States" "FEs" ) fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
+	
+	esttab amf_vyg amf_vyg amf_vygp amf_vygpw amf_vygpwh using "/Users/austinbean/Desktop/Birth2005-2012/ivshorttable_allmonthfes.tex", replace label keep(prev_*_month) stats(IV Insurance VLBW HealthStates FEs N, labels("IV" "Ins." "VLBW" "Health States" "FEs") fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
+	
+* long table
+	esttab amf_vyg amf_vyg amf_vygp amf_vygpw amf_vygpwh, drop(*year *b_es_ges) label stats(IV Insurance VLBW HealthStates FEs N, fmt(%9.3f %9.0g)) style(tex) cells(b se) legend eqlabels(none) collabels(none)
+
+	esttab amf_vyg amf_vyg amf_vygp amf_vygpw amf_vygpwh using "/Users/austinbean/Desktop/Birth2005-2012/ivslongtable_allmonthfes.tex", drop(*year *b_es_ges) longtable replace label stats(IV Insurance VLBW HealthStates FEs N, fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
+	
+	
+		
 	
 	
 * More specifications with FE's for the presentation:
