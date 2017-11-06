@@ -249,6 +249,10 @@ coefplot prob_margins_no_iv prob_margins_w_iv,  recast(line) vertical title("Eff
   * IV and one lagged month
   ivprobit neonataldeath (prev_1_month = exp_share) i.fid i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
   ivprobit neonataldeath (prev_1_month = exp_share) i.fid i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+	* robust SE
+  ivprobit neonataldeath (prev_1_month = exp_share) i.fid i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa, vce(robust)  
+	* cluster SE at fid
+  ivprobit neonataldeath (prev_1_month = exp_share) i.fid i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa, vce(cluster fid)
   
   
 	* With Previous Quarter
@@ -271,6 +275,12 @@ coefplot prob_margins_no_iv prob_margins_w_iv,  recast(line) vertical title("Eff
   probit neonataldeath nicu_year i.fid i.b_es_ges
   probit neonataldeath nicu_year i.fid i.b_es_ges i.pay
   probit neonataldeath nicu_year i.fid i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+  * robust SE
+  probit neonataldeath nicu_year i.fid i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa, vce(robust)  
+  * cluster SE at fid level
+  probit neonataldeath nicu_year i.fid i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa, vce(cluster fid)
+
+  
   est sto prob_yr_fs
   ivprobit neonataldeath (nicu_year = exp_share) i.fid i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
 
