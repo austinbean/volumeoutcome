@@ -8,8 +8,9 @@ capture quietly do "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/T
 use "${birthdata}Birth2007.dta", clear
 
 /* keep Tom Green County (San Angelo) only just to keep size small. */
-keep if b_bcntyc == 226
-
+	*keep if b_bcntyc == 226
+/* keep Travis county */
+	keep if b_bcntyc == 227
 
 	drop if b_mrzip < 70000 | b_mrzip > 79999
 	* TODO - this may not be necessary
@@ -81,37 +82,92 @@ keep if b_bcntyc == 226
 	bysort patid: replace hs = _n
 	bysort patid: egen nnn = max(hs)
 	drop nnn
+	
+* For Travis County... keep only TC facilities.
+	keep if fidcn == 4530200 | fidcn == 4536253 | fidcn == 4530170 | fidcn == 4530190 | fidcn == 4536048 | fidcn == 4536337 | fidcn == 4536338 | fidcn == 0
+	bysort patid: replace hs = _n
+	bysort patid: egen nnn = max(hs)
+	tab nnn 
+	drop if nnn != 8
+	drop nnn
 
+	
+	* set factor var for fidcn w/out base category
+	fvset base none fidcn
 
 * probit on distance
-bayes: mprobit chosen zipfacdistancecn zipfacdistancecn2
+bayes: mprobit chosen i.fidcn zipfacdistancecn zipfacdistancecn2
 
 
 
 
-* set factor var for fidcn w/out base category
-fvset base none fidcn
+
 
 * add "dryrun" at the end of any command to see the parameter names
 
-bayesmh neonataldeath i.fidcn b_wt_cgr, reffects(fidcn) likelihood(probit) ///
-prior({neonataldeath:b_wt_cgr}, normal(0, 100)) ///
-prior({neonataldeath:i.fidcn}, normal({mu}, {sig2})) ///
-prior({mu}, normal(0,100)) ///
-prior({sig2}, igamma(0.001, 0.001)) ///
-prior({_cons}, normal(0,1000)) 
+	bayesmh neonataldeath i.fidcn b_wt_cgr, reffects(fidcn) likelihood(probit) ///
+	prior({neonataldeath:b_wt_cgr}, normal(0, 100)) ///
+	prior({neonataldeath:i.fidcn}, normal({mu}, {sig2})) ///
+	prior({mu}, normal(0,100)) ///
+	prior({sig2}, igamma(0.001, 0.001)) ///
+	prior({_cons}, normal(0,1000)) 
 
+* Health states to include:
+* i.b_es_ges i.pay 
+* as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+
+	bayesmh neonataldeath b_wt_cgr ///
+	antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa, ///
+	reffects(fidcn) likelihood(probit) ///
+	prior({neonataldeath:b_wt_cgr}, normal(0, 100)) ///
+	prior({neonataldeath:i.fidcn}, normal({mu}, {sig2})) ///
+	prior({mu}, normal(0,100)) ///
+	prior({sig2}, igamma(0.001, 0.001)) ///
+	prior({_cons}, normal(0,1000)) ///
+	prior({neonataldeath:antibiot}, normal(0,100)) ///
+	prior({neonataldeath:seizure}, normal(0,100)) ///
+	prior({neonataldeath:b_injury}, normal(0,100)) ///
+	prior({neonataldeath:bca_aeno}, normal(0,100)) ///
+	prior({neonataldeath:bca_spin}, normal(0,100)) ///
+	prior({neonataldeath:congenhd}, normal(0,100)) ///
+	prior({neonataldeath:bca_hern}, normal(0,100)) ///
+	prior({neonataldeath:congenom}, normal(0,100)) ///
+	prior({neonataldeath:congenga}, normal(0,100)) ///
+	prior({neonataldeath:bca_limb}, normal(0,100)) ///
+	prior({neonataldeath:hypsospa}, normal(0,100)) 
+	
+	* can specify all the priors above as: prior( {neonataldeath:bca_hern}{neonataldeath:antibiot} ... normal(0,100))
+
+	
+* try to look at the graph:
+* bayesgraph diagnostic {neonataldeath:4513000.fidcn}
 
 
 * The equation for the choice...
 gen choice = 0
 replace choice = 1 if fidcn == fid
 
-bayesmh choice i.fidcn, reffects(fidcn) likelihood(probit) ///
+bayesmh choice, reffects(fidcn) likelihood(probit) ///
 prior({choice:i.fidcn}, normal({mu}, {sig2})) ///
 prior({mu}, normal(0,100)) ///
 prior({sig2}, igamma(0.001, 0.001)) ///
 prior({choice:_cons}, normal(0,1000)) 
+
+
+gen choice = 0
+replace choice = 1 if fidcn == fid
+
+bayesmh choice zipfacdistancecn zipfacdistancecn2, reffects(fidcn) likelihood(probit) ///
+prior({choice:i.fidcn}, normal({mu}, {sig2})) ///
+prior({mu}, normal(0,100)) ///
+prior({sig2}, igamma(0.001, 0.001)) ///
+prior({choice:_cons}, normal(0,1000)) ///
+prior({choice:zipfacdistancecn}, normal(0, 5)) ///
+prior({choice:zipfacdistancecn2}, normal(0,5)) 
+
+
+
+* bayesgraph diagnostic {choice:4513000.fidcn}
 
 
 * Combined...
@@ -125,4 +181,29 @@ prior({sig2}, igamma(0.001, 0.001)) ///
 prior({choice:_cons}, normal(0,100)) ///
 prior({neonataldeath:_cons}, normal(0,100)) 
 
-dryrun
+
+* Another combined version with more health states...
+
+bayesmh (neonataldeath i.fidcn b_wt_cgr antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa, likelihood(probit) )  ///
+	(choice i.fidcn zipfacdistancecn zipfacdistancecn2, likelihood(probit) ), ///
+	prior({neonataldeath:b_wt_cgr}, normal(0, 100)) ///
+	prior({neonataldeath:_cons},    normal(0,1000)) ///
+	prior({neonataldeath:antibiot}, normal(0,100)) ///
+	prior({neonataldeath:seizure},  normal(0,100)) ///
+	prior({neonataldeath:b_injury}, normal(0,100)) ///
+	prior({neonataldeath:bca_aeno}, normal(0,100)) ///
+	prior({neonataldeath:bca_spin}, normal(0,100)) ///
+	prior({neonataldeath:congenhd}, normal(0,100)) ///
+	prior({neonataldeath:bca_hern}, normal(0,100)) ///
+	prior({neonataldeath:congenom}, normal(0,100)) ///
+	prior({neonataldeath:congenga}, normal(0,100)) ///
+	prior({neonataldeath:bca_limb}, normal(0,100)) ///
+	prior({neonataldeath:hypsospa}, normal(0,100)) ///
+	prior({neonataldeath:i.fidcn},  normal({mu}, {sig2})) ///
+	prior({choice:i.fidcn},         normal({mu}, {sig2})) ///
+	prior({choice:_cons},           normal(0,1000)) ///
+	prior({choice:zipfacdistancecn},normal(0, 5)) ///
+	prior({choice:zipfacdistancecn2},normal(0,5)) ///
+	prior({mu}, normal(0,100)) ///
+	prior({sig2}, igamma(0.001, 0.001))
+
