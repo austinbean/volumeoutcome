@@ -168,6 +168,7 @@ prior({choice:zipfacdistancecn2}, normal(0,5))
 
 
 * bayesgraph diagnostic {choice:4513000.fidcn}
+* bayesgraph diagnostic {choice:4536253.fidcn}
 
 
 * Combined...
@@ -206,4 +207,45 @@ bayesmh (neonataldeath i.fidcn b_wt_cgr antibiot seizure b_injury bca_aeno bca_s
 	prior({choice:zipfacdistancecn2},normal(0,5)) ///
 	prior({mu}, normal(0,100)) ///
 	prior({sig2}, igamma(0.001, 0.001))
+
+
+	
+	
+	
+* For travis cty:
+
+bayestest interval (prob1: {neonataldeath:4536253.fidcn} - ///
+ max({neonataldeath:4530170.fidcn}, {neonataldeath:4530190.fidcn}, ///
+ {neonataldeath:4530200.fidcn}, {neonataldeath:4536048.fidcn}, ///
+ {neonataldeath:4536337.fidcn}, {neonataldeath:4536338.fidcn}) ), upper(0)
+ 
+* Test all Travis county...
+
+bayestest interval (prob12: {neonataldeath:4536253.fidcn} - {neonataldeath:4530170.fidcn}) ), upper(0)
+bayestest interval (prob13: {neonataldeath:4536253.fidcn} - {neonataldeath:4530190.fidcn}) ), upper(0)
+bayestest interval (prob14: {neonataldeath:4536253.fidcn} - {neonataldeath:4530200.fidcn}) ), upper(0)
+bayestest interval (prob15: {neonataldeath:4536253.fidcn} - {neonataldeath:4536048.fidcn}) ), upper(0)
+bayestest interval (prob16: {neonataldeath:4536253.fidcn} - {neonataldeath:4536337.fidcn}) ), upper(0)
+bayestest interval (prob17: {neonataldeath:4536253.fidcn} - {neonataldeath:4536338.fidcn}) ), upper(0)
+
+bayestest interval (prob23: {neonataldeath:4530170.fidcn} - {neonataldeath:4530190.fidcn}) ), upper(0)
+bayestest interval (prob24: {neonataldeath:4530170.fidcn} - {neonataldeath:4530200.fidcn}) ), upper(0)
+bayestest interval (prob25: {neonataldeath:4530170.fidcn} - {neonataldeath:4536048.fidcn}) ), upper(0)
+bayestest interval (prob26: {neonataldeath:4530170.fidcn} - {neonataldeath:4536337.fidcn}) ), upper(0)
+bayestest interval (prob27: {neonataldeath:4530170.fidcn} - {neonataldeath:4536338.fidcn}) ), upper(0)
+
+bayestest interval (prob34: {neonataldeath:4530190.fidcn} - {neonataldeath:4530200.fidcn}) ), upper(0)
+bayestest interval (prob35: {neonataldeath:4530190.fidcn} - {neonataldeath:4536048.fidcn}) ), upper(0)
+bayestest interval (prob36: {neonataldeath:4530190.fidcn} - {neonataldeath:4536337.fidcn}) ), upper(0)
+bayestest interval (prob37: {neonataldeath:4530190.fidcn} - {neonataldeath:4536338.fidcn}) ), upper(0)
+
+bayestest interval (prob45: {neonataldeath:4530200.fidcn} - {neonataldeath:4536048.fidcn}) ), upper(0)
+bayestest interval (prob46: {neonataldeath:4530200.fidcn} - {neonataldeath:4536048.fidcn}) ), upper(0)
+bayestest interval (prob47: {neonataldeath:4530200.fidcn} - {neonataldeath:4536048.fidcn}) ), upper(0)
+
+bayestest interval (prob56: {neonataldeath:4536048.fidcn} - {neonataldeath:4536337.fidcn}) ), upper(0)
+bayestest interval (prob57: {neonataldeath:4536048.fidcn} - {neonataldeath:4536338.fidcn}) ), upper(0)
+
+bayestest interval (prob67: {neonataldeath:4536337.fidcn} - {neonataldeath:4536338.fidcn}) ), upper(0)
+
 
