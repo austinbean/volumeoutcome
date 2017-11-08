@@ -138,6 +138,38 @@ bayes: mprobit chosen i.fidcn zipfacdistancecn zipfacdistancecn2
 	
 	* can specify all the priors above as: prior( {neonataldeath:bca_hern}{neonataldeath:antibiot} ... normal(0,100))
 
+* Some tests w/ Travis County... 
+
+	bayestest interval (prob12: {neonataldeath:4536253.fidcn} - {neonataldeath:4530170.fidcn}) ), upper(0)
+	bayestest interval (prob13: {neonataldeath:4536253.fidcn} - {neonataldeath:4530190.fidcn}) ), upper(0)
+	bayestest interval (prob14: {neonataldeath:4536253.fidcn} - {neonataldeath:4530200.fidcn}) ), upper(0)
+	bayestest interval (prob15: {neonataldeath:4536253.fidcn} - {neonataldeath:4536048.fidcn}) ), upper(0)
+	bayestest interval (prob16: {neonataldeath:4536253.fidcn} - {neonataldeath:4536337.fidcn}) ), upper(0)
+	bayestest interval (prob17: {neonataldeath:4536253.fidcn} - {neonataldeath:4536338.fidcn}) ), upper(0)
+	
+	bayestest interval (prob23: {neonataldeath:4530170.fidcn} - {neonataldeath:4530190.fidcn}) ), upper(0)
+	bayestest interval (prob24: {neonataldeath:4530170.fidcn} - {neonataldeath:4530200.fidcn}) ), upper(0)
+	bayestest interval (prob25: {neonataldeath:4530170.fidcn} - {neonataldeath:4536048.fidcn}) ), upper(0)
+	bayestest interval (prob26: {neonataldeath:4530170.fidcn} - {neonataldeath:4536337.fidcn}) ), upper(0)
+	bayestest interval (prob27: {neonataldeath:4530170.fidcn} - {neonataldeath:4536338.fidcn}) ), upper(0)
+	
+	bayestest interval (prob34: {neonataldeath:4530190.fidcn} - {neonataldeath:4530200.fidcn}) ), upper(0)
+	bayestest interval (prob35: {neonataldeath:4530190.fidcn} - {neonataldeath:4536048.fidcn}) ), upper(0)
+	bayestest interval (prob36: {neonataldeath:4530190.fidcn} - {neonataldeath:4536337.fidcn}) ), upper(0)
+	bayestest interval (prob37: {neonataldeath:4530190.fidcn} - {neonataldeath:4536338.fidcn}) ), upper(0)
+	
+	bayestest interval (prob45: {neonataldeath:4530200.fidcn} - {neonataldeath:4536048.fidcn}) ), upper(0)
+	bayestest interval (prob46: {neonataldeath:4530200.fidcn} - {neonataldeath:4536048.fidcn}) ), upper(0)
+	bayestest interval (prob47: {neonataldeath:4530200.fidcn} - {neonataldeath:4536048.fidcn}) ), upper(0)
+	
+	bayestest interval (prob56: {neonataldeath:4536048.fidcn} - {neonataldeath:4536337.fidcn}) ), upper(0)
+	bayestest interval (prob57: {neonataldeath:4536048.fidcn} - {neonataldeath:4536338.fidcn}) ), upper(0)
+	
+	bayestest interval (prob67: {neonataldeath:4536337.fidcn} - {neonataldeath:4536338.fidcn}) ), upper(0)
+
+	
+	
+	
 	
 * try to look at the graph:
 * bayesgraph diagnostic {neonataldeath:4513000.fidcn}
