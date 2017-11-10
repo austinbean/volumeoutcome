@@ -319,7 +319,7 @@ Run some regular and IV probits with the goal of creating a table with the coeff
 	
 
 
-* Run the probits with the volume IV - prev_month:
+* Run the probits with 12 prev_months:
 	foreach nm of numlist 1(1)12{
 		label variable prev_`nm'_month "Lag `nm' Months NICU Admits"
 	}
