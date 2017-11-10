@@ -3,6 +3,8 @@
 
 Not as bad as I thought. 
 TODO - transformation of delta1 in Benkard style nlls. 
+
+TODO - this works with eststo, estadd and esttab.  Add these for a few models.  
 */
 
 
