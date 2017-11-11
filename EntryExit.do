@@ -167,6 +167,37 @@ What's expected mortality among that group given that volume?
 	replace mrtrt2 = 0.0053 if nicu_year > 1760 & nicu_year <= 1840 
 	replace mrtrt2 = 0.0051 if nicu_year > 1840	
 	
+	
+* Different experiment: savings if all transferred to hosp with max volume
+* but don't let that hospital see improvement from treating patients.
+	gen mrtrt3 = 0
+	replace mrtrt3 = 0.0151 if                max_i <= 80
+	replace mrtrt3 = 0.0145 if max_i > 80   & max_i <= 160
+	replace mrtrt3 = 0.0138 if max_i > 160  & max_i <= 240
+	replace mrtrt3 = 0.0132 if max_i > 240  & max_i <= 320
+	replace mrtrt3 = 0.0126 if max_i > 320  & max_i <= 400 
+	replace mrtrt3 = 0.0121 if max_i > 400  & max_i <= 480
+	replace mrtrt3 = 0.0115 if max_i > 480  & max_i <= 560 
+	replace mrtrt3 = 0.0110 if max_i > 560  & max_i <= 640 
+	replace mrtrt3 = 0.0105 if max_i > 640  & max_i <= 720
+	replace mrtrt3 = 0.0100 if max_i > 720  & max_i <= 800 
+	replace mrtrt3 = 0.0096 if max_i > 800  & max_i <= 880 
+	replace mrtrt3 = 0.0091 if max_i > 880  & max_i <= 960 
+	replace mrtrt3 = 0.0087 if max_i > 960  & max_i <= 1040 
+	replace mrtrt3 = 0.0083 if max_i > 1040 & max_i <= 1120 
+	replace mrtrt3 = 0.0079 if max_i > 1120 & max_i <= 1200 
+	replace mrtrt3 = 0.0075 if max_i > 1200 & max_i <= 1280 
+	replace mrtrt3 = 0.0072 if max_i > 1280 & max_i <= 1360 
+	replace mrtrt3 = 0.0068 if max_i > 1360 & max_i <= 1440
+	replace mrtrt3 = 0.0065 if max_i > 1440 & max_i <= 1520 
+	replace mrtrt3 = 0.0062 if max_i > 1520 & max_i <= 1600
+	replace mrtrt3 = 0.0059 if max_i > 1600 & max_i <= 1680 
+	replace mrtrt3 = 0.0056 if max_i > 1680 & max_i <= 1760 
+	replace mrtrt3 = 0.0053 if max_i > 1760 & max_i <= 1840 
+	replace mrtrt3 = 0.0051 if max_i > 1840		
+	
+	
+	
 * hospital specific mortality...
 	gen hs_mrt = nicu_year*mrtrt2
 	label variable hs_mrt "mortality rate at hospital specific volume"
@@ -178,59 +209,114 @@ What's expected mortality among that group given that volume?
 
 * Compare to realized county mortality.	
 	gen rl_lives = county_mort - exp_mrt
+	*replace rl_lives = round(rl_lives)
 	label variable rl_lives "real. mort. nicu admits - pred. w/ consolidation"
+	
+* Suppose highest-vol does not see improvement in mort rate, then should be mrtrt3
+	gen no_vol_mort = mrtrt3*mft
+	label variable no_vol_mort "all n. pats to one, but no vol-outcome effects"
+
 	
 	
 * Lives saved at the county level...
 	gen lives = cnty_mort - exp_mrt
+	*replace lives = round(lives)
 	label variable lives "mort w/out consolidation - mort w/ consolidation"
+
+* Lives saved w/ out volume effect
+	gen lives_novol = cnty_mort - no_vol_mort
+	label variable lives_novol "mortality w/ consolidation & NO vol effects"
+	
 	
 * Look at counties individually:
 
-	keep b_bcntyc countycount year cnty_mort exp_mrt lives rl_lives county_mort
+	keep b_bcntyc countycount year cnty_mort exp_mrt lives rl_lives county_mort no_vol_mort lives_novol
 	duplicates drop b_bcntyc year, force
-	drop if countycount == 1
+	*drop if countycount == 1
 	
-* Large counties...  All counties in the state with populations over 250,000
-/*
-Harris      - 101
-Dallas      - 57
-Tarrant     - 220
-Bexar       - 15
-Travis      - 227
-El Paso     - 71
-Collin      - 43
-Hidalgo     - 108
-Denton      - 61
-Fort Bend   - 79
-Montgomery  - 170
-Williamson  - 246
-Cameron     - 31
-Nueces      - 178
-Brazoria    - 20 
-Bell        - 14
-Galveston   - 84
-Lubbock     - 152
-Jefferson   - 123
-Webb        - 240
-
-*/
+	* Large counties...  All counties in the state with populations over 250,000
+	/*
+	Harris      - 101
+	Dallas      - 57
+	Tarrant     - 220
+	Bexar       - 15
+	Travis      - 227
+	El Paso     - 71
+	Collin      - 43
+	Hidalgo     - 108
+	Denton      - 61
+	Fort Bend   - 79
+	Montgomery  - 170
+	Williamson  - 246
+	Cameron     - 31
+	Nueces      - 178
+	Brazoria    - 20 
+	Bell        - 14
+	Galveston   - 84
+	Lubbock     - 152
+	Jefferson   - 123
+	Webb        - 240
 	
+	*/
+		
 	gen LARGE = 0 
 	replace LARGE = 1 if b_bcntyc == 101 | b_bcntyc == 57 | b_bcntyc == 220 | b_bcntyc == 15 | b_bcntyc == 227 | b_bcntyc == 71 | b_bcntyc == 43 | ///
 	b_bcntyc == 108 | b_bcntyc == 61 | b_bcntyc == 79 | b_bcntyc == 170 | b_bcntyc == 246 | b_bcntyc == 31 | b_bcntyc == 178 | b_bcntyc ==  20 | ///
 	b_bcntyc == 14 | b_bcntyc == 84 | b_bcntyc == 152 | b_bcntyc == 123 | b_bcntyc == 240 
 	keep if LARGE == 1
 	bysort LARGE year: egen lss = sum(lives)
-	eststo summarize lss
+	bysort LARGE year: egen rlss = sum(rl_lives)
+	bysort LARGE year: egen nvlss = sum(lives_novol)
+	*eststo tabl1: summarize lss
 	
 	
 * County-level SD in lives saved.  
 	bysort b_bcntyc: egen l_sd = sd(lives)
 	bysort b_bcntyc: egen rl_sd = sd(rl_lives)
+	bysort b_bcntyc: egen m_ls = mean(lives)
+	bysort b_bcntyc: egen m_rl = mean(rl_lives)
+	replace m_ls = round(m_ls)
+	replace m_rl = round(m_rl)
+
+* Add observations for the whole state.  
+	count
+	local nobs = `r(_N)' + 8
+	* Above line does not work, just use number
+	set obs 168
+	replace b_bcntyc = 999 if b_bcntyc == .
+	bysort b_bcntyc: replace year = 2004 + _n if year == .
+	label define cnty_l 999 "Texas", add
+	
+	bysort year (b_bcntyc): replace lss = lss[_n-1] if lss == .
+	bysort year (b_bcntyc): replace rlss = rlss[_n-1] if rlss == .
+	bysort year (b_bcntyc): replace nvlss = nvlss[_n-1] if nvlss == .
+	
+	bysort b_bcntyc year: replace lives = lss if lives == .
+	bysort b_bcntyc year: replace rl_lives = rlss if rl_lives == .
+	bysort b_bcntyc year: replace lives_novol = nvlss if lives_novol == .
+	
+	
+* Can replace all the rest of the variables if necessary too...
+	bysort b_bcntyc: egen ststd = sd(lss)
+
+* Generate some plots of mean effect by county and for the whole state:	
+	preserve
+	collapse (mean) lives lives_novol, by(b_bcntyc)
+	
+	* Plotting mean lives saved with and without volume effects
+	graph bar lives lives_novol, over(b_bcntyc, label(angle(45))) graphregion(color(white))  ytitle("Lives Saved Annually") title("Benefits of Facility Consolidation") note("Counties w/ Population > 250,000") legend( label(1 "Vol. Effects") label(2 "No Vol. Effects"))
+	
+	* Just plotting with volume effects
+	graph bar lives, over(b_bcntyc, label(angle(45))) graphregion(color(white))  ytitle("Lives Saved Annually") title("Benefits of Facility Consolidation") note("Counties w/ Population > 250,000")
 	
 	
 
+  
+	
+	
+	
+	
+	
 /*
 
 
