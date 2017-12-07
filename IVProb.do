@@ -141,7 +141,8 @@ ivprobit neonataldeath  (lag_1_months = exp_share )  i.b_es_ges i.pay bca_aeno-h
 	* Without the IV
 	eststo: probit neonataldeath nicu_year i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
 	est store prob_marg_no_iv_year
-	margins, at((mean) _all  nicu_year = (0(100)2000) ) post saving("/Users/austinbean/Desktop/noivprb_marg_year.dta", replace) 
+	margins, at((mean) _all  nicu_year = (0(100)2000) ) post saving("/Users/austinbean/Desktop/noivprb_marg_year.dta", replace) nose
+
 	est sto pmarg_noiv_year
 	estimates save "/Users/austinbean/Desktop/Birth2005-2012/prob_marg_no_iv_year.ster", replace
 	marginsplot, recastci(rarea) ciopts(color(gray*0.6))  recast(line) plot1opts(lcolor(black)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Year NICU Admits") title("Effect of Volume on Mortality Probability") saving("/Users/austinbean/Desktop/Birth2005-2012/volprob_noiv_year.gph", replace)
@@ -168,6 +169,12 @@ ivprobit neonataldeath  (lag_1_months = exp_share )  i.b_es_ges i.pay bca_aeno-h
 
 
 
+* margin at gestational age:
+	probit neonataldeath nicu_year i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa   
+	margins, at((mean) _all  b_es_ges = (23(1)41) ) post  nose
+	marginsplot, recastci(rarea) ciopts(color(gray*0.6))  recast(line) plot1opts(lcolor(black)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Gestational Age (Weeks)") title("Effect of Incr. Gest. Age on Mortality Probability") 
+	
+	*saving("/Users/austinbean/Desktop/Birth2005-2012/volprob_noiv_year.gph", replace)
 
 
 
@@ -351,11 +358,31 @@ coefplot prob_margins_no_iv prob_margins_w_iv,  recast(line) vertical title("Eff
 		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Year NICU Admits") title("Effect of Volume on Mortality Probability") 
 		est sto prb_pq_fs
 		
-		* Monthly
+		* 12 Months full (insurance and health states)
 		probit neonataldeath  prev_*_month i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa i.fid
 		est sto prb_mn_fs_fe
-		margins, at((mean) _all prev_1_month = (0(10)200)) nose predict(pr)
-		marginsplot, recastci(rarea) ciopts(color(*0.6)) recast(line) plot1opts(lcolor(red)) graphregion(color(white)) xlabel(#10) ytitle("Mortality Probability") xtitle("Prior Month NICU Admits") title("Effect of Volume on Mortality Probability") 
+		estadd local Time "Month"
+		estadd local Health "Yes"
+		estadd local Ins. "Yes"
+		estadd local IV "No"
+		* 12 Months, no health states
+		probit neonataldeath  prev_*_month i.b_es_ges i.pay i.fid
+		est sto prb_mn_i_fe
+		estadd local Time "Month"
+		estadd local Health "No"
+		estadd local Ins. "Yes"
+		estadd local IV "No"
+		* 12 months, no insurance status		
+		probit neonataldeath  prev_*_month i.b_es_ges as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa i.fid
+		est sto prb_mn_ihs_fe
+		estadd local Time "Month"
+		estadd local Health "Yes"
+		estadd local Ins. "No"
+		estadd local IV "No"
+		 
+	  
+	  
+	  
 	  
 		* Combine Estimates
 		suest prb_mn_fs_fe prb_py_fs_fe prb_pq_fs_fe 

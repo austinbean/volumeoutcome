@@ -136,7 +136,7 @@ Run some regular and IV probits with the goal of creating a table with the coeff
 * long table
 	esttab noiv_vyg iv_vyg iv_vygp iv_vygpw iv_vygpwh , drop(*year *b_es_ges) label mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Insurance VLBW HealthStates ExogeneityPval N, fmt(%9.3f %9.0g)) style(tex) cells(b se) legend eqlabels(none) collabels(none)
 
-	esttab noiv_vyg iv_vyg iv_vygp iv_vygpw iv_vygpwh using "/Users/austinbean/Desktop/Birth2005-2012/ivslongtable.tex", drop(*year *b_es_ges) longtable replace label mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Insurance VLBW HealthStates ExogeneityPval N, fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
+	esttab noiv_vyg iv_vyg iv_vygp iv_vygpw iv_vygpwh using "/Users/austinbean/Desktop/Birth2005-2012/ivslongtable.tex", drop(*year *b_es_ges)  replace label mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Insurance VLBW HealthStates ExogeneityPval N, fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
 	
 
 	
@@ -562,9 +562,46 @@ Run some regular and IV probits with the goal of creating a table with the coeff
   esttab iv_mfph iv_mfp iv_mfh, label keep(prev_1_month) stats(IV Insurance FEs Time HealthStates N, labels("IV" "Ins." "FEs" "Time" "Health States" "N") fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
   esttab iv_mfph iv_mfp iv_mfh using "/Users/austinbean/Desktop/Birth2005-2012/ivfemonthshorttable.tex", replace label keep(prev_1_month) stats(IV Insurance FEs Time HealthStates N, labels("IV" "Ins." "FEs" "Time" "Health States" "N") fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
 
+  
+  
+	  label variable prev_1_month "1 Mnth"
+	  label variable prev_2_month "2 Mnth"
+	  label variable prev_3_month "3 Mnth"
+	  label variable prev_4_month "4 Mnth"
+	  label variable prev_5_month "5 Mnth"
+	  label variable prev_6_month "6 Mnth"
+	  label variable prev_7_month "7 Mnth"
+	  label variable prev_8_month "8 Mnth"
+	  label variable prev_9_month "9 Mnth"
+	  label variable prev_10_month "10 Mnth"
+	  label variable prev_11_month "11 Mnth"
+	  label variable prev_12_month "12 Mnth"
 	
-	
-	
+		* 12 Months full (insurance and health states)
+		probit neonataldeath  prev_*_month i.b_es_ges i.pay as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa i.fid
+		est sto prb_mn_fs_fe
+		estadd local Time "Month"
+		estadd local Health "Yes"
+		estadd local Ins "Yes"
+		estadd local IV "No"
+		* 12 Months, no health states
+		probit neonataldeath  prev_*_month i.b_es_ges i.pay i.fid
+		est sto prb_mn_i_fe
+		estadd local Time "Month"
+		estadd local Health "No"
+		estadd local Ins "Yes"
+		estadd local IV "No"
+		* 12 months, no insurance status		
+		probit neonataldeath  prev_*_month i.b_es_ges as_vent rep_ther antibiot seizure b_injury bca_aeno bca_spin congenhd bca_hern congenom congenga bca_limb hypsospa i.fid
+		est sto prb_mn_ihs_fe
+		estadd local Time "Month"
+		estadd local Health "Yes"
+		estadd local Ins "No"
+		estadd local IV "No"
+		 
+		esttab prb_mn_fs_fe prb_mn_i_fe prb_mn_ihs_fe, keep(prev_*_month) label stats(IV Ins Health Time N, labels("IV" "Ins." "Health States" "Time" "N"))  style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
+	    esttab prb_mn_fs_fe prb_mn_i_fe prb_mn_ihs_fe using "/Users/austinbean/Desktop/Birth2005-2012/prob12monthfe.tex", replace keep(prev_*_month) label stats(IV Ins Health Time N, labels("IV" "Ins." "Health States" "Time" "N"))  style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
+
 	
 	
 	
