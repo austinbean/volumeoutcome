@@ -3,7 +3,8 @@
 - This file will take the outputs of Fac-level Counts.do and turn them into a panel
 - There should be one hospital observation per year for 2005 - 2012
 - Variables include: admits and deaths across LBW, VLBW, admitted, everyone, including and excluding transfers
-- 
+- Also merge in the instrument.  
+- Should add a variable tracking when entry occurred.  
 */
 
 
@@ -60,6 +61,15 @@
 	
 	merge 1:1 fid year using "/Users/austinbean/Desktop/BirthData2005-2012/AllBirths2005-2012.dta"
 	drop if _merge != 3
+	drop _merge
 	
+	
+	* Add the volume instrument:
+	* TODO - some of these merge a partial set of years.  FIX.  
+	rename year ncdobyear
+	merge m:1 ncdobyear fid using "${birthdata}allyearnicufidshares.dta"
+	drop if _merge != 3
+	drop _merge
+
 
 	
