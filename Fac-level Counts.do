@@ -398,7 +398,7 @@ Per hospital/month observation
 			label variable lbw_year_na "LBW nicu admits, inc trans"
 			* LBW NICU Admits, Ex. Trans.
 			bysort facname: egen lbw_year_na_ex = sum(lbw_month_adm_ex)
-			label variable lbw_year_adm_ex "LBW NICU Admits, ex trans"
+			label variable lbw_year_na_ex "LBW NICU Admits, ex trans"
 			
 		* VLBW	
 		    * Total VLBW, nonadmits and Transfers Incl.
@@ -414,7 +414,7 @@ Per hospital/month observation
 			label variable vlbw_year_na "VLBW nicu admits, inc trans"
 			* VLBW NICU Admits, Ex. Trans.
 			bysort facname: egen vlbw_year_na_ex = sum(vlbw_month_adm_ex)
-			label variable vlbw_year_adm_ex "VLBW NICU Admits, ex trans"
+			label variable vlbw_year_na_ex "VLBW NICU Admits, ex trans"
 			
 		* Mortality
 			* Total deaths, admits and nonadmits, inc transfers
@@ -451,11 +451,12 @@ Per hospital/month observation
 				* LBW year mortality, admits, ex trans
 				bysort facname: egen d_lbw_year_na_ex = sum(lbw_mort_na_ex)
 				label variable d_lbw_year_na_ex "lbw mort, admits, ex trans"
-				
+		/*
+		* Year Vars listed
 		nicu_year nicu_year_ex lbw_year lbw_year_ex lbw_year_na lbw_year_na_ex vlbw_year vlbw_year_ex vlbw_year_na vlbw_year_na_ex
 		d_year_all deaths_year d_vlbw_year_total d_vlbw_year_total_ex d_vlbw_year_na_total d_vlbw_year_na_ex
 		d_lbw_year_total d_lbw_year_total_ex d_lbw_year_na_total d_lbw_year_na_ex
-		
+		*/
 
 * Count of  LBW, VLBW, deaths by quarter
 * Note that quarter total nicu admits are "prev_q"
