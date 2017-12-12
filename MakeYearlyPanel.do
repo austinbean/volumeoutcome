@@ -1,4 +1,15 @@
 * Make yearly panel.
+/*
+- This file will take the outputs of Fac-level Counts.do and turn them into a panel
+- There should be one hospital observation per year for 2005 - 2012
+- Variables include: admits and deaths across LBW, VLBW, admitted, everyone, including and excluding transfers
+- 
+*/
+
+
+* Setup global variables
+	do "/Users/austinbean/Desktop/Birth2005-2012/FilePathGlobal.do"
+	capture quietly do "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/TX Global Filepath Names.do"
 
 
 * Get the Level Information and Delivery Information
@@ -32,9 +43,11 @@
 	
 	drop ncdobmonth
 
+	* Keep only yearly variables - drop monthly.
+	drop vlbw_mort_na vlbw_mort_na_ex
+	
 	keep facname fid year  b_bcntyc  ///
 	yearly_admit_deaths  ///
-	vlbw_mort_na_ex vlbw_mort_na lbw_mort_na_ex lbw_mort_na ///
 	nicu_year nicu_year_ex lbw_year lbw_year_ex lbw_year_na lbw_year_na_ex vlbw_year vlbw_year_ex vlbw_year_na vlbw_year_na_ex ///
 	d_year_all deaths_year d_vlbw_year_total d_vlbw_year_total_ex d_vlbw_year_na_total d_vlbw_year_na_ex ///
 	d_lbw_year_total d_lbw_year_total_ex d_lbw_year_na_total d_lbw_year_na_ex
@@ -47,3 +60,6 @@
 	
 	merge 1:1 fid year using "/Users/austinbean/Desktop/BirthData2005-2012/AllBirths2005-2012.dta"
 	drop if _merge != 3
+	
+
+	
