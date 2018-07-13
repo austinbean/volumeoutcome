@@ -16,7 +16,7 @@ gen year = `nm'
 
 * Add FIDS to patient records:
 * Merge now on names using hosps.csv, which were matched to FIDS by hand.  
-
+	* The file LevelInfo produced in AddFids.do using Import 1990 - 2012.do
 merge m:1 fid year using "${birthdata}LevelInfo.dta", gen(facinfo)
 drop if facinfo == 2
 label variable facinfo "No facility information available"
@@ -221,8 +221,17 @@ label variable lag_6_vlbw " VLBW lag 6 Months"
 
 
 * Add prior year measures:
+	* NICU Admits - this may not be doing the right thing.
+	* Where is nicu_year from? From Fac-level Counts.do
 	bysort facname (year ncdobmonth): gen nicu_prior_year = nicu_year[_n-12]
 	label variable nicu_prior_year "total nicu admits prior year"
+	* Deaths
+	* All
+	bysort facname (year ncdobmonth): gen deaths_prior_year = d_year_all[_n-12]
+	label variable deaths_prior_year "total deaths pr. yr inc non-nicu"
+	* NICU (deaths among NICU admits)
+	bysort facname (year ncdobmonth): gen deaths_nicu_prior_year = deaths_year[_n-12]
+	label variable deaths_nicu_prior_year "deaths amg. nicu admits prior year"
 	
 	
 
@@ -473,13 +482,13 @@ replace zipfacdistancecn`i' = . if chosenind == `i'
 }
 */
 
-
 * Add hospital-specific mortality: Total Deliveries > 20 weeks from hospital survey, total mortality from this data.
 	* should do all mortality, lbw mortality, vlbw mortality and mortality among NICU admits
 	* Do this for PRIOR year too.
-	gen all_mort_rate = (/TotalDeliveries)*1000
+	gen all_mort_rate = (deaths_prior_year/birth_previous)*1000 if birth_previous > 10
 	label variable all_mort_rate "All-patient mortality rate per 1000"
-	gen nicu_mort_rate = (nicu_prior_year/)*1000
+	gen nicu_mort_rate = (deaths_nicu_prior_year/nicu_prior_year)*1000 if nicu_prior_year > 10
+	label variable nicu_mort_rate "Mort rate amng NICU admits per 1000"
 
 
 
