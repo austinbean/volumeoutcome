@@ -135,8 +135,8 @@ Run some regular and IV probits with the goal of creating a table with the coeff
 	
 * long table
 	esttab noiv_vyg iv_vyg iv_vygp iv_vygpw iv_vygpwh , drop(*year *b_es_ges) label mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Insurance VLBW HealthStates ExogeneityPval N, fmt(%9.3f %9.0g)) style(tex) cells(b se) legend eqlabels(none) collabels(none)
-
-	esttab noiv_vyg iv_vyg iv_vygp iv_vygpw iv_vygpwh using "/Users/austinbean/Desktop/Birth2005-2012/ivslongtable.tex", drop(*year *b_es_ges)  replace label mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Insurance VLBW HealthStates ExogeneityPval N, fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
+	* careful - added longtable 
+	esttab noiv_vyg iv_vyg iv_vygp iv_vygpw iv_vygpwh using "/Users/austinbean/Desktop/Birth2005-2012/ivslongtable.tex", longtable drop(*year *b_es_ges)  replace label mtitle("No IV" "Vol. IV" "Vol. IV" "Vol. IV" "Vol. IV") stats(IV Insurance VLBW HealthStates ExogeneityPval N, fmt(%9.3f %9.0g)) style(tex) cells(b(star fmt(4)) se(fmt(4))) legend eqlabels(none) collabels(none)
 	
 
 	
