@@ -35,6 +35,10 @@ quietly do "/Users/austinbean/Google Drive/Annual Surveys of Hospitals/Import 19
 
 keep fid year NeoIntensive SoloIntermediate NeoIntensiveCapacity NeoIntermediateCapacity TotalDeliveries TransfersOut_NO_NICU-TransfersOut_HAS_NICU TransfersInternally_HAS_NICU nfpstatus TotalBeds ObstetricsLevel ObstetricBeds ObstetricCare
 
+sort fid year
+bysort fid (year): gen birth_previous = TotalDeliveries[_n-1]
+label variable birth_previous "Total Deliveries Prior Year"
+
 save "${birthdata}LevelInfo.dta", replace
 
 
