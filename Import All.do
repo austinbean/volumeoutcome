@@ -484,10 +484,13 @@ replace zipfacdistancecn`i' = . if chosenind == `i'
 
 * Add hospital-specific mortality: Total Deliveries > 20 weeks from hospital survey, total mortality from this data.
 	* should do all mortality, lbw mortality, vlbw mortality and mortality among NICU admits
-	* Do this for PRIOR year too.
+	* Mortality among all births. 
 	gen all_mort_rate = (deaths_prior_year/birth_previous)*1000 if birth_previous > 10
+	replace all_mort_rate = 0 if deaths_prior_year == 0 | birth_previous == 0
 	label variable all_mort_rate "All-patient mortality rate per 1000"
+	* Among nicu admits only
 	gen nicu_mort_rate = (deaths_nicu_prior_year/nicu_prior_year)*1000 if nicu_prior_year > 10
+	replace nicu_mort_rate = 0 if deaths_nicu_prior_year == 0 | nicu_prior_year == 0
 	label variable nicu_mort_rate "Mort rate amng NICU admits per 1000"
 
 
