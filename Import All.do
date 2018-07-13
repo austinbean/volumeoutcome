@@ -223,6 +223,8 @@ label variable lag_6_vlbw " VLBW lag 6 Months"
 * Add prior year measures:
 	bysort facname (year ncdobmonth): gen nicu_prior_year = nicu_year[_n-12]
 	label variable nicu_prior_year "total nicu admits prior year"
+	
+	
 
 
 rename year ncdobyear
@@ -470,6 +472,14 @@ replace zipfacdistancecn`i' = . if chosenind == `i'
 
 }
 */
+
+
+* Add hospital-specific mortality: Total Deliveries > 20 weeks from hospital survey, total mortality from this data.
+	* should do all mortality, lbw mortality, vlbw mortality and mortality among NICU admits
+	* Do this for PRIOR year too.
+	gen all_mort_rate = (/TotalDeliveries)*1000
+	label variable all_mort_rate "All-patient mortality rate per 1000"
+	gen nicu_mort_rate = (nicu_prior_year/)*1000
 
 
 
